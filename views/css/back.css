@@ -1,0 +1,535 @@
+/**
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * @author    UPELA
+ * @copyright 2017-2018 MPG Upela
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+@font-face {
+    font-family: 'UpelaRaleway';
+    src: url(../fonts/raleway-black.ttf);
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'UpelaRaleway';
+    src: url(../fonts/raleway-bold.ttf);
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'UpelaRaleway';
+    src: url(../fonts/raleway-light.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
+#upela_mnu a {
+    text-decoration: none;
+    color: #FF6600;
+}
+
+#upela_mnu a:hover, a:focus, a:active, a:visited, a:hover {
+    text-decoration: none;
+    color: #FF6600;;
+}
+
+#upela_content {
+    font-family: UpelaRaleway, sans-serif;
+    font-size: 16px;
+}
+
+#upela_content .panel_grey {
+    background-color: #EAEAEA;
+}
+
+#upela_content h2, p {
+    color: #323236;
+    font-family: UpelaRaleway, sans-serif;
+}
+
+#upela_content h3 {
+    height: 3em;
+    font-family: UpelaRaleway, sans-serif;
+}
+
+#upela_content h4 {
+    font-size: 18px;
+    font-family: UpelaRaleway, sans-serif;
+}
+
+#upela_content p {
+    font-size: 16px;
+    font-family: UpelaRaleway, sans-serif;
+}
+
+#upela_content a:hover, a:focus, a:active, a:visited, a:hover {
+    text-decoration: none;
+}
+
+/*#upela_content a:hover, a:focus, a:active, a:visited
+{
+    text-decoration: none;
+    color: #FFFFFF;
+    background: #FF6600;
+}*/
+
+.upela_home_form_bg {
+    background: transparent;
+    color: #FFFFFF;
+    background: url("../img/banner2.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    width: 100%;
+    height: -webkit-calc(55vh - 240px);
+    height: -moz-calc(55vh - 240px);
+    min-height: 300px;
+}
+
+@media (max-width: 991px) {
+    /* line 2, ../sass/src/modules/_home.scss */
+    .upela_home_form_bg {
+        height: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    /* line 2, ../sass/src/modules/_home.scss */
+    .upela_home_form_bg {
+        background: transparent;
+        background: transparent;
+        color: #323232;
+        min-height: 0;
+    }
+}
+
+/* line 16, ../sass/src/modules/_home.scss */
+.upela_home_caption {
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    min-height: 1px;
+    padding-left: 0;
+    padding-right: 0;
+
+}
+
+@media (min-width: 768px) {
+    /* line 16, ../sass/src/modules/_home.scss */
+    .upela_home_caption {
+        width: 50%;
+    }
+
+}
+
+/* line 21, ../sass/src/modules/_home.scss */
+.upela_home_caption h1 {
+    color: #FF6600;
+    font-family: UpelaRaleway, sans-serif;
+    font-weight: bold;
+}
+
+@media (max-width: 767px) {
+    /* line 16, ../sass/src/modules/_home.scss */
+    .upela_home_caption {
+        text-align: center;
+    }
+}
+
+#upela_content .part__button {
+    -webkit-border-radius: 2px;
+    -khtml-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    border: 2px solid #FF6600;
+    background: #FF6600;
+    color: #FFF0E5;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 15px;
+    max-width: 340px;
+    display: inline-block;
+    text-decoration: none;
+
+    box-shadow: 2px 4px 5px rgba(80, 80, 100, 0.4);
+    -webkit-box-shadow: 2px 4px 5px rgba(80, 80, 100, 0.4);
+    -moz-box-shadow: 2px 4px 5px rgba(80, 80, 100, 0.4);
+
+    transition: all .1s ease-out;
+}
+
+#upela_content .part__button:hover, .part__button:focus {
+    background: #e65c00;
+    border: 2px solid #e65c00;
+    box-shadow: 0 8px 18px rgba(30, 30, 30, .6);
+    transition: all .3s ease-in;
+    color: #FFF0E5;
+    outline: 0;
+}
+
+#upela_content .part__button:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 2px rgba(30, 30, 30, .9);
+    transition: all 50ms ease-in;
+    color: #ffc299;
+    border: 2px solid #e65c00;
+}
+
+/* line 108, ../sass/src/modules/_section.scss */
+#upela_content .button--white {
+    background: #FFFFFF;
+    color: #FF6600;
+    border: 2px solid #FF6600;
+}
+
+/* line 111, ../sass/src/modules/_section.scss */
+#upela_content .button--white:hover, .button--white:focus, .button--white:active, .button--white:visited {
+    background: #FFFFFF;
+    color: #FF6600;
+}
+
+#upela_content .section__title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+/* line 18, ../sass/src/modules/_section.scss */
+#upela_content .section__title.title--no-margin {
+    margin-bottom: 15px;
+}
+
+#upela_mnu ul > li > a > img {
+    margin-right: 5px;
+}
+
+#upela_content .bg {
+    text-align: center;
+    background: rgba(255, 102, 0, .9);
+    padding: 15px;
+    font-size: 21px;
+    width: 100%;
+    border-radius: 0 0 5px 5px;
+    color: #FFF0E5;
+    font-weight: bold;
+}
+
+#upela_content .section {
+    margin-bottom: 60px;
+}
+
+/* line 5, ../sass/src/modules/_section.scss */
+#upela_content .section.section--bg {
+    background: #EAEAEA;
+    color: #323232;
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+/* line 9, ../sass/src/modules/_section.scss */
+#upela_content .section:last-child {
+    margin-bottom: 120px;
+}
+
+#upela_content .section__part {
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: 60px;
+}
+
+/* line 14, ../sass/bootstrap/mixins/_clearfix.scss */
+#upela_content .section__part:before, .section__part:after {
+    content: " ";
+    display: table;
+}
+
+/* line 19, ../sass/bootstrap/mixins/_clearfix.scss */
+#upela_content .section__part:after {
+    clear: both;
+}
+
+/* line 27, ../sass/src/modules/_section.scss */
+#upela_content .section__part:last-child {
+    margin-bottom: 0;
+}
+
+#upela_content .section__title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+#upela_content .section__title.title--no-margin {
+    margin-bottom: 15px;
+}
+
+#upela_content .part__img {
+    position: relative;
+    float: left;
+    width: 100%;
+    min-height: 1px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#upela_content .part__icon {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+}
+
+#upela_content .upela_logo_img {
+    max-height: 50px;
+    margin-right: 2%;
+    margin-bottom: 20px;
+}
+
+.section3Img {
+    position: relative;
+    height: 90px;
+    overflow: hidden;
+}
+
+.section4Img {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+}
+
+.align-img-center {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+}
+
+.align-img-center img {
+    left: -50%;
+    position: relative;
+}
+
+#upela_content .dhl {
+    max-height: 30px !important;
+}
+
+#upela_content .part__content {
+    margin-top: 15px;
+    color: #666;
+}
+
+#upela_content .part__list {
+    margin-top: 15px;
+    color: #969696;
+}
+
+#upela_content ul {
+    list-style: none;
+}
+
+#upela_content .part__list li {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 5px;
+}
+
+/* line 134, ../sass/src/modules/_section.scss */
+#upela_content .part__list li .button__icon {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    bottom: auto;
+    right: auto;
+}
+
+/* line 140, ../sass/src/modules/_section.scss */
+#upela_content .button__icon {
+    height: 12px;
+    top: 8px;
+    position: relative;
+}
+
+#upela_content .title-font, h2, .part__title {
+    font-size: 2.8rem;
+    font-weight: normal;
+}
+
+@media (max-width: 767px) {
+    /* line 59, ../sass/src/_fonts.scss */
+    #upela_content .title-font, h2, .part__title {
+        font-size: 2.6rem;
+    }
+}
+
+.cadre {
+    -webkit-border-radius: 2px;
+    -khtml-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    border: 1px solid #FF6600;
+    text-align: center;
+    padding: 15px;
+}
+
+.accent-font {
+    color: #FF6600;
+    font-weight: 900;
+}
+
+.light-accent-font {
+    color: #FF6600;
+}
+
+#upela_content .upela__button_next {
+    background-color: #FF6600;
+    border-color: #FF6600;
+}
+
+#upela_content .upela__button_prev:hover {
+    background-color: #FF6600;
+    border-color: #FF6600;
+}
+
+.orange {
+    color: #F60;
+}
+
+.fontBlack {
+    font-weight: 900;
+}
+
+.light.light.light {
+    font-weight: 300;
+}
+
+.list {
+    padding-left: 0;
+}
+
+.list li {
+    font-size: 22px;
+    color: #969696;
+}
+
+.list li {
+    list-style: none;
+}
+
+.fa {
+    vertical-align: middle;
+}
+
+.listStyle {
+    margin-right: 25px;
+}
+
+#upela_content .section8 p {
+    font-size: 22px;
+    color: #969696;
+}
+
+#upela_content .section8 h2 {
+    font-size: 28px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+
+    color: #969696;
+}
+
+#upela_content .section8 h4 {
+    font-size: 22px;
+    color: #969696;
+    font-weight: bold;
+}
+
+.section9Img {
+    position: relative;
+    height: 97px;
+}
+
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+}
+
+.fa-caret-right:before {
+    content: "\f0da"
+}
+
+.orangeBorder {
+    border: 1px solid #F60;
+    border-radius: 10px;
+    padding-bottom: 40px;
+    padding-top: 50px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.orangeBorderNp {
+    border: 1px solid #F60;
+    border-radius: 10px;
+}
+
+#upela_content label {
+    font-weight: normal;
+}
+
+.pb40 {
+    padding-bottom: 40px;
+}
+
+.pb10 {
+    padding-bottom: 10px;
+}
+
+.pt10 {
+    padding-top: 10px;
+}
+
+.pt5 {
+    padding-top: 5px;
+}
+
+.video {
+    position: relative;
+}
+
+.video iframe {
+    top: 0;
+    left: 0;
+    width: 700px;
+    height: 450px;
+}
+
+@media (max-width: 767px) {
+    /* line 59, ../sass/src/_fonts.scss */
+    .video iframe {
+        width: 500px;
+        height: 250px;
+    }
+}
