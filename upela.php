@@ -25,11 +25,62 @@ require_once 'api/UpelaApi.php';
 
 class Upela extends Module
 {
+    const VALUE_CHEAPEST = 'cheapest';
+    const VALUE_FASTEST = 'fastest';
+    const MSG_DELAY = 'MSG_DELAY';
+    const OPT_CHEAPEST_CARRIER_ID = 'UPELA_CHEAPEST_CARRIER_ID';
+    const OPT_FASTEST_CARRIER_ID = 'UPELA_FASTEST_CARRIER_ID';
+    const MSG_CARRIER_NAME_CHEAPEST = 'MSG_CARRIER_NAME_CHEAPEST';
+    const MSG_CARRIER_NAME_FASTEST = 'MSG_CARRIER_NAME_FASTEST';
     protected $errors = array();
+    /**
+     * Definition of default upela carrier
+     * @var array
+     */
+    protected $aCarrierDefinitions = array(
+        self::VALUE_CHEAPEST => array(
+            'name' => self::MSG_CARRIER_NAME_CHEAPEST,
+            'url' => 'fr/suivi?code=@',
+            'delay' => self::MSG_DELAY,
+            'active' => 1,
+            'deleted' => 0,
+            'shipping_handling' => 1,
+            'range_behavior' => 0,
+            'is_module' => 0,
+            'is_free' => 0,
+            'shipping_method' => Carrier::SHIPPING_METHOD_WEIGHT,
+            'shipping_external' => 1,
+            'external_module_name' => 'upela',
+            'need_range' => 0,
+            'max_width' => 0,
+            'max_height' => 0,
+            'max_depth' => 0,
+            'max_weighth' => 0,
+            'grade' => 8
+        ),
+        self::VALUE_FASTEST => array(
+            'name' => self::MSG_CARRIER_NAME_FASTEST,
+            'url' => 'fr/suivi?code=@',
+            'delay' => self::MSG_DELAY,
+            'active' => 1,
+            'deleted' => 0,
+            'shipping_handling' => 1,
+            'range_behavior' => 0,
+            'is_module' => 0,
+            'is_free' => 0,
+            'shipping_method' => Carrier::SHIPPING_METHOD_WEIGHT,
+            'shipping_external' => 1,
+            'external_module_name' => 'upela',
+            'need_range' => 0,
+            'max_width' => 0,
+            'max_height' => 0,
+            'max_depth' => 0,
+            'max_weighth' => 0,
+            'grade' => 9
+        ));
     private $mode = null;
     private $api = null;
     private $isConnected = false;
-
     /**
      * @var array
      */
@@ -39,11 +90,10 @@ class Upela extends Module
     /**
      * Upela constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->name = 'upela';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.0.7';
+        $this->version = '1.1.0';
         $this->author = 'Upela';
         $this->need_instance = 1;
         $this->bootstrap = true;
@@ -57,13 +107,13 @@ class Upela extends Module
         $this->description = $this->l('The best way to ship a parcel Save on shipping costs, never on service quality.');
 
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+
     }
 
     /**
      * API Initialization
      */
-    private function initAPI()
-    {
+    private function initAPI() {
         $this->loadMode();
         $hasAccountConnected = $this->hasAccountConnected();
 
@@ -78,8 +128,7 @@ class Upela extends Module
     /**
      * Mode initialization
      */
-    private function loadMode()
-    {
+    private function loadMode() {
         $apiMode = Configuration::get('UPELA_API_MODE');
 
         if ($apiMode == 'prod') {
@@ -93,8 +142,7 @@ class Upela extends Module
      * True if Account is define in configuration
      * @return bool
      */
-    private function hasAccountConnected()
-    {
+    private function hasAccountConnected() {
         return Configuration::get('UPELA_USER_LOGIN') &&
             Configuration::get('UPELA_USER_PASSWORD') &&
             Configuration::get('UPELA_USER_ID') &&
@@ -104,8 +152,7 @@ class Upela extends Module
     /**
      * @return array
      */
-    private function getUserConnected()
-    {
+    private function getUserConnected() {
         return array(
             'login' => Configuration::get('UPELA_USER_LOGIN'),
             'password' => Configuration::get('UPELA_USER_PASSWORD'),
@@ -117,16 +164,14 @@ class Upela extends Module
     /**
      * @return UpelaAPI::MODE
      */
-    public function getMode()
-    {
+    public function getMode() {
         return $this->mode;
     }
 
     /**
      * @param null $mode
      */
-    public function setMode($mode)
-    {
+    public function setMode($mode) {
         if (($this->mode != $mode) && ($this->isConnected)) {
             $this->dumpConfigurations();
             $this->isConnected = false;
@@ -141,28 +186,30 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function isAccountConnected()
-    {
+    public function isAccountConnected() {
         return $this->isConnected;
     }
 
     /**
      * @return bool
      */
-    public function install()
-    {
+    public function install() {
         return parent::install() &&
-            Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_TEST) &&
+            Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_PROD) &&
             //$this->installTab('AdminUpela', Tab::getIdFromClassName('AdminParentShipping'), 'Upela') &&
             $this->registerHook('displayAdminOrder') &&
             $this->dumpConfigurations();
+
+    }
+
+    private function installDb(){
+
     }
 
     /**
      * @return bool
      */
-    public function dumpConfigurations()
-    {
+    public function dumpConfigurations() {
         return Configuration::updateValue('UPELA_USER_LOGIN', '') &&
             Configuration::updateValue('UPELA_USER_PASSWORD', '') &&
             Configuration::updateValue('UPELA_USER_ID', '') &&
@@ -176,8 +223,7 @@ class Upela extends Module
      *
      * @return mixed
      */
-    public function installTab($class_name, $id_parent, $name)
-    {
+    public function installTab($class_name, $id_parent, $name) {
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $class_name;
@@ -188,41 +234,24 @@ class Upela extends Module
 
         $tab->id_parent = (int)$id_parent;
         $tab->module = $this->name;
+
         return $tab->add();
     }
 
     /**
      * @return bool
      */
-    public function uninstall()
-    {
+    public function uninstall() {
         return parent::uninstall() &&
-           // $this->uninstallTab('AdminUpela') &&
+            // $this->uninstallTab('AdminUpela') &&
             $this->unregisterHook('displayAdminOrder') &&
             $this->removeConfig();
     }
 
     /**
-     * @param $class_name
-     *
      * @return bool
      */
-    public function uninstallTab($class_name)
-    {
-        $id_tab = Tab::getIdFromClassName($class_name);
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            return $tab->delete();
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    private function removeConfig()
-    {
+    private function removeConfig() {
         Configuration::deleteByName('UPELA_USER_LOGIN');
         Configuration::deleteByName('UPELA_USER_PASSWORD');
         Configuration::deleteByName('UPELA_USER_ID');
@@ -233,15 +262,29 @@ class Upela extends Module
     }
 
     /**
+     * @param $class_name
+     *
+     * @return bool
+     */
+    public function uninstallTab($class_name) {
+        $id_tab = Tab::getIdFromClassName($class_name);
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+
+            return $tab->delete();
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @return mixed
      */
-    public function getModulePath()
-    {
+    public function getModulePath() {
         return $this->_path;
     }
 
-    public function hookdisplayAdminOrder($params)
-    {
+    public function hookdisplayAdminOrder($params) {
 
         $this->context->smarty->assign(array(
             'simple_link' => $this->_path,
@@ -269,8 +312,7 @@ class Upela extends Module
     /**
      * @return string
      */
-    public function getContent()
-    {
+    public function getContent() {
         if (Tools::isSubmit('processChangeMode')) {
             $this->setMode((Tools::getValue('upela_mode')) ? UpelaApi::API_MODE_PROD : UpelaApi::API_MODE_TEST);
             $this->context->smarty->assign(array('postSuccess' =>
@@ -284,10 +326,12 @@ class Upela extends Module
 
                 if (count($this->postErrors)) {
                     $this->context->smarty->assign(array('postErrors' => $this->postErrors));
+
                     return $this->displayRegistrationForm2();
                 }
             } else {
                 $this->context->smarty->assign(array('postErrors' => $this->postErrors));
+
                 return $this->displayRegistrationForm2();
             }
             if (count($this->postSuccess)) {
@@ -301,10 +345,12 @@ class Upela extends Module
                 $this->postProcess();
                 if (count($this->postErrors)) {
                     $this->context->smarty->assign(array('postErrors' => $this->postErrors));
+
                     return $this->displayCreateStoreForm2();
                 }
             } else {
                 $this->context->smarty->assign(array('postErrors' => $this->postErrors));
+
                 return $this->displayCreateStoreForm2();
             }
             if (count($this->postSuccess)) {
@@ -353,7 +399,7 @@ class Upela extends Module
 
             if (isset($stores)) {
                 foreach ($stores as $store) {
-                    if (isset($store['type']) && ($store['type'] == "prestashop")){
+                    if (isset($store['type']) && ($store['type'] == "prestashop")) {
                         $storeExists++;
                     }
                 }
@@ -452,8 +498,7 @@ class Upela extends Module
         );
     }
 
-    private function postValidation()
-    {
+    private function postValidation() {
         if (Tools::isSubmit('processStoreCreation')) {
             $values = $this->getStoreFormValues();
 
@@ -571,10 +616,9 @@ class Upela extends Module
         }
     }
 
-    public function getStoreFormValues()
-    {
+    public function getStoreFormValues() {
         if (!Tools::isSubmit('processStoreCreation')) {
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))){
+            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -616,11 +660,10 @@ class Upela extends Module
         return $return;
     }
 
-    public function getAccountFormValues()
-    {
+    public function getAccountFormValues() {
         if (!Tools::isSubmit('processAccountCreation')) {
 
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))){
+            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -686,8 +729,7 @@ class Upela extends Module
         return $return;
     }
 
-    private function postProcess()
-    {
+    private function postProcess() {
         if (Tools::isSubmit('processStoreCreation')) {
             $orderStates = OrderState::getOrderStates($this->context->language->id);
             $statusList = array();
@@ -734,6 +776,7 @@ class Upela extends Module
 
             if ($this->api->getUserExists($values['email'])) {
                 $this->postErrors[] = $this->l('Error: Email already exists! Please connect or use another email.', 'upela');
+
                 return false;
             }
 
@@ -835,8 +878,7 @@ class Upela extends Module
      * @param     $msg
      * @param int $level
      */
-    private function quickLog($msg, $level = 1)
-    {
+    private function quickLog($msg, $level = 1) {
         if (version_compare(_PS_VERSION_, '1.6.0.0', '>')) {
             PrestaShopLogger::addLog('UPELA_LOG: '.strip_tags(print_r($msg, true)), $level, null, 'upela');
         } else {
@@ -847,20 +889,18 @@ class Upela extends Module
     /**
      * @return bool
      */
-    private function saveUser()
-    {
+    private function saveUser() {
         return (bool)Configuration::updateValue('UPELA_USER_LOGIN', $this->api->getUser()) &&
             (bool)Configuration::updateValue('UPELA_USER_PASSWORD', $this->api->getPassword()) &&
             (bool)Configuration::updateValue('UPELA_USER_ID', $this->api->getId()) &&
             (bool)Configuration::updateValue('UPELA_USER_NAME', $this->api->getName());
     }
 
-    private function displayRegistrationForm2()
-    {
+    private function displayRegistrationForm2() {
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))){
+        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
             $default_Country = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
         } else {
             $default_Country = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -1153,8 +1193,7 @@ class Upela extends Module
     /**
      * @return mixed
      */
-    private function displayCreateStoreForm2()
-    {
+    private function displayCreateStoreForm2() {
         $countries = Country::getCountries($this->context->language->id);
         $lCountries = array();
 
@@ -1327,8 +1366,7 @@ class Upela extends Module
     /**
      * @return string
      */
-    private function processLoginSubmitted()
-    {
+    private function processLoginSubmitted() {
         // Get vars
         $username = Tools::getValue('upela_email');
         $password = Tools::getValue('upela_password');
@@ -1338,6 +1376,7 @@ class Upela extends Module
 
         if (!isset($userConnection['success'])) {
             $this->postErrors[] = $this->l('Error when log in to your account!', 'upela');
+
             return false;
         }
 
@@ -1350,10 +1389,208 @@ class Upela extends Module
 
         if (!$this->saveUser()) {
             $this->postErrors[] = $this->l('Error when log in to your account!', 'upela');
+
             return false;
         }
 
         $this->isConnected = true;
         $this->postSuccess[] = $this->l('Connection success!');
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function createCarriers() {
+        $this->quickLog('createCarriers2');
+
+        return  (bool)Configuration::updateValue(self::OPT_CHEAPEST_CARRIER_ID,
+                                        $this->createCarrier($this->aCarrierDefinitions[self::VALUE_CHEAPEST])) &&
+                (bool)Configuration::updateValue(self::OPT_FASTEST_CARRIER_ID,
+                                        $this->createCarrier($this->aCarrierDefinitions[self::VALUE_FASTEST]));
+
+    }
+
+    /**
+     * Adds new carrier linked to the module
+     * @todo Add logo
+     * @todo delete / desactivate other carriers
+     * @param array $aDefinition Carrier definition, see upela::$aCarrierDefinitions
+     * @return int
+     */
+    protected function createCarrier($aDefinition) {
+        $this->quickLog('createCarrier: '.$aDefinition['name']);
+
+        $oCarrier = new Carrier();
+        $this->setCarrierProperties($oCarrier, $aDefinition);
+
+        if ($oCarrier->add()) {
+            $this->addCarrierToGroups($oCarrier);
+            $this->addCarrierToZones($oCarrier);
+            $oRangeWeight = $this->addCarrierRangeWeight($oCarrier);
+            $this->addDeliveryPrice($oCarrier, $oRangeWeight);
+            $this->copyCarrierImage($oCarrier);
+            return $oCarrier->id;
+        }
+        return 0;
+    }
+
+/**
+     * Sets carrier properties. Generates multilang / translated properties if necessary
+     * @param Carrier $oCarrier
+     * @param array $aDefinition <string : property name => mixed : property value>
+     */
+    protected function setCarrierProperties($oCarrier, $aDefinition) {
+
+        foreach ($aDefinition as $sKey => $mValue) {
+
+            if ($sKey === 'url') {
+                $mValue = $this->api->getBaseUrl().$mValue;
+            }
+
+            if ($sKey === 'delay') {
+                $mValue = array_fill_keys($this->getLanguagesIds(), $this->l($mValue));
+            }
+
+            if ($sKey === 'name') {
+                $mValue = $this->l($mValue);
+            }
+            $oCarrier->{$sKey} = $mValue;
+        }
+
+    }
+
+    /**
+     * Adds carrier to all groups
+     * @param Carrier $oCarrier
+     */
+    protected function addCarrierToGroups($oCarrier) {
+
+        $aGroups = array();
+
+        foreach (Group::getGroups($this->context->language->id) as $aGroup) {
+            $aGroups[] = (int)$aGroup['id_group'];
+        }
+
+        $this->setGroups($oCarrier, $aGroups);
+    }
+
+    /**
+     * Adds carrier to all active zones
+     * @param Carrier $oCarrier
+     */
+    protected function addCarrierToZones(Carrier $oCarrier) {
+        foreach (Zone::getZones(true) as $aZone) {
+            $oCarrier->addZone((int)$aZone['id_zone']);
+        }
+    }
+
+    /**
+     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
+     * @param Carrier $oCarrier
+     * @return RangeWeight
+     */
+    protected function addCarrierRangeWeight(Carrier $oCarrier) {
+
+        $oRangeWeight = new RangeWeight();
+
+        $oRangeWeight->id_carrier = $oCarrier->id;
+
+        $oRangeWeight->delimiter1 = 0;
+
+        $oRangeWeight->delimiter2 = 99999;
+
+        $oRangeWeight->add();
+
+        return $oRangeWeight;
+
+    }
+
+    protected function addDeliveryPrice(Carrier $oCarrier, $oRangeWeight) {
+        foreach ($oCarrier->getZones() as $aZone) {
+            Db::getInstance()->Execute('INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `price`)
+				VALUES ('.(int)($oCarrier->id).', NULL, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).', 0)');
+        }
+    }
+
+    /**
+     * Copies default image as carrier logo
+     * @param Carrier $oCarrier
+     * @return boolean
+     */
+    protected function copyCarrierImage($oCarrier) {
+
+        $sSource = _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'carriers'.DIRECTORY_SEPARATOR.'carrier-upela.jpg';
+
+        $sDestination = _PS_SHIP_IMG_DIR_.$oCarrier->id.'.jpg';
+
+        return copy($sSource, $sDestination);
+
+    }
+
+    /**
+     * Copy of Carrier::setGroups, not disponible before 1.5.4
+     * @param Carrier $oCarriers
+     * @param array $aGroups
+     * @param boolean $bDelete
+     * @return boolean
+     */
+    protected function setGroups($oCarriers, $aGroups, $bDelete = true){
+        if ($bDelete){
+            Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'carrier_group WHERE id_carrier = '. (int)$oCarriers->id);
+        }
+
+        if (!is_array($aGroups) || !count($aGroups)){
+            return true;
+        }
+
+        $aValues = array();
+
+        foreach ($aGroups as $nGroupId) {
+            $aValues[] = sprintf('(%d,%d)', (int)$oCarriers->id, (int)$nGroupId);
+        }
+
+        $sQuery = 'INSERT INTO '._DB_PREFIX_.'carrier_group (id_carrier, id_group) VALUES ' . implode(',', $aValues);
+        return Db::getInstance()->execute($sQuery);
+    }
+
+    /**
+     * Gets ids of all languages
+     * @return array <int : language id>
+     */
+    protected function getLanguagesIds(){
+
+        $aResult= array();
+
+        foreach (Language::getLanguages(false) as $aLanguage){
+
+            $aResult[] = (int)$aLanguage['id_lang'];
+
+        } // foreach
+
+        return $aResult;
+
+    }
+
+    /**
+     * Get Carriers list
+     * @param string $origin
+     * @return array
+     */
+    protected function getCarriers($origin){
+        $carriers = array(
+            'express' => array(
+                'name' => $this->l('Express'),
+                'actif' => false,
+                'price' => 0
+            ),
+            'standard' => array(
+                'name' => $this->l('Standard'),
+                'actif' => false,
+                'price' => 0
+            )
+        );
+
+        return $carriers;
     }
 }

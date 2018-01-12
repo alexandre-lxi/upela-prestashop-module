@@ -47,7 +47,7 @@ class UpelaApi
     /**
      * UpelaApi constructor.
      *
-     * @param string      $user
+     * @param array|bool  $user
      * @param null|string $mode
      */
     public function __construct($user, $mode)
@@ -136,6 +136,14 @@ class UpelaApi
         $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
         $url .= $this->getId().'&url='.$this->url_upela.'store/orders.php';
         return $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->url_upela;
     }
 
     /**

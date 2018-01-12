@@ -45,9 +45,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#guide_form" data-toggle="tab" role="tab">
-                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
-                {l s='User manual' mod='upela'}
+            <a href="#carriers_form" data-toggle="tab" role="tab">
+                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-carriers.png"/>
+                {l s='Carriers' mod='upela'}
             </a>
         </li>
         {if {$upela_login}}
@@ -58,6 +58,12 @@
             <a href="#settings_form" data-toggle="tab" role="tab">
                 <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-config.png"/>
                 {l s='Connections parameters' mod='upela'}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#guide_form" data-toggle="tab" role="tab">
+                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
+                {l s='User manual' mod='upela'}
             </a>
         </li>
         <li class="nav-item">
@@ -78,7 +84,7 @@
                     <div class="upela_home_caption">
                         <h1>{l s='Upela' mod='upela'}</h1>
                         <h2>{l s='The best way to ship a parcel' mod='upela'}</h2>
-                        <p>{l s='Save on shipping costs, never on service quality.' mod='upela'}</p>
+                        <p>{l s='Compare quotes and ship with ease from a single platform.' mod='upela'}</p>
                     </div>
                     <div class="row pb10">
                         {if $upela_user_connected}
@@ -122,32 +128,8 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12 text-center">
-                            <a href="https://www.upela.com/en/carrier-ups-131.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/ups.png"
-                                     class="upela_logo_img" alt="UPS"> </a>
-                            <a href="https://www.upela.com/en/carrier-mondial-relay-181.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/relay.png"
-                                     class="upela_logo_img" alt="Mondial Relay"> </a>
-                            <a href="https://www.upela.com/en/carrier-dhl-130.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/dhl.png"
-                                     class="upela_logo_img dhl" alt="DHL"> </a>
-                            <a href="https://www.upela.com/en/transporteur-dpd-170.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/fedex.png"
-                                     class="upela_logo_img" alt="Fedex"> </a>
-                            <a href="https://www.upela.com/fr/service-coursier-upela-157.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/img-07.png"
-                                     class="upela_logo_img" alt="Mondial Relay"> </a>
-                            {if {$country} == 'FR'}
-                                <a href="https://www.upela.com/en/carrier-ups-131.html" target="_blank">
-                                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/chronopost.png"
-                                         class="upela_logo_img" alt="Chronopost"> </a>
-                                <a href="https://www.upela.com/en/carrier-colissimo-182.html" target="_blank">
-                                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/colissimo.png"
-                                         class="upela_logo_img" alt="collisimo"> </a>
-                            {/if}
-                            <a href="https://www.upela.com/en/transporteur-dpd-170.html" target="_blank">
-                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/trans/dpd.png"
-                                     class="upela_logo_img" alt="dpd"> </a>
+                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/carriers/logo-transporteurs-FR-ES-IT.jpg"
+                                 class="upela_logo_img" alt="Carriers">
                         </div>
                     </div>
                 </div>
@@ -393,6 +375,32 @@
         </div>
     </div>
 
+    <div class="tab-pane" id="carriers_form" role="tabpanel">
+        <div class="row">
+            <div class="panel section8">
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="carrier">{l s='Carrier' mod='upela'}</th>
+                            <!--<th class="offer">{l s='Offer' mod='upela'}</th>
+                            <th class="area">{l s='Coverage' mod='upela'}</th>
+                            <th class="departure">{l s='Departure' mod='upela'}</th>
+                            <th class="destination">{l s='Destination' mod='upela'}</th>
+                            <th class="delivery_due_time">{l s='Delay' mod='upela'}</th>-->
+                            <th class="status">{l s='Status' mod='upela'}</th>
+                            <th class="price">{l s='Price' mod='upela'}</th>
+                            <th class="edit">{l s='Edit' mod='upela'}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="tab-pane" id="guide_form" role="tabpanel">
         <div class="row">
@@ -402,44 +410,6 @@
                         <div class="panel-content part__content">
                             <h2 class="text-center">{l s='How to set up your UPELA account?' mod='upela'} </h2>
                             <h4 class="text-center pb40">{l s='In your Prestashop store' mod='upela'}</h4>
-                            <div class="row pb40">
-                                <p>{l s='1) Activate the Webservice :' mod='upela'}</p>
-                                <ul class="part__list">
-                                    <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                        {l s='Select \"Advanced Settings\", then \"Webservice\"' mod='upela'}
-                                    </li>
-                                    <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                        {l s='Please \"Activate Webservice\" and \"Enable the CGI mode for PHP\"' mod='upela'}
-                                    </li>
-                                    <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                        {l s='Add a new Webservice.' mod='upela'}
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="row pb40">
-                                <div class="col-md-7">
-                                    <p>{l s='2) Create the new Webservice:' mod='upela'}</p>
-                                    <ul class="part__list">
-                                        <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                            {l s='Generate a new API key.' mod='upela'}
-                                        </li>
-                                        <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                            {l s='Check that the Service status is active: \"Yes\"' mod='upela'}
-                                        </li>
-                                        <li><i class="fa fa-caret-right listStyle" aria-hidden="true"></i>
-                                            {l s='Grant the GET, POST and PUT permissions to allow the use of the Webservice.' mod='upela'}
-
-                                        </li>
-
-                                    </ul>
-                                </div>
-                                <div class="col-md-5">
-                                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/manual-screen2.png"
-                                         class="part__img">
-                                </div>
-                            </div>
-
                             <div class="row pb40">
                                 <div class="col-md-8">
                                     <p>{l s='3) Register or log in to your Upela account' mod='upela'}</p>
@@ -636,7 +606,7 @@
                             <img class="part__icon" src="{$_path|escape:'htmlall':'UTF-8'}views/img/logocontact.png"
                                  alt="Upela - image"/>
                             <p>{l s='MPG UPELA' mod='upela'}</p>
-                            <p>{l s='17BIS RUE LA BOETIE' mod='upela'}</p>
+                            <p>{l s='17 RUE DE SURENE' mod='upela'}</p>
                             <p>{l s='75008 PARIS - FRANCE' mod='upela'}</p>
                             <p>{l s='RCS Paris 750 389 769' mod='upela'}</p>
                             <p>{l s='N° TVA FR12750389769' mod='upela'}</p>
