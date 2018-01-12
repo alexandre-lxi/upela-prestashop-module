@@ -155,6 +155,8 @@ class Upela extends Module
             Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_TEST) &&
             //$this->installTab('AdminUpela', Tab::getIdFromClassName('AdminParentShipping'), 'Upela') &&
             $this->registerHook('displayAdminOrder') &&
+            $this->registerHook('DisplayCarrierExtraContent') &&
+            $this->registerHook('header') &&
             $this->dumpConfigurations();
     }
 
@@ -239,6 +241,104 @@ class Upela extends Module
     {
         return $this->_path;
     }
+
+
+    /**
+     * Header's hook. It displays included JavaScript for GoogleMaps API.
+     * @access public
+     * @return Displayed Smarty template.
+     */
+    public function hookHeader($params)
+    {
+        $smarty = $this->context->smarty;
+        $controller = $this->context->controller;
+        $smarty->assign('upelaBaseDir', _MODULE_DIR_ . '/upela/');
+        $controllerClass = get_class($controller);
+
+        if (method_exists($controller, 'registerJavascript')) {
+            $controller->registerJavascript(
+                'upela-jquery',
+                'https://code.jquery.com/jquery-3.2.1.min.js',
+                array('priority' => 100, 'server' => 'remote')
+            );
+            $controller->registerJavascript(
+                'upela-googlemap',
+                'https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw',
+                array('priority' => 100, 'server' => 'remote')
+            );
+            $controller->registerJavascript(
+                'upela-googlemap',
+                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js',
+                array('priority' => 100, 'server' => 'remote')
+            );
+            $controller->registerJavascript(
+                'upela-googlemap',
+                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js',
+                array('priority' => 100, 'server' => 'remote')
+            );
+            $controller->registerJavascript(
+                'upela',
+                'modules/upela/views/js/upela.js',
+                array('priority' => 100, 'server' => 'local')
+            );
+            $controller->registerStylesheet(
+                'upela',
+                'modules/upela/views/css/upela.css',
+                array('priority' => 100, 'server' => 'local')
+            );
+        } else {
+            $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
+            $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw');
+            $controller->addJs('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js');
+            $controller->addJs('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js');
+            $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
+        }
+
+        return $this->display(__FILE__, '/views/templates/hook/header_hook.tpl');
+
+    }
+
+    /**
+     * Since Prestashop 1.7, this hook is used to display front-office list of relay points
+     * @access public
+     * @param array $params Parameters array (cart object, address informations)
+     * @return Display template.
+     */
+    public function hookDisplayCarrierExtraContent(&$params)
+    {
+
+        $controller = $this->context->controller;
+        // initialisation de l address
+
+        $postcode = null ;
+        $city = null ;
+        $deleted = null ;
+
+        $sql = 'SELECT  is_dropoff_point,id_up_service FROM '._DB_PREFIX_.'upela_services WHERE id_carrier='.$params['carrier']['id'];
+        $results = Db::getInstance()->getRow($sql,false);
+        $is_dropoff = $results['is_dropoff_point'];
+        $upela_service = $results['id_up_service'];
+        $carrier_id = $params['carrier']['id'];
+
+        foreach($this->context->cart->getAddressCollection()  as $address)
+        {
+            $postcode = $address->postcode ;
+            $city =$address->city ;
+            $deleted = $address->deleted ;
+        }
+
+
+        if($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted)
+        {
+            $this->context->smarty->assign(
+                ['address'=>
+                     ['postcode'=>$postcode,'city'=>$city,'upela_service'=>$upela_service,'carrier_id'=>$carrier_id]]);
+            return $this->display(__FILE__, 'displayCarrierExtraContent.tpl');;
+        }
+
+        return '';
+
+       }
 
     public function hookdisplayAdminOrder($params)
     {
@@ -1356,4 +1456,7 @@ class Upela extends Module
         $this->isConnected = true;
         $this->postSuccess[] = $this->l('Connection success!');
     }
+
+
+
 }
