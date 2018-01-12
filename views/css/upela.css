@@ -1,0 +1,16 @@
+#upela-delivery{
+    margin-left : 15px;
+}
+
+#delivery-point-list{
+    overflow-y: scroll;
+    height: 400px;
+}
+
+img[src="https://maps.gstatic.com/mapfiles/api-3/images/mapcnt6.png"] {
+    display: none;
+}
+
+.delivery-point-name a {
+    text-decoration: underline;
+}

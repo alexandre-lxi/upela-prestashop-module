@@ -182,6 +182,7 @@ class UpelaApi
 
         $ret = $this->makeCall($this->getBody($data), null, true);
 
+
         if (isset($ret['success'])) {
             if ($ret['success']) {
                 $this->setCredentials($username, $password);
@@ -211,6 +212,8 @@ class UpelaApi
         } else {
             $uri_to_call = $this->host.$this->endpoint;
         }
+
+
 
         if ($body != null) {
             if ($http_header) {
@@ -286,7 +289,10 @@ class UpelaApi
             }
 
             $content = curl_exec($curl);
+
+
             curl_close($curl);
+
 
             return $content;
         } else {
