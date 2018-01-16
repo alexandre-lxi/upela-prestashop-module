@@ -8,7 +8,6 @@ var markers = [];
 var infoWindow;
 var first = false;
 var listDroppOff =false;
-var carrier_id = false;
 
 
 function createCookie(name, value, days) {
@@ -44,8 +43,8 @@ function eraseCookie(name) {
 
 function initializeMap(options) {
     var uluru = {lat: options.lat, lng: options.lng};
-    map = new google.maps.Map(document.getElementById('map-upela'), {
-        zoom: 12,
+    map = new google.maps.Map(document.getElementById(options.id), {
+        zoom: options.zoom,
         center: uluru
     });
     infoWindow = new google.maps.InfoWindow();
@@ -61,7 +60,7 @@ function setSelectedVal(dropoffLocation)
     $('#dp_city').val(dropoffLocation.city);
     $('#dp_country').val(dropoffLocation.country_code);
     var info = dropoffLocation.name + ', ' + dropoffLocation.address1 + ' ' + dropoffLocation.address2 + ' ' + dropoffLocation.city;
-    $('#selected-delivery-point').text(info);
+    $('#selected-delivery-point').html(info);
 }
 
 function createMarker(latlng, data) {
@@ -117,6 +116,13 @@ $('#delivery_option_' + carrier_id).change(
         if ($(this).is(':checked') ) {
             e.stopPropagation();
             $('#upela-delivery').parent('div').show();
+            initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:11});
+            var latlng = new google.maps.LatLng(
+                parseFloat(first.latitude),
+                parseFloat(first.longitude));
+                first.number = 1;
+                createMarker(latlng, first);
+            google.maps.event.trigger(map, 'resize');
         }
     });
 
@@ -125,7 +131,7 @@ $(document).ready(function() {
     if(typeof url === 'undefined' )
     {
       return;
-    };
+    }
     $.ajax({
             url: url,
             type: 'GET',
@@ -145,6 +151,8 @@ $(document).ready(function() {
                         first = JSON.parse(readCookie('dropoffLocation'))
                     }
 
+                    initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:1});
+
                     listDroppOff = s.rows;
                     setSelectedVal(first);
                 }
@@ -158,7 +166,7 @@ $(document).ready(function() {
 });
 $('#choose-delivery').on('click',function(){$('#upelaModal').modal('show');});
 $('#upelaModal').on('shown.bs.modal', function() {
-    initializeMap({lat:first.latitude,lng:first.longitude});
+    initializeMap({id:'map-upela',lat:first.latitude,lng:first.longitude,zoom:12});
     setSelectedVal(first);
     setDropOffPoints(listDroppOff);
 });
@@ -170,5 +178,12 @@ $('body').on('click','.upela-marker-click',function(){
     eraseCookie('dropoffLocation');
     createCookie('dropoffLocation', JSON.stringify(data), 1);
     $('#upelaModal').modal('hide');
+    initializeMap({id:'map-upela-selected',lat:data.latitude,lng:data.longitude,zoom:11});
+    var latlng = new google.maps.LatLng(
+        parseFloat(data.latitude),
+        parseFloat(data.longitude));
+    first.number = 1;
+    createMarker(latlng, data);
+    google.maps.event.trigger(map, 'resize');
 });
 
