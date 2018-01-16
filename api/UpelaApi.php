@@ -20,9 +20,10 @@
 class UpelaApi
 {
     const URL_API = 'https://api.upela.com/';
-    const URL_API_TEST = 'https://dev.upela.com/';
+    const URL_API_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
+    //const URL_API_TEST = 'https://dev.upela.com/';
     const URL_UPELA = 'https://www.upela.com/';
-    const URL_UPELA_TEST = 'https://dev.upela.com/';
+    const URL_UPELA_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
 
     const API_MODE_PROD = 'prod';
     const API_MODE_TEST = 'test';
@@ -204,13 +205,19 @@ class UpelaApi
      *
      * @return mixed               Call
      */
-    protected function makeCall($body = null, $http_header = null, $urlOrApi = false)
+    protected function makeCall($body = null, $http_header = null, $urlOrApi = false, $vardump = false)
     {
         // init uri to call
         if ($urlOrApi) {
             $uri_to_call = $this->url_upela.$this->endpoint;
         } else {
             $uri_to_call = $this->host.$this->endpoint;
+        }
+
+        if ( $vardump ) {
+            var_dump($body);
+            var_dump($uri_to_call);
+            die();
         }
 
 
@@ -365,7 +372,7 @@ class UpelaApi
             'pro' => '1'
         );
 
-        $ret = $this->makeCall($this->getBody($data));
+        $ret = $this->makeCall($this->getBody($data), null, false, false);
 
         $result = false;
 
@@ -410,7 +417,7 @@ class UpelaApi
                 'naf' => '',
             );
 
-            $address_ret = $this->makeCall($this->getBody($data));
+            $address_ret = $this->makeCall($this->getBody($data), null, false, false);
 
             if (isset($address_ret['id'])) {
                 $result = array(

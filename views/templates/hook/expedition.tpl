@@ -32,15 +32,78 @@
 <div class="tab-content panel" id="UpelaExpedition">
     <div class="tab-pane active">
         <div class="table-responsive">
+
             <table class="table">
                 <tbody>
                 <tr>
-                    <td style="border:none; background-color: #FF6600"><img style="height: 38px; width: 38px;"
+
+                    <td style="border:none; background-color: #FF6600" colspan="4"><img style="height: 38px; width: 38px;"
                                                                             src="{$simple_link|escape:'html':'UTF-8'}views/img/logo-upela-w.png"
                                                                             width="150px;"></td>
-                    <td style="border:none; background-color: #FF6600"><span
-                                style="font-weight: normal;">{$reference|escape:'html':'UTF-8'}</span></td>
-                    <td style="border:none;text-align:right;background-color: #FF6600"><a class="btn btn-default"
+                </tr>
+                <tr>
+                    <td >
+                    <div class="form-group">
+                        <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
+                        <div class="col-sm-4">
+                            <input name="upela_weight" type="text" class="form-control" id="upela_weight"
+                                   placeholder="{l s='Weight (Kg)' mod='upela'}"
+                                   value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                        </div>
+                    </div>
+                    </td>
+                    <td>
+                    <div class="form-group">
+                        <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
+                        <div class="col-sm-4">
+                            <input name="upela_length" type="text" class="form-control" id="upela_length"
+                                   placeholder="{l s='Length' mod='upela'}"
+                                   value="{$upela_length|escape:'htmlall':'UTF-8'}">
+                        </div>
+                    </div>
+                    </td>
+                    <td>
+                    <div class="form-group">
+                        <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
+                        <div class="col-sm-4">
+                            <input name="upela_width" type="text" class="form-control" id="upela_width"
+                                   placeholder="{l s='Width' mod='upela'}"
+                                   value="{$upela_width|escape:'htmlall':'UTF-8'}">
+                        </div>
+                    </div>
+                    </td>
+                    <td>
+                    <div class="form-group">
+                        <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
+                        <div class="col-sm-4">
+                            <input name="upela_height" type="text" class="form-control" id="upela_height"
+                                   placeholder="{l s='Height' mod='upela'}"
+                                   value="{$upela_height|escape:'htmlall':'UTF-8'}">
+                        </div>
+                    </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div class="form-group">
+                            <label for="ship_content" class="col-sm-4">{l s='Shipment content' mod='upela'}</label>
+                            <div class="col-sm-4">
+                                <input name="ship_content" type="text" class="form-control" id="ship_content"
+                                       placeholder="{l s='Shipment content' mod='upela'}"
+                                       value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td colspan="3"></td>
+
+                    <td style="border:none;text-align:right;">
+
+
+                        <a class="btn btn-primary text-center part__button"
+                                style="background-color: #FF6600"
                                                                                           target="{$target|escape:'html':'UTF-8'}"
                                                                                           href="{$link_suivi|escape:'html':'UTF-8'}"><i
                                     class="{$iconBtn|escape:'html':'UTF-8'}"></i> {$suivi|escape:'html':'UTF-8'}</a>

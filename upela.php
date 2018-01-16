@@ -25,62 +25,12 @@ require_once 'api/UpelaApi.php';
 
 class Upela extends Module
 {
-    const VALUE_CHEAPEST = 'cheapest';
-    const VALUE_FASTEST = 'fastest';
-    const MSG_DELAY = 'MSG_DELAY';
-    const OPT_CHEAPEST_CARRIER_ID = 'UPELA_CHEAPEST_CARRIER_ID';
-    const OPT_FASTEST_CARRIER_ID = 'UPELA_FASTEST_CARRIER_ID';
-    const MSG_CARRIER_NAME_CHEAPEST = 'MSG_CARRIER_NAME_CHEAPEST';
-    const MSG_CARRIER_NAME_FASTEST = 'MSG_CARRIER_NAME_FASTEST';
+
     protected $errors = array();
-    /**
-     * Definition of default upela carrier
-     * @var array
-     */
-    protected $aCarrierDefinitions = array(
-        self::VALUE_CHEAPEST => array(
-            'name' => self::MSG_CARRIER_NAME_CHEAPEST,
-            'url' => 'fr/suivi?code=@',
-            'delay' => self::MSG_DELAY,
-            'active' => 1,
-            'deleted' => 0,
-            'shipping_handling' => 1,
-            'range_behavior' => 0,
-            'is_module' => 0,
-            'is_free' => 0,
-            'shipping_method' => Carrier::SHIPPING_METHOD_WEIGHT,
-            'shipping_external' => 1,
-            'external_module_name' => 'upela',
-            'need_range' => 0,
-            'max_width' => 0,
-            'max_height' => 0,
-            'max_depth' => 0,
-            'max_weighth' => 0,
-            'grade' => 8
-        ),
-        self::VALUE_FASTEST => array(
-            'name' => self::MSG_CARRIER_NAME_FASTEST,
-            'url' => 'fr/suivi?code=@',
-            'delay' => self::MSG_DELAY,
-            'active' => 1,
-            'deleted' => 0,
-            'shipping_handling' => 1,
-            'range_behavior' => 0,
-            'is_module' => 0,
-            'is_free' => 0,
-            'shipping_method' => Carrier::SHIPPING_METHOD_WEIGHT,
-            'shipping_external' => 1,
-            'external_module_name' => 'upela',
-            'need_range' => 0,
-            'max_width' => 0,
-            'max_height' => 0,
-            'max_depth' => 0,
-            'max_weighth' => 0,
-            'grade' => 9
-        ));
     private $mode = null;
     private $api = null;
     private $isConnected = false;
+    private $carriers;
     /**
      * @var array
      */
@@ -93,13 +43,16 @@ class Upela extends Module
     public function __construct() {
         $this->name = 'upela';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.1.0';
+        $this->version = '2.0.0';
         $this->author = 'Upela';
         $this->need_instance = 1;
         $this->bootstrap = true;
         $this->module_key = '909a230701b42c01ef40630cccc65b82';
 
         parent::__construct();
+
+        require_once(_PS_MODULE_DIR_ . '/upela/includes/UpelaHelper.php');
+        require_once(_PS_MODULE_DIR_ . '/upela/includes/UpelaCarriers.php');
 
         $this->initAPI();
 
@@ -108,6 +61,7 @@ class Upela extends Module
 
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 
+        $this->carriers = new UpelaCarriers(Db::getInstance(), $this->name);
     }
 
     /**
@@ -194,16 +148,39 @@ class Upela extends Module
      * @return bool
      */
     public function install() {
+        Logger::addLog('UPELA: Install module');
+
         return parent::install() &&
             Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_PROD) &&
             //$this->installTab('AdminUpela', Tab::getIdFromClassName('AdminParentShipping'), 'Upela') &&
             $this->registerHook('displayAdminOrder') &&
+            $this->registerHook('DisplayCarrierExtraContent') &&
+            $this->installDb() &&
             $this->dumpConfigurations();
-
     }
 
+    /**
+     * @return bool
+     */
     private function installDb(){
+        $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_ . '/upela/sql/install.sql');
+        $sql_file = str_replace('{PREFIXE}', _DB_PREFIX_, $sql_file);
 
+        $query = explode('-- REQUEST --', $sql_file);
+        foreach ($query as $q) {
+            if ($q <> '') {
+                if (Db::getInstance()->execute($q) === false) {
+                    Logger::addLog(
+                        '['.$this->l('UPELA').']['.time().'] '.
+                        $this->l('installation :  An error occured on the query : ').$q
+                    );
+                    $this->uninstallDb();
+
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -213,7 +190,8 @@ class Upela extends Module
         return Configuration::updateValue('UPELA_USER_LOGIN', '') &&
             Configuration::updateValue('UPELA_USER_PASSWORD', '') &&
             Configuration::updateValue('UPELA_USER_ID', '') &&
-            Configuration::updateValue('UPELA_USER_NAME', '');
+            Configuration::updateValue('UPELA_USER_NAME', '') &&
+            Configuration::updateValue('UPELA_WEBSERVICE_KEY', '');
     }
 
     /**
@@ -242,10 +220,30 @@ class Upela extends Module
      * @return bool
      */
     public function uninstall() {
+        Logger::addLog('UPELA: Uninstall module');
+
         return parent::uninstall() &&
             // $this->uninstallTab('AdminUpela') &&
             $this->unregisterHook('displayAdminOrder') &&
+            $this->unregisterHook('DisplayCarrierExtraContent') &&
+            $this->uninstallDb() &&
             $this->removeConfig();
+    }
+
+    /**
+     * @return bool
+     */
+    public function uninstallDb() {
+        $helper = new UpelaHelper();
+
+        $tables = array();
+        foreach ($helper->getTablesNames() as $table) {
+            Logger::addLog('UPELA: remove '.$table);
+            $tables[] = '`' . _DB_PREFIX_ . $table . '`';
+        }
+        $remove_tables = 'SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS ' . implode(',', $tables);
+
+        return DB::getInstance()->execute($remove_tables);
     }
 
     /**
@@ -257,6 +255,7 @@ class Upela extends Module
         Configuration::deleteByName('UPELA_USER_ID');
         Configuration::deleteByName('UPELA_USER_NAME');
         Configuration::deleteByName('UPELA_API_MODE');
+        Configuration::deleteByName('UPELA_WEBSERVICE_KEY');
 
         return true;
     }
@@ -382,21 +381,28 @@ class Upela extends Module
 
        }
 
-    public function hookdisplayAdminOrder($params)
+    public function hookdisplayAdminOrder(&$params)
     {
 
         $this->context->smarty->assign(array(
             'simple_link' => $this->_path,
             'reference' => " ",
-            'suivi' => $this->l('Go to Upela.com', 'upela'),
+            'suivi' => $this->l('Ship', 'upela'),
             'iconBtn' => "icon-plus-sign",
             'link_suivi' => ($this->isConnected) ?
-                $this->api->getUrlconnection() :
+                 $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name.'&sendorder=1' :
                 $this->context->link->getAdminLink('AdminModules').
                 '&configure='.$this->name.'&tab_module='.$this->tab.
                 '&module_name='.$this->name,
             'img15' => 'views/img/add.gif',
-            'target' => ($this->isConnected) ? '_blank' : ''
+            'target' => ($this->isConnected) ? '_blank' : '',
+            'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
+            'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
+            'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
+            'upela_width' =>  Configuration::get('UPELA_SHIP_WIDTH'),
+            'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
         ));
 
         if (version_compare(_PS_VERSION_, '1.6', '<')) {
@@ -487,6 +493,24 @@ class Upela extends Module
             //return $this->displayLoginForm(true);
         }
 
+        if (Tools::isSubmit('updateparameters')) {
+            Configuration::updateValue('UPELA_SHIP_CONTENT', Tools::getValue('ship_content'));
+            Configuration::updateValue('UPELA_SHIP_WEIGHT', Tools::getValue('upela_weight'));
+            Configuration::updateValue('UPELA_SHIP_LENGTH', Tools::getValue('upela_length'));
+            Configuration::updateValue('UPELA_SHIP_WIDTH', Tools::getValue('upela_width'));
+            Configuration::updateValue('UPELA_SHIP_HEIGHT', Tools::getValue('upela_height'));
+        }
+
+        if (Tools::isSubmit('update_carriers')) {
+            $offers1 = (array)Tools::getValue('offers1');
+            $offers2 = (array)Tools::getValue('offers2');
+            $offers3 = (array)Tools::getValue('offers3');
+
+            $this->carriers->createCarriers($offers1);
+            $this->carriers->createCarriers($offers2);
+            $this->carriers->createCarriers($offers3);
+        }
+
         $storeExists = 0;
         $stores = array();
         $user = '';
@@ -505,17 +529,28 @@ class Upela extends Module
             }
         }
 
+        $carriersListExpress = $this->carriers->getCarriersForTpl('FR', 'and is_express=1');
+        $carriersListRelay = $this->carriers->getCarriersForTpl('FR', 'and is_dropoff_point=1');
+        $carriersListOthers = $this->carriers->getCarriersForTpl('FR', 'and is_dropoff_point=0 and is_express=0');
+
+
         $this->context->smarty->assign(
             array(
                 'upela_register_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&register=1',
+                'upela_parameters_link' => $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name.'&updateparameters=1',
                 'upela_store_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&newstore=1',
                 'upela_login_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&login=1',
+                'upela_update_carrier_link' => $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name.'&update_carriers=1',
                 'upela_user_link' => ($this->isConnected) ? $this->api->getUrlconnection() : '',
                 'upela_create_account_post_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
@@ -530,7 +565,17 @@ class Upela extends Module
                 'upela_login' => false,
                 'upela_nbstores' => count($stores),
                 'upela_storeexsists' => $storeExists,
-                'country' => Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'))
+                'country' => Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID')),
+                'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
+                'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
+                'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
+                'upela_width' =>  Configuration::get('UPELA_SHIP_WIDTH'),
+                'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
+                'carriersListExpress' => $carriersListExpress,
+                'carriersListRelay' => $carriersListRelay,
+                'carriersListOthers' => $carriersListOthers,
+                'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY'
+
             )
         );
 
@@ -616,9 +661,9 @@ class Upela extends Module
                 $this->postErrors[] = $this->l('Incorrect phone number');
             }
 
-            if (empty($values['webservicekey'])) {
-                $this->postErrors[] = $this->l('Webservice key is required');
-            }
+//            if (empty($values['webservicekey'])) {
+//                $this->postErrors[] = $this->l('Webservice key is required');
+//            }
 
             if (empty($values['store_name'])) {
                 $this->postErrors[] = $this->l('Store name is required');
@@ -665,9 +710,9 @@ class Upela extends Module
                 $this->postErrors[] = $this->l('Password check failed');
             }
 
-            if (empty($values['webservicekey'])) {
-                $this->postErrors[] = $this->l('Webservice key is required');
-            }
+//            if (empty($values['webservicekey'])) {
+//                $this->postErrors[] = $this->l('Webservice key is required');
+//            }
 
             if (empty($values['company_name'])) {
                 $this->postErrors[] = $this->l('Company name is required');
@@ -751,7 +796,7 @@ class Upela extends Module
                 'store_address_3' => Tools::getValue('store_address_3'),
                 'store_city' => Tools::getValue('store_city'),
                 'store_zipcode' => Tools::getValue('store_zipcode'),
-                'webservicekey' => Tools::getValue('webservicekey'),
+                'webservicekey' => $this->getWebServiceKey(),
                 'store_business' => Tools::getValue('store_business'),
             );
         }
@@ -809,7 +854,7 @@ class Upela extends Module
                 'store_address_3' => Tools::getValue('store_address_3'),
                 'store_city' => Tools::getValue('store_city'),
                 'store_zipcode' => Tools::getValue('store_zipcode'),
-                'webservicekey' => Tools::getValue('webservicekey'),
+                'webservicekey' => $this->getWebServiceKey(),
                 'store_business' => Tools::getValue('store_business'),
                 'company_vat' => Tools::getValue('company_vat'),
                 'company_siret' => Tools::getValue('company_siret'),
@@ -971,6 +1016,39 @@ class Upela extends Module
                 $this->postSuccess[] = $this->l('Store created !');
             }
         }
+    }
+
+    /**
+     * Create the WebserviceKey
+     * @return string
+     */
+    private function getWebServiceKey(){
+        $wskey = Configuration::get('UPELA_WEBSERVICE_KEY');
+
+        $webservice_key = new WebserviceKey();
+
+        if (($wskey != '') && $webservice_key->keyExists($wskey)){
+                return $wskey;
+        }else{
+            $upela_helper = new UpelaHelper();
+
+            Configuration::updateValue('PS_WEBSERVICE', 1);
+            Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
+
+            Tools::generateHtaccess();
+
+            $key = Tools::passwdGen(32);
+
+            $webservice_key->key = $key;
+            $webservice_key->description = 'Upela';
+
+            $webservice_key->add();
+            WebserviceKey::setPermissionForAccount($webservice_key->id, $upela_helper->getPermissions());
+
+            Configuration::updateValue('UPELA_WEBSERVICE_KEY', $key);
+            return $key;
+        }
+
     }
 
     /**
@@ -1244,14 +1322,14 @@ class Upela extends Module
                     'required' => true,
                     'tab' => 'store',
                 ),
-                array(
-                    'col' => 3,
-                    'type' => 'text',
-                    'name' => 'webservicekey',
-                    'label' => $this->l('Webservice key'),
-                    'required' => true,
-                    'tab' => 'store',
-                ),
+//                array(
+//                    'col' => 3,
+//                    'type' => 'text',
+//                    'name' => 'webservicekey',
+//                    'label' => $this->l('Webservice key'),
+//                    'required' => true,
+//                    'tab' => 'store',
+//                ),
             ),
             'submit' => array(
                 'title' => $this->l('   Create Account   ')
@@ -1414,14 +1492,6 @@ class Upela extends Module
                     'label' => $this->l('City'),
                     'required' => true,
                 ),
-                array(
-                    'col' => 3,
-                    'type' => 'text',
-                    'name' => 'webservicekey',
-                    'label' => $this->l('Webservice key'),
-                    'required' => true,
-                ),
-
             ),
             'submit' => array(
                 'title' => $this->l('   Create Store   ')
@@ -1492,204 +1562,10 @@ class Upela extends Module
             return false;
         }
 
+        $this->getWebServiceKey();
         $this->isConnected = true;
         $this->postSuccess[] = $this->l('Connection success!');
     }
 
 
-    /**
-     * @return bool
-     */
-    protected function createCarriers() {
-        $this->quickLog('createCarriers2');
-
-        return  (bool)Configuration::updateValue(self::OPT_CHEAPEST_CARRIER_ID,
-                                        $this->createCarrier($this->aCarrierDefinitions[self::VALUE_CHEAPEST])) &&
-                (bool)Configuration::updateValue(self::OPT_FASTEST_CARRIER_ID,
-                                        $this->createCarrier($this->aCarrierDefinitions[self::VALUE_FASTEST]));
-
-    }
-
-    /**
-     * Adds new carrier linked to the module
-     * @todo Add logo
-     * @todo delete / desactivate other carriers
-     * @param array $aDefinition Carrier definition, see upela::$aCarrierDefinitions
-     * @return int
-     */
-    protected function createCarrier($aDefinition) {
-        $this->quickLog('createCarrier: '.$aDefinition['name']);
-
-        $oCarrier = new Carrier();
-        $this->setCarrierProperties($oCarrier, $aDefinition);
-
-        if ($oCarrier->add()) {
-            $this->addCarrierToGroups($oCarrier);
-            $this->addCarrierToZones($oCarrier);
-            $oRangeWeight = $this->addCarrierRangeWeight($oCarrier);
-            $this->addDeliveryPrice($oCarrier, $oRangeWeight);
-            $this->copyCarrierImage($oCarrier);
-            return $oCarrier->id;
-        }
-        return 0;
-    }
-
-/**
-     * Sets carrier properties. Generates multilang / translated properties if necessary
-     * @param Carrier $oCarrier
-     * @param array $aDefinition <string : property name => mixed : property value>
-     */
-    protected function setCarrierProperties($oCarrier, $aDefinition) {
-
-        foreach ($aDefinition as $sKey => $mValue) {
-
-            if ($sKey === 'url') {
-                $mValue = $this->api->getBaseUrl().$mValue;
-            }
-
-            if ($sKey === 'delay') {
-                $mValue = array_fill_keys($this->getLanguagesIds(), $this->l($mValue));
-            }
-
-            if ($sKey === 'name') {
-                $mValue = $this->l($mValue);
-            }
-            $oCarrier->{$sKey} = $mValue;
-        }
-
-    }
-
-    /**
-     * Adds carrier to all groups
-     * @param Carrier $oCarrier
-     */
-    protected function addCarrierToGroups($oCarrier) {
-
-        $aGroups = array();
-
-        foreach (Group::getGroups($this->context->language->id) as $aGroup) {
-            $aGroups[] = (int)$aGroup['id_group'];
-        }
-
-        $this->setGroups($oCarrier, $aGroups);
-    }
-
-    /**
-     * Adds carrier to all active zones
-     * @param Carrier $oCarrier
-     */
-    protected function addCarrierToZones(Carrier $oCarrier) {
-        foreach (Zone::getZones(true) as $aZone) {
-            $oCarrier->addZone((int)$aZone['id_zone']);
-        }
-    }
-
-    /**
-     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
-     * @param Carrier $oCarrier
-     * @return RangeWeight
-     */
-    protected function addCarrierRangeWeight(Carrier $oCarrier) {
-
-        $oRangeWeight = new RangeWeight();
-
-        $oRangeWeight->id_carrier = $oCarrier->id;
-
-        $oRangeWeight->delimiter1 = 0;
-
-        $oRangeWeight->delimiter2 = 99999;
-
-        $oRangeWeight->add();
-
-        return $oRangeWeight;
-
-    }
-
-    protected function addDeliveryPrice(Carrier $oCarrier, $oRangeWeight) {
-        foreach ($oCarrier->getZones() as $aZone) {
-            Db::getInstance()->Execute('INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `price`)
-				VALUES ('.(int)($oCarrier->id).', NULL, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).', 0)');
-        }
-    }
-
-    /**
-     * Copies default image as carrier logo
-     * @param Carrier $oCarrier
-     * @return boolean
-     */
-    protected function copyCarrierImage($oCarrier) {
-
-        $sSource = _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'carriers'.DIRECTORY_SEPARATOR.'carrier-upela.jpg';
-
-        $sDestination = _PS_SHIP_IMG_DIR_.$oCarrier->id.'.jpg';
-
-        return copy($sSource, $sDestination);
-
-    }
-
-    /**
-     * Copy of Carrier::setGroups, not disponible before 1.5.4
-     * @param Carrier $oCarriers
-     * @param array $aGroups
-     * @param boolean $bDelete
-     * @return boolean
-     */
-    protected function setGroups($oCarriers, $aGroups, $bDelete = true){
-        if ($bDelete){
-            Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'carrier_group WHERE id_carrier = '. (int)$oCarriers->id);
-        }
-
-        if (!is_array($aGroups) || !count($aGroups)){
-            return true;
-        }
-
-        $aValues = array();
-
-        foreach ($aGroups as $nGroupId) {
-            $aValues[] = sprintf('(%d,%d)', (int)$oCarriers->id, (int)$nGroupId);
-        }
-
-        $sQuery = 'INSERT INTO '._DB_PREFIX_.'carrier_group (id_carrier, id_group) VALUES ' . implode(',', $aValues);
-        return Db::getInstance()->execute($sQuery);
-    }
-
-    /**
-     * Gets ids of all languages
-     * @return array <int : language id>
-     */
-    protected function getLanguagesIds(){
-
-        $aResult= array();
-
-        foreach (Language::getLanguages(false) as $aLanguage){
-
-            $aResult[] = (int)$aLanguage['id_lang'];
-
-        } // foreach
-
-        return $aResult;
-
-    }
-
-    /**
-     * Get Carriers list
-     * @param string $origin
-     * @return array
-     */
-    protected function getCarriers($origin){
-        $carriers = array(
-            'express' => array(
-                'name' => $this->l('Express'),
-                'actif' => false,
-                'price' => 0
-            ),
-            'standard' => array(
-                'name' => $this->l('Standard'),
-                'actif' => false,
-                'price' => 0
-            )
-        );
-
-        return $carriers;
-    }
 }

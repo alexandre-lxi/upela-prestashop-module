@@ -414,6 +414,12 @@
     color: #F60;
 }
 
+
+.blue, .blue a {
+    color: #2389a6;
+}
+
+
 .fontBlack {
     font-weight: 900;
 }
@@ -462,6 +468,9 @@
     font-weight: bold;
 }
 
+.toggleCarrier{
+    cursor : pointer;
+}
 .section9Img {
     position: relative;
     height: 97px;
@@ -478,6 +487,14 @@
 
 .fa-caret-right:before {
     content: "\f0da"
+}
+
+.fa-home:before {
+    content: "\f015";
+}
+
+.fa-map-marker:before {
+    content: "\f041";
 }
 
 .orangeBorder {

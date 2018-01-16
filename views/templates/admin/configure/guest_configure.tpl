@@ -44,12 +44,6 @@
                 {l s='The Upela solution' mod='upela'}
             </a>
         </li>
-        <li class="nav-item">
-            <a href="#carriers_form" data-toggle="tab" role="tab">
-                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-carriers.png"/>
-                {l s='Carriers' mod='upela'}
-            </a>
-        </li>
         {if {$upela_login}}
         <li class="active">
             {else}
@@ -57,21 +51,32 @@
             {/if}
             <a href="#settings_form" data-toggle="tab" role="tab">
                 <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-config.png"/>
-                {l s='Connections parameters' mod='upela'}
+                {l s='Parameters' mod='upela'}
             </a>
         </li>
-        <li class="nav-item">
-            <a href="#guide_form" data-toggle="tab" role="tab">
-                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
-                {l s='User manual' mod='upela'}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="#contact_form" data-toggle="tab" role="tab">
-                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-contact.png"/>
-                {l s='Contact' mod='upela'}
-            </a>
-        </li>
+        {if {$upela_user_connected}}
+            <li class="nav-item">
+                <a href="#carriers_form" data-toggle="tab" role="tab">
+                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-carriers.png"/>
+                    {l s='Carriers' mod='upela'}
+                </a>
+            </li>
+        {/if}
+
+        {if {$isnotpsready}}
+            <li class="nav-item">
+                <a href="#guide_form" data-toggle="tab" role="tab">
+                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
+                    {l s='User manual' mod='upela'}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#contact_form" data-toggle="tab" role="tab">
+                    <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-contact.png"/>
+                    {l s='Contact' mod='upela'}
+                </a>
+            </li>
+        {/if}
     </ul>
 </div>
 
@@ -379,23 +384,184 @@
         <div class="row">
             <div class="panel section8">
                 <div class="row">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="carrier">{l s='Carrier' mod='upela'}</th>
-                            <!--<th class="offer">{l s='Offer' mod='upela'}</th>
-                            <th class="area">{l s='Coverage' mod='upela'}</th>
-                            <th class="departure">{l s='Departure' mod='upela'}</th>
-                            <th class="destination">{l s='Destination' mod='upela'}</th>
-                            <th class="delivery_due_time">{l s='Delay' mod='upela'}</th>-->
-                            <th class="status">{l s='Status' mod='upela'}</th>
-                            <th class="price">{l s='Price' mod='upela'}</th>
-                            <th class="edit">{l s='Edit' mod='upela'}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <form method="POST" action="{$upela_update_carrier_link|escape:'htmlall':'UTF-8'}">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="carrier">{l s='Carrier' mod='upela'}</th>
+                                <th class="offer">{l s='Offer' mod='upela'}</th>
+                                <th class="from">{l s='From' mod='upela'}</th>
+                                <th class="to">{l s='To' mod='upela'}</th>
+                                <th class="delay">{l s='Delay' mod='upela'}</th>
+                                <th class="status">{l s='Status' mod='upela'}</th>
+                                <!--<th class="edit">{l s='Edit' mod='upela'}</th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($carriersListOthers) && $carriersListOthers && sizeof($carriersListOthers)}
+                                <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Standard' mod='upela'}</span></td></tr>
+
+                                {foreach from=$carriersListOthers key=o item=offer}
+                                    <tr>
+                                        <td class="operator">{$offer.label|escape:'htmlall':'UTF-8'}</td>
+                                        <td class="offer">{$offer.desc_store|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_pickup_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+                                        {if $offer.is_dropoff_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+
+                                        <td class="delay">{$offer.delay_text|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_active == 1}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers1[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/enabled.gif" alt="true" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
+                                            </td>
+                                        {else}
+                                            <td class="status">
+                                                <div class="hide">
+                                                <input type="checkbox" name="offers1[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
+                                        {/if}
+
+                                        <!--<td class="edit"></td>-->
+                                    </tr>
+                                {/foreach}
+                            {/if}
+
+                            {if isset($carriersListExpress) && $carriersListExpress && sizeof($carriersListExpress)}
+                                <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Express' mod='upela'}</span></td></tr>
+
+                                {foreach from=$carriersListExpress key=o item=offer}
+                                    <tr>
+                                        <td class="operator">{$offer.label|escape:'htmlall':'UTF-8'}</td>
+                                        <td class="offer">{$offer.desc_store|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_pickup_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+                                        {if $offer.is_dropoff_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+
+                                        <td class="delay">{$offer.delay_text|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_active == 1}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers2[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/enabled.gif" alt="true" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
+                                        {else}
+
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers2[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
+                                            </td>
+                                        {/if}
+
+                                        <!--<td class="edit"></td>-->
+                                    </tr>
+                                {/foreach}
+                            {/if}
+
+                            {if isset($carriersListRelay) && $carriersListRelay && sizeof($carriersListRelay)}
+                                <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Relay' mod='upela'}</span></td></tr>
+
+                                {foreach from=$carriersListRelay key=o item=offer}
+                                    <tr>
+                                        <td class="operator">{$offer.label|escape:'htmlall':'UTF-8'}</td>
+                                        <td class="offer">{$offer.desc_store|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_pickup_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+                                        {if $offer.is_dropoff_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+
+                                        <td class="delay">{$offer.delay_text|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_active == 1}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/enabled.gif" alt="true" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
+                                        {else}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
+                                            </td>
+                                        {/if}
+
+                                        <!--<td class="edit"></td>-->
+                                    </tr>
+                                {/foreach}
+                            {/if}
+                            </tbody>
+                        </table>
+                        <div class="margin-form submit">
+                            <div class="col-sm-offset-4">
+                                <button name="processParameters" type="submit"
+                                        class="btn btn-primary text-center part__button">
+                                    {l s='Save'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -487,110 +653,177 @@
         </div>
     </div>
     <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'}}active{/if}" id="settings_form" role="tabpanel">
-        <div class="panel">
-            <div class="row">
-                <div class="panel-content part__content">
-                    <h2 class="col-lg-offset-4">{l s='Connection parameters to your Upela account' mod='upela'}</h2>
-                    <br>
-                    {if $upela_user_connected}
-                        <h4 class="col-lg-offset-4">{l s='Your account has been activated.' mod='upela'}</h4>
-                        <br>
-                        <form method='POST' action="#"
-                              class="form-horizontal col-lg-5 col-lg-offset-4">
-                            <div class="form-group">
-                                <label for="email" class="col-sm-4">{l s='Email' mod='upela'}</label>
-                                <div class="col-sm-8">
-                                    <input name="upela_email" type="email" class="form-control" id="email"
-                                           placeholder="{l s='Email' mod='upela'}" disabled
-                                           value="{$upela_user_email|escape:'htmlall':'UTF-8'}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="col-sm-4">{l s='Password' mod='upela'}</label>
-                                <div class="col-sm-8">
-                                    <input name="upela_password" type="password" class="form-control" id="password"
-                                           placeholder="{l s='Password' mod='upela'}" disabled>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-offset-3">
-                                        <button name="updateLogin" type="submit"
-                                                class="btn btn-primary text-center part__button">
-                                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13-w.png">
-                                            {l s='Disconnect' mod='upela'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    {else}
-                        <form method='POST' action="{$upela_login_link|escape:'htmlall':'UTF-8'}"
-                              class="form-horizontal col-lg-5 col-lg-offset-4">
-                            <div class="form-group">
-                                <label for="email" class="col-sm-4">{l s='Email' mod='upela'}</label>
-                                <div class="col-sm-8">
-                                    <input name="upela_email" type="email" class="form-control" id="email"
-                                           placeholder="{l s='Email' mod='upela'}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="col-sm-4">{l s='Password' mod='upela'}</label>
-                                <div class="col-sm-8">
-                                    <input name="upela_password" type="password" class="form-control" id="password"
-                                           placeholder="{l s='Password' mod='upela'}">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-offset-3">
-                                        <button name="processLogin" type="submit"
-                                                class="btn btn-primary text-center part__button">
-                                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13-w.png">
-                                            {l s='Log Into your Account' mod='upela'}
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-offset-3">
-                                    <a href="{$upela_register_link|escape:'htmlall':'UTF-8'}"
-                                       class="part__button button--white">
-                                        <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-14-u.png">
-                                        {l s='Create a Business Account' mod='upela'}
-                                    </a>
-                                </div>
-                            </div>
-
-                        </form>
-                    {/if}
-                </div>
-            </div>
-        </div>
         {if $upela_user_connected}
             <div class="panel">
                 <div class="row">
                     <div class="panel-content part__content">
-                        <h2 class="col-lg-offset-4">{l s='Stores information' mod='upela'}</h2>
+                        <h2 class="col-lg-offset-4">{l s='Shipment information' mod='upela'}</h2>
                         <br>
-                        <h4 class="col-lg-offset-4">{l s='You currently have:' mod='upela'} {$upela_nbstores|escape:'htmlall':'UTF-8'} {l s='store(s)' mod='upela'}</h4>
-                        <h4 class="col-lg-offset-4">{l s='You currently have:' mod='upela'} {$upela_storeexsists|escape:'htmlall':'UTF-8'} {l s='Prestashop store(s)' mod='upela'}</h4>
-                        <br>
-                        <div class="col-lg-5 col-lg-offset-4">
-                            <div class="row">
-                                <div class="col-sm-offset-3">
-                                    <a href="{$upela_store_link|escape:'htmlall':'UTF-8'}"
-                                       class="part__button button--white"
-                                       style="text-align: center;">
-                                        <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-40.png">
-                                        {l s='Create store' mod='upela'}
-                                    </a>
+                        <form method='POST' action="{$upela_parameters_link|escape:'htmlall':'UTF-8'}"
+                              class="form-horizontal col-lg-offset-4">
+                            <h4>{l s='Default parcel informations' mod='upela'}</h4>
+                            <div class="form-group">
+                                <label for="ship_content" class="col-sm-4">{l s='Shipments content' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="ship_content" type="text" class="form-control" id="ship_content"
+                                           placeholder="{l s='Shipment content' mod='upela'}"
+                                           value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
                                 </div>
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_weight" type="text" class="form-control" id="upela_weight"
+                                           placeholder="{l s='Weight (Kg)' mod='upela'}"
+                                           value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                            <h5>{l s='Dimensions (cm)' mod='upela'}</h5>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_length" type="text" class="form-control" id="upela_length"
+                                           placeholder="{l s='Length' mod='upela'}"
+                                           value="{$upela_length|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_width" type="text" class="form-control" id="upela_width"
+                                           placeholder="{l s='Width' mod='upela'}"
+                                           value="{$upela_width|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_height" type="text" class="form-control" id="upela_height"
+                                           placeholder="{l s='Height' mod='upela'}"
+                                           value="{$upela_height|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-1">
+                                    <button name="processParameters" type="submit"
+                                            class="btn btn-primary text-center part__button">
+                                        {l s='Save'}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         {/if}
+        <div class="panel">
+            <div class="row">
+                <div class="panel-content part__content">
+                    <div class="col-lg-12">
+                        <h2>{l s='Connection parameters to your Upela account' mod='upela'}</h2>
+                        <br>
+                        <div class="col-lg-6">
+                        {if $upela_user_connected}
+
+                            <h4>{l s='Your account has been activated.' mod='upela'}</h4>
+                            <br>
+                            <form method='POST' action="#"
+                                  class="form-horizontal col-lg-offset-1">
+                                <div class="form-group">
+                                    <label for="email" class="col-sm-4">{l s='Email' mod='upela'}</label>
+                                    <div class="col-sm-6">
+                                        <input name="upela_email" type="email" class="form-control" id="email"
+                                               placeholder="{l s='Email' mod='upela'}" disabled
+                                               value="{$upela_user_email|escape:'htmlall':'UTF-8'}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="col-sm-4">{l s='Password' mod='upela'}</label>
+                                    <div class="col-sm-6">
+                                        <input name="upela_password" type="password" class="form-control" id="password"
+                                               placeholder="{l s='Password' mod='upela'}" disabled>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-3">
+                                            <button name="updateLogin" type="submit"
+                                                    class="btn btn-primary text-center part__button">
+                                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13-w.png">
+                                                {l s='Disconnect' mod='upela'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        {else}
+                            <form method='POST' action="{$upela_login_link|escape:'htmlall':'UTF-8'}"
+                                  class="form-horizontal col-lg-offset-1">
+                                <div class="form-group">
+                                    <label for="email" class="col-sm-4">{l s='Email' mod='upela'}</label>
+                                    <div class="col-sm-6">
+                                        <input name="upela_email" type="email" class="form-control" id="email"
+                                               placeholder="{l s='Email' mod='upela'}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="col-sm-4">{l s='Password' mod='upela'}</label>
+                                    <div class="col-sm-6">
+                                        <input name="upela_password" type="password" class="form-control" id="password"
+                                               placeholder="{l s='Password' mod='upela'}">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-1">
+                                            <button name="processLogin" type="submit"
+                                                    class="btn btn-primary text-center part__button">
+                                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13-w.png">
+                                                {l s='Log Into your Account' mod='upela'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-offset-1">
+                                        <a href="{$upela_register_link|escape:'htmlall':'UTF-8'}"
+                                           class="part__button button--white">
+                                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-14-u.png">
+                                            {l s='Create a Business Account' mod='upela'}
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </form>
+                        {/if}
+                        </div>
+                        <div class="col-lg-6">
+                            <h4 class="col-lg-offset-1">{l s='Stores information' mod='upela'}</h4>
+                            <br>
+                            <h4 class="col-lg-offset-1">{l s='You currently have:' mod='upela'} {$upela_nbstores|escape:'htmlall':'UTF-8'} {l s='store(s)' mod='upela'}</h4>
+                            <h4 class="col-lg-offset-1">{l s='You currently have:' mod='upela'} {$upela_storeexsists|escape:'htmlall':'UTF-8'} {l s='Prestashop store(s)' mod='upela'}</h4>
+                            <br>
+                            {if $upela_user_connected}
+                            <div class="col-lg-offset-1">
+                                <div class="row">
+                                    <div class="col-sm-offset-3">
+                                        <a href="{$upela_store_link|escape:'htmlall':'UTF-8'}"
+                                           class="part__button button--white"
+                                           style="text-align: center;">
+                                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-40.png">
+                                            {l s='Create store' mod='upela'}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <div class="tab-pane" id="contact_form" role="tabpanel">
         <div class="row">
@@ -619,3 +852,29 @@
     </div>
 
 </div>
+
+
+<script type="text/javascript">
+
+    function UpelatoggleCarrier (carrier) {
+        Upela_modify = true;
+        var value = carrier.attr('alt');
+
+
+            var prices = carrier.parents('tr').find('.price').children('div');
+            var checkbox = carrier.parent('td').find('input');
+
+            if (value === 'true') {
+                //prices.fadeOut();
+                carrier.attr('alt', 'false');
+                checkbox.attr('checked', false);
+                carrier.attr('src', '../img/admin/disabled.gif');
+            } else {
+                carrier.attr('alt', 'true');
+                checkbox.attr('checked', true);
+                carrier.attr('src', '../img/admin/enabled.gif');
+            }
+
+
+    }
+</script>
