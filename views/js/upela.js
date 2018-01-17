@@ -141,7 +141,6 @@ $(document).ready(function() {
                     $('#selected-delivery-point').text('Impossible de trouver un point relais');
                 }
                 else {
-
                     if( readCookie('dropoffLocation') === null)
                     {
                         first = s.rows[0];
@@ -150,9 +149,7 @@ $(document).ready(function() {
                     {
                         first = JSON.parse(readCookie('dropoffLocation'))
                     }
-
                     initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:1});
-
                     listDroppOff = s.rows;
                     setSelectedVal(first);
                 }
@@ -182,7 +179,7 @@ $('body').on('click','.upela-marker-click',function(){
     var latlng = new google.maps.LatLng(
         parseFloat(data.latitude),
         parseFloat(data.longitude));
-    first.number = 1;
+    data.number = 1;
     createMarker(latlng, data);
     google.maps.event.trigger(map, 'resize');
 });
