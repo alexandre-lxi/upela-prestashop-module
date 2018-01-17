@@ -505,4 +505,44 @@ class UpelaApi
     {
         return array('login' => $this->user, 'password' => $this->passwd);
     }
+
+    public function getPrices($addressFrom, $addressTo, $parcel){
+        $date = date('Y-m-d');
+        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
+
+        $this->action = self::API_POST;
+        $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
+
+        $data = array(
+            'account'=>$this->getCredentials(),
+            'ship_from' => array(
+                'country_code' => $addressFrom['country'],
+                'postcode' => $addressFrom['cp'],
+                'city' => $addressFrom['city'],
+                'pro' => 1,
+            ),
+            'ship_to' => array(
+                'country_code' => $addressTo['country'],
+                'postcode' => $addressTo['cp'],
+                'city' => $addressTo['city'],
+                'pro' => 1,
+            ),
+            'parcels' => array(
+                array(
+                    'number' => 1,
+                    'weight' => (int)$parcel['weight'],
+                    'x' => (int)$parcel['length'],
+                    'y' => (int)$parcel['width'],
+                    'z' => (int)$parcel['height'],)
+            ),
+            'shipment_date' => $date,
+            'unit' => 'fr',
+            'selection'=> 'all',
+            'type' => 'parcel'
+        );
+
+        $prices = $this->makeCall($this->getBody($data), null, true, false);
+
+        return $prices;
+    }
 }

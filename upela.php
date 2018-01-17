@@ -29,6 +29,7 @@ class Upela extends Module
     protected $errors = array();
     private $mode = null;
     private $api = null;
+    private $upela_helper = null;
     private $isConnected = false;
     private $carriers;
     /**
@@ -61,7 +62,8 @@ class Upela extends Module
 
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 
-        $this->carriers = new UpelaCarriers(Db::getInstance(), $this->name);
+        $this->carriers = new UpelaCarriers(Db::getInstance(), $this->name, $this->api);
+        $this->upela_helper = new UpelaHelper(Db::getInstance());
     }
 
     /**
@@ -234,10 +236,9 @@ class Upela extends Module
      * @return bool
      */
     public function uninstallDb() {
-        $helper = new UpelaHelper();
 
         $tables = array();
-        foreach ($helper->getTablesNames() as $table) {
+        foreach ($this->upela_helper->getTablesNames() as $table) {
             Logger::addLog('UPELA: remove '.$table);
             $tables[] = '`' . _DB_PREFIX_ . $table . '`';
         }
@@ -383,7 +384,6 @@ class Upela extends Module
 
     public function hookdisplayAdminOrder(&$params)
     {
-
         $this->context->smarty->assign(array(
             'simple_link' => $this->_path,
             'reference' => " ",
@@ -499,6 +499,7 @@ class Upela extends Module
             Configuration::updateValue('UPELA_SHIP_LENGTH', Tools::getValue('upela_length'));
             Configuration::updateValue('UPELA_SHIP_WIDTH', Tools::getValue('upela_width'));
             Configuration::updateValue('UPELA_SHIP_HEIGHT', Tools::getValue('upela_height'));
+            $this->context->smarty->assign(array('postSuccess' => $this->l('Parameters updates!') ));
         }
 
         if (Tools::isSubmit('update_carriers')) {
@@ -529,9 +530,17 @@ class Upela extends Module
             }
         }
 
-        $carriersListExpress = $this->carriers->getCarriersForTpl('FR', 'and is_express=1');
-        $carriersListRelay = $this->carriers->getCarriersForTpl('FR', 'and is_dropoff_point=1');
-        $carriersListOthers = $this->carriers->getCarriersForTpl('FR', 'and is_dropoff_point=0 and is_express=0');
+        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+        } else {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+        }
+
+        $zone = $this->upela_helper->getCountryZone($defaultCountry);
+
+        $carriersListExpress = $this->carriers->getCarriersForTpl($zone, 'and is_express=1 and is_dropoff_point=0',false, Language::getLanguages(true, $this->context->shop->id));
+        $carriersListRelay = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=1 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
+        $carriersListOthers = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=0 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
 
 
         $this->context->smarty->assign(
@@ -1030,8 +1039,6 @@ class Upela extends Module
         if (($wskey != '') && $webservice_key->keyExists($wskey)){
                 return $wskey;
         }else{
-            $upela_helper = new UpelaHelper();
-
             Configuration::updateValue('PS_WEBSERVICE', 1);
             Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
 
@@ -1043,7 +1050,7 @@ class Upela extends Module
             $webservice_key->description = 'Upela';
 
             $webservice_key->add();
-            WebserviceKey::setPermissionForAccount($webservice_key->id, $upela_helper->getPermissions());
+            WebserviceKey::setPermissionForAccount($webservice_key->id, $this->upela_helper->getPermissions());
 
             Configuration::updateValue('UPELA_WEBSERVICE_KEY', $key);
             return $key;

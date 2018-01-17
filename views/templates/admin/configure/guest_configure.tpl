@@ -398,6 +398,56 @@
                             </tr>
                             </thead>
                             <tbody>
+                            {if isset($carriersListRelay) && $carriersListRelay && sizeof($carriersListRelay)}
+                                <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Relay' mod='upela'}</span></td></tr>
+
+                                {foreach from=$carriersListRelay key=o item=offer}
+                                    <tr>
+                                        <td class="operator">{$offer.label|escape:'htmlall':'UTF-8'}</td>
+                                        <td class="offer">{$offer.desc_store|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_pickup_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+                                        {if $offer.is_dropoff_point == 0}
+                                            <td class="from">
+                                                <span class="orange fa fa-home"></span>
+                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
+                                        {else}
+                                            <td class="from">
+                                                <span class="blue fa fa-map-marker"></span>
+                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
+                                        {/if}
+
+
+                                        <td class="delay">{$offer.delay_text|escape:'htmlall':'UTF-8'}</td>
+
+                                        {if $offer.is_active == 1}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/enabled.gif" alt="true" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
+                                        {else}
+                                            <td class="status">
+                                                <div class="hide">
+                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
+                                                </div>
+                                                <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
+                                            </td>
+                                        {/if}
+
+                                        <!--<td class="edit"></td>-->
+                                    </tr>
+                                {/foreach}
+                            {/if}
                             {if isset($carriersListOthers) && $carriersListOthers && sizeof($carriersListOthers)}
                                 <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Standard' mod='upela'}</span></td></tr>
 
@@ -491,57 +541,6 @@
                                             <td class="status">
                                                 <div class="hide">
                                                     <input type="checkbox" name="offers2[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
-                                                </div>
-                                                <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
-                                            </td>
-                                        {/if}
-
-                                        <!--<td class="edit"></td>-->
-                                    </tr>
-                                {/foreach}
-                            {/if}
-
-                            {if isset($carriersListRelay) && $carriersListRelay && sizeof($carriersListRelay)}
-                                <tr  ><td colspan = 9><span class="accent-font" style="font-size: 16px">{l s='Relay' mod='upela'}</span></td></tr>
-
-                                {foreach from=$carriersListRelay key=o item=offer}
-                                    <tr>
-                                        <td class="operator">{$offer.label|escape:'htmlall':'UTF-8'}</td>
-                                        <td class="offer">{$offer.desc_store|escape:'htmlall':'UTF-8'}</td>
-
-                                        {if $offer.is_pickup_point == 0}
-                                            <td class="from">
-                                                <span class="orange fa fa-home"></span>
-                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
-                                        {else}
-                                            <td class="from">
-                                                <span class="blue fa fa-map-marker"></span>
-                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
-                                        {/if}
-
-                                        {if $offer.is_dropoff_point == 0}
-                                            <td class="from">
-                                                <span class="orange fa fa-home"></span>
-                                                <span class="orange">{l s='On-site' mod='upela'}</span></td>
-                                        {else}
-                                            <td class="from">
-                                                <span class="blue fa fa-map-marker"></span>
-                                                <span class="blue">{l s='Dropoff' mod='upela'}</span></td>
-                                        {/if}
-
-
-                                        <td class="delay">{$offer.delay_text|escape:'htmlall':'UTF-8'}</td>
-
-                                        {if $offer.is_active == 1}
-                                            <td class="status">
-                                                <div class="hide">
-                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
-                                                </div>
-                                                <img src="../img/admin/enabled.gif" alt="true" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
-                                        {else}
-                                            <td class="status">
-                                                <div class="hide">
-                                                    <input type="checkbox" name="offers3[]" value="{$offer.id_service|escape:'htmlall':'UTF-8'}" id="offer{$offer.id_service|escape:'htmlall':'UTF-8'}" {if $offer.is_active > 0} checked="checked"{/if}/>
                                                 </div>
                                                 <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))">
                                             </td>
