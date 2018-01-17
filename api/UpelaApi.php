@@ -20,10 +20,10 @@
 class UpelaApi
 {
     const URL_API = 'https://api.upela.com/';
-    const URL_API_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
-    //const URL_API_TEST = 'https://dev.upela.com/';
+    //const URL_API_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
+    const URL_API_TEST = 'https://dev.upela.com/';
     const URL_UPELA = 'https://www.upela.com/';
-    const URL_UPELA_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
+    const URL_UPELA_TEST = 'https://dev.upela.com/';
 
     const API_MODE_PROD = 'prod';
     const API_MODE_TEST = 'test';

@@ -1582,5 +1582,9 @@ class Upela extends Module
         $this->postSuccess[] = $this->l('Connection success!');
     }
 
+    public function getOrderShippingCost($params, $shipping_cost)
+    {
+        return $shipping_cost; // carrier is not known
+    }
 
 }
