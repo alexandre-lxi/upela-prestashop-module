@@ -232,6 +232,10 @@ class UpelaCarriers
                         continue;
 
                     $carrierInfo =  $this->getCarriers(false,false, $serviceId);
+
+//                    print_r($carrierInfo);
+//                    print_r($activeCarrier);
+
                     if (isset($carrierInfo[0]['id_carrier']) && isset($activeCarrier['id_carrier'])) {
                         if ($carrierInfo[0]['id_carrier'] == $activeCarrier['id_carrier']) {
                             $toDel = false;
@@ -240,7 +244,9 @@ class UpelaCarriers
                     }
                 }
 
-                //die();
+
+
+
 
                 if ($toDel){
                     $carrier = new Carrier($activeCarrier['id_carrier']);
@@ -252,9 +258,10 @@ class UpelaCarriers
                     $query = 'update `'._DB_PREFIX_.'upela_services` us
                             set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
 
-                    return $this->db->execute($query);
+                    $this->db->execute($query);
                 }
             }
+            //die();
         }
 
         return $ret;
