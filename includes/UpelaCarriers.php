@@ -179,74 +179,81 @@ class UpelaCarriers
      * @return bool
      */
     public function createCarriers($servicesId) {
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
-            $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
-        } else {
-            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+        $ret=true;
+
+        if(count($servicesId)>0) {
+            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+                $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+            } else {
+                $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+            }
+
+            $this->prices = array();
+
+            if (array_key_exists($defaultCountry, UpelaHelper::$countryCities)) {
+                $addressFrom = array(
+                    'country' => $defaultCountry,
+                    'city' => Configuration::get('PS_SHOP_CITY'),
+                    'cp' => Configuration::get('PS_SHOP_CODE')
+                );
+                $addressTo = array(
+                    'country' => $defaultCountry,
+                    'city' => UpelaHelper::$countryCities[$defaultCountry]['city'],
+                    'cp' => UpelaHelper::$countryCities[$defaultCountry]['cp'],
+                );
+                $parcel = array(
+                    'weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
+                    'length' => Configuration::get('UPELA_SHIP_LENGTH'),
+                    'width' => Configuration::get('UPELA_SHIP_WIDTH'),
+                    'height' => Configuration::get('UPELA_SHIP_HEIGHT'),
+                );
+
+                $this->prices = $this->api->getPrices($addressFrom, $addressTo, $parcel);
+            }
+
+            foreach ($servicesId as $serviceId) {
+                if ($serviceId == '')
+                    continue;
+
+                $carrierInfo = $this->getCarriers(false, false, $serviceId);
+
+                $carrierId = $this->createCarrier($carrierInfo[0]);
+
+                $this->updateCarrierUpela($carrierInfo[0]['id_service'], $carrierId, 1);
+            }
+
+            $activeCarriers = $this->getActiveCarriers();
+
+            foreach ($activeCarriers as $activeCarrier) {
+                $toDel = true;
+
+                foreach ($servicesId as $serviceId) {
+                    if ($serviceId == '')
+                        continue;
+
+                    $carrierInfo =  $this->getCarriers(false,false, $serviceId);
+
+                    if (isset($carrierInfo[0]['id_carrier']) && isset($activeCarrier['id_carrier'])) {
+                        if ($carrierInfo[0]['id_carrier'] == $activeCarrier['id_carrier']) {
+                            $toDel = false;
+                            break;
+                        }
+                    }
+                }
+
+                if ($toDel){
+                    $carrier = new Carrier($activeCarrier['id_carrier']);
+                    $carrier->delete();
+
+                    $query = 'update `'._DB_PREFIX_.'upela_services` us
+                            set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
+
+                    return $this->db->execute($query);
+                }
+            }
         }
 
-        $this->prices = array();
-
-        if (array_key_exists($defaultCountry, UpelaHelper::$countryCities)) {
-            $addressFrom = array(
-                'country' => $defaultCountry,
-                'city' => Configuration::get('PS_SHOP_CITY'),
-                'cp' => Configuration::get('PS_SHOP_CODE')
-            );
-            $addressTo = array(
-                'country' => $defaultCountry,
-                'city' => UpelaHelper::$countryCities[$defaultCountry]['city'],
-                'cp' => UpelaHelper::$countryCities[$defaultCountry]['cp'],
-            );
-            $parcel = array(
-                'weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
-                'length' => Configuration::get('UPELA_SHIP_LENGTH'),
-                'width' => Configuration::get('UPELA_SHIP_WIDTH'),
-                'height' => Configuration::get('UPELA_SHIP_HEIGHT'),
-            );
-
-            $this->prices = $this->api->getPrices($addressFrom, $addressTo, $parcel);
-        }
-
-        foreach ($servicesId as $serviceId) {
-            $carrierInfo =  $this->getCarriers(false,false, $serviceId);
-
-            $carrierId = $this->createCarrier($carrierInfo[0]);
-
-            $this->updateCarrierUpela($carrierInfo[0]['id_service'], $carrierId, 1);
-        }
-
-        $activeCarriers = $this->getActiveCarriers();
-
-        foreach ($activeCarriers as $activeCarrier) {
-            $toDel = true;
-
-//            foreach ($servicesId as $serviceId) {
-//                $carrierInfo =  $this->getCarriers(false,false, $serviceId);
-//
-//                if (isset($carrierInfo['id_carrier']) && isset($activeCarrier['id_carrier'])) {
-//                    if ($carrierInfo['id_carrier'] == $activeCarrier['id_carrier']) {
-//                        $toDel = false;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if ($toDel){
-//                Logger::addLog('UPELA: Carrier desactive '.$activeCarrier['id_carrier']);
-//
-//                $carrier = new Carrier($activeCarrier['id_carrier']);
-//                $carrier->delete();
-//
-//                $query = 'update `'._DB_PREFIX_.'upela_services` us
-//                        set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
-//
-//                return $this->db->execute($query);
-//            }
-        }
-
-        //die();
-
+        return $ret;
     }
 
     /**

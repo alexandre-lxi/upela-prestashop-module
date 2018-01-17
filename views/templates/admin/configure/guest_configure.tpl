@@ -394,7 +394,7 @@
                                 <th class="to">{l s='To' mod='upela'}</th>
                                 <th class="delay">{l s='Delay' mod='upela'}</th>
                                 <th class="status">{l s='Status' mod='upela'}</th>
-                                <!--<th class="edit">{l s='Edit' mod='upela'}</th>-->
+                                <th class="edit">{l s='Edit' mod='upela'}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -444,7 +444,19 @@
                                             </td>
                                         {/if}
 
-                                        <!--<td class="edit"></td>-->
+                                        <td class="edit">
+                                            {if $offer.is_active == 1}
+                                            <div class="btn-group-action">
+                                                <div class="btn-group">
+                                                    <a href="{$carrierControllerUrl|escape:'htmlall':'UTF-8'}&id_carrier={$offer.id_carrier|escape:'htmlall':'UTF-8'}" title="{l s='Edit' mod='upela'}" class="edit btn btn-default" target="_blank" >
+                                                        <i class="icon-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            {else}
+                                            <div class="disable-edit">-</div>
+                                            {/if}
+                                        </td>
                                     </tr>
                                 {/foreach}
                             {/if}
@@ -494,7 +506,19 @@
                                                 <img src="../img/admin/disabled.gif" alt="done" class="toggleCarrier" onclick="UpelatoggleCarrier($(this))"></td>
                                         {/if}
 
-                                        <!--<td class="edit"></td>-->
+                                        <td class="edit">
+                                            {if $offer.is_active == 1}
+                                                <div class="btn-group-action">
+                                                    <div class="btn-group">
+                                                        <a href="{$carrierControllerUrl|escape:'htmlall':'UTF-8'}&id_carrier={$offer.id_carrier|escape:'htmlall':'UTF-8'}" title="{l s='Edit' mod='upela'}" class="edit btn btn-default" target="_blank" >
+                                                            <i class="icon-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {else}
+                                                <div class="disable-edit">-</div>
+                                            {/if}
+                                        </td>
                                     </tr>
                                 {/foreach}
                             {/if}
@@ -546,7 +570,19 @@
                                             </td>
                                         {/if}
 
-                                        <!--<td class="edit"></td>-->
+                                        <td class="edit">
+                                            {if $offer.is_active == 1}
+                                                <div class="btn-group-action">
+                                                    <div class="btn-group">
+                                                        <a href="{$carrierControllerUrl|escape:'htmlall':'UTF-8'}&id_carrier={$offer.id_carrier|escape:'htmlall':'UTF-8'}" title="{l s='Edit' mod='upela'}" class="edit btn btn-default" target="_blank" >
+                                                            <i class="icon-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {else}
+                                                <div class="disable-edit">-</div>
+                                            {/if}
+                                        </td>
                                     </tr>
                                 {/foreach}
                             {/if}

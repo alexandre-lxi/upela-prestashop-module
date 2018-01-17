@@ -507,9 +507,12 @@ class Upela extends Module
             $offers2 = (array)Tools::getValue('offers2');
             $offers3 = (array)Tools::getValue('offers3');
 
-            $this->carriers->createCarriers($offers1);
-            $this->carriers->createCarriers($offers2);
-            $this->carriers->createCarriers($offers3);
+            $offers = array_merge($offers1, $offers2, $offers3);
+
+            if ($this->carriers->createCarriers($offers))
+                $this->context->smarty->assign(array('postSuccess' => $this->l('Carriers updates!') ));
+            else
+                $this->context->smarty->assign(array('postErrors' => $this->l('Carriers updates issue!') ));
         }
 
         $storeExists = 0;
@@ -542,6 +545,11 @@ class Upela extends Module
         $carriersListRelay = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=1 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
         $carriersListOthers = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=0 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
 
+        if (!file_exists(_PS_ROOT_DIR_.'/controllers/admin/AdminCarrierWizardController.php')) {
+            $carrierControllerUrl = $this->context->link->getAdminLink('AdminCarriers').'&updatecarrier';
+        } else {
+            $carrierControllerUrl = $this->context->link->getAdminLink('AdminCarrierWizard');
+        }
 
         $this->context->smarty->assign(
             array(
@@ -583,8 +591,8 @@ class Upela extends Module
                 'carriersListExpress' => $carriersListExpress,
                 'carriersListRelay' => $carriersListRelay,
                 'carriersListOthers' => $carriersListOthers,
-                'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY'
-
+                'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY',
+                'carrierControllerUrl' => $carrierControllerUrl
             )
         );
 
