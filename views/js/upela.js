@@ -237,10 +237,11 @@ function sendCommandeToUpela($data){
                 $('#upela-error').html('Une erreur est survenu, impossible de traiter votre demande');
             }else
             {
-                var WayBilllink = '<tr><td><a href="'+result.waybill.url+'" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
+                var WayBilllink = '<tr><td class="up-sended-td">';
+                WayBilllink += '<img  src="'+pdfImg+'" width="150px;">';
+                WayBilllink = WayBilllink+'<br><a href="'+result.waybill.url+'" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
                 $('#table-body-upela').html(WayBilllink);
             }
-
         },
         error:function(e){
             console.log(e);

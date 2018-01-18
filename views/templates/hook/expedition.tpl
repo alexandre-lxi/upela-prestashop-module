@@ -21,10 +21,17 @@
         padding-top:20px !important;
         padding-bottom:20px !important;
         padding-right:20px !important;  }
+    .up-sended-td{
+        padding:10% !important;
+        text-align:center !important;
+        vertical-align:middle !important;
+    }
 
 </style>
 <script type="text/javascript">
     var infoExpedition = {$jsonShipInfo};
+    var pdfImg = "{$simple_link|escape:'html':'UTF-8'}views/img/bordereau.jpg";
+
 
     $(function () {
         $('#expeditionTab').insertBefore('#myTab');
