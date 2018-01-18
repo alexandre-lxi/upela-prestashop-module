@@ -50,9 +50,8 @@ function initializeMap(options) {
         zoom: options.zoom,
         center: uluru
     });
-    google.maps.event.trigger(map, 'resize');
-
     infoWindow = new google.maps.InfoWindow();
+    google.maps.event.trigger(map, 'resize');
 }
 function setSelectedVal(dropoffLocation)
 {
@@ -196,3 +195,35 @@ $('body').on('click','.upela-marker-click',function(){
     google.maps.event.trigger(map, 'resize');
 });
 
+$('#checkout-delivery-step h1').on('click',function(){
+    $('#map-upela-selected').html('Loading map ...');
+    setTimeout(function(){
+        initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:11});
+        var latlng = new google.maps.LatLng(
+            parseFloat(first.latitude),
+            parseFloat(first.longitude));
+        first.number = 1;
+        createMarker(latlng, first);
+        google.maps.event.trigger(first, 'resize');
+    },500);
+});
+
+
+function sendCommandeToUpela(){
+    var url = 'index.php?fc=module&module=upela&controller=ajax&option=';
+
+    var data = {id:'id'};
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: data,
+        success:function(s){
+            console.log(s);
+        },
+        error:function(e){
+            console.log(e);
+    }
+
+    });
+}
