@@ -701,63 +701,128 @@
             <div class="panel">
                 <div class="row">
                     <div class="panel-content part__content">
-                        <h2 class="col-lg-offset-4">{l s='Shipment information' mod='upela'}</h2>
-                        <br>
-                        <form method='POST' action="{$upela_parameters_link|escape:'htmlall':'UTF-8'}"
-                              class="form-horizontal col-lg-offset-4">
-                            <h4>{l s='Default parcel informations' mod='upela'}</h4>
-                            <div class="form-group">
-                                <label for="ship_content" class="col-sm-4">{l s='Shipments content' mod='upela'}</label>
-                                <div class="col-sm-4">
-                                    <input name="ship_content" type="text" class="form-control" id="ship_content"
-                                           placeholder="{l s='Shipment content' mod='upela'}"
-                                           value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
+                        <div class="col-lg-6">
+                            <h2 class="col-lg-offset-1">{l s='Shipment information' mod='upela'}</h2>
+                            <br>
+                            <form method='POST' action="{$upela_parameters_link|escape:'htmlall':'UTF-8'}"
+                                  class="form-horizontal">
+                                <h4>{l s='Default parcel informations' mod='upela'}</h4>
+                                <div class="form-group">
+                                    <label for="ship_content" class="col-sm-4">{l s='Shipments content' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="ship_content" type="text" class="form-control" id="ship_content"
+                                               placeholder="{l s='Shipment content' mod='upela'}"
+                                               value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
-                                <div class="col-sm-4">
-                                    <input name="upela_weight" type="text" class="form-control" id="upela_weight"
-                                           placeholder="{l s='Weight (Kg)' mod='upela'}"
-                                           value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                <div class="form-group">
+                                    <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="upela_weight" type="text" class="form-control" id="upela_weight"
+                                               placeholder="{l s='Weight (Kg)' mod='upela'}"
+                                               value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                    </div>
                                 </div>
-                            </div>
-                            <h5>{l s='Dimensions (cm)' mod='upela'}</h5>
-                            <div class="form-group">
-                                <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
-                                <div class="col-sm-4">
-                                    <input name="upela_length" type="text" class="form-control" id="upela_length"
-                                           placeholder="{l s='Length' mod='upela'}"
-                                           value="{$upela_length|escape:'htmlall':'UTF-8'}">
+                                <h5>{l s='Dimensions (cm)' mod='upela'}</h5>
+                                <div class="form-group">
+                                    <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="upela_length" type="text" class="form-control" id="upela_length"
+                                               placeholder="{l s='Length' mod='upela'}"
+                                               value="{$upela_length|escape:'htmlall':'UTF-8'}">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
-                                <div class="col-sm-4">
-                                    <input name="upela_width" type="text" class="form-control" id="upela_width"
-                                           placeholder="{l s='Width' mod='upela'}"
-                                           value="{$upela_width|escape:'htmlall':'UTF-8'}">
+                                <div class="form-group">
+                                    <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="upela_width" type="text" class="form-control" id="upela_width"
+                                               placeholder="{l s='Width' mod='upela'}"
+                                               value="{$upela_width|escape:'htmlall':'UTF-8'}">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
-                                <div class="col-sm-4">
-                                    <input name="upela_height" type="text" class="form-control" id="upela_height"
-                                           placeholder="{l s='Height' mod='upela'}"
-                                           value="{$upela_height|escape:'htmlall':'UTF-8'}">
+                                <div class="form-group">
+                                    <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="upela_height" type="text" class="form-control" id="upela_height"
+                                               placeholder="{l s='Height' mod='upela'}"
+                                               value="{$upela_height|escape:'htmlall':'UTF-8'}">
+                                    </div>
                                 </div>
-                            </div>
 
 
-                            <div class="form-group">
-                                <div class="col-sm-offset-1">
-                                    <button name="processParameters" type="submit"
-                                            class="btn btn-primary text-center part__button">
-                                        {l s='Save'}
-                                    </button>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-1">
+                                        <button name="processParameters" type="submit"
+                                                class="btn btn-primary text-center part__button button--white">
+
+                                            {l s='Save'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
+                        <div class="col-lg-6">
+                            <h2 class="col-lg-offset-1">{l s='Payment information' mod='upela'}</h2>
+                            <br>
+                            {if {$paymentInfos['info']|escape:'htmlall':'UTF-8'} == false}
+                                <h4>{l s='No payment informations avalaible !' mod='upela'}</h4>
+                            {else}
+                                {if {$paymentInfos['avalaible']|escape:'htmlall':'UTF-8'} == false}
+                                    <h4>
+                                        {l s='You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!' mod='upela'}
+                                    </h4>
+                                    <br>
+                                {/if}
+
+
+                                <table class="table">
+                                    <tr>
+                                        <td style="font-size: 16px">
+                                                {l s='Payment method' mod='upela'}
+                                        </td>
+                                        <td style="font-size: 16px">
+                                            {$paymentInfos['method']|escape:'htmlall':'UTF-8'}
+                                        </td>
+                                    </tr>
+                                    {if {$paymentInfos['method']|escape:'htmlall':'UTF-8'}=='Credit card'}
+                                        <tr>
+                                            <td style="font-size: 16px">
+                                                {l s='Amount avalaible' mod='upela'}
+                                            </td>
+                                            <td style="font-size: 16px">
+                                                {$paymentInfos['amount']|escape:'htmlall':'UTF-8'}
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                    {if {$paymentInfos['voucher']|escape:'htmlall':'UTF-8'}==true}
+                                        <tr>
+                                            <td style="font-size: 16px">
+                                                {l s='Voucher amount' mod='upela'}
+                                            </td>
+                                            <td style="font-size: 16px">
+                                                {$paymentInfos['vamount']|escape:'htmlall':'UTF-8'}
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </table>
+
+
+                                <br><br><br><br><br>
+
+                                <div class="col-lg-offset-1">
+                                    <div class="row">
+                                        <div class="col-sm-offset-3">
+                                            <a href="{$upela_param_link|escape:'htmlall':'UTF-8'}"
+                                               class="part__button button--white"
+                                               style="text-align: center;">
+                                                {l s='Go to payment update' mod='upela'}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -794,8 +859,8 @@
                                     <div class="form-group">
                                         <div class="col-sm-offset-3">
                                             <button name="updateLogin" type="submit"
-                                                    class="btn btn-primary text-center part__button">
-                                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13-w.png">
+                                                    class="btn btn-primary text-center part__button button--white">
+                                                <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-13.png">
                                                 {l s='Disconnect' mod='upela'}
                                             </button>
                                         </div>

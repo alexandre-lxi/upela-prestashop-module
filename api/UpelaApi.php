@@ -62,6 +62,10 @@ class UpelaApi
         }
     }
 
+    /**
+     * @param $user
+     * @param $password
+     */
     protected function setCredentials($user, $password)
     {
         $this->user = $user;
@@ -108,6 +112,9 @@ class UpelaApi
         return $this->passwd;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHost()
     {
         return $this->host;
@@ -136,6 +143,16 @@ class UpelaApi
     {
         $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
         $url .= $this->getId().'&url='.$this->url_upela.'store/orders.php';
+        return $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlparameter()
+    {
+        $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
+        $url .= $this->getId().'&url='.$this->url_upela.'mon-compte/prelevement-sepa';
         return $url;
     }
 
@@ -329,6 +346,10 @@ class UpelaApi
         return $return;
     }
 
+    /**
+     * @param $username
+     * @return bool
+     */
     public function getUserExists($username)
     {
         $this->action = self::API_GET;
@@ -339,6 +360,10 @@ class UpelaApi
         return isset($ret['id']);
     }
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function getStores($userId)
     {
         $this->action = self::API_GET;
@@ -501,11 +526,20 @@ class UpelaApi
         return false;
     }
 
+    /**
+     * @return array
+     */
     protected function getCredentials()
     {
         return array('login' => $this->user, 'password' => $this->passwd);
     }
 
+    /**
+     * @param $addressFrom
+     * @param $addressTo
+     * @param $parcel
+     * @return mixed
+     */
     public function getPrices($addressFrom, $addressTo, $parcel){
         $date = date('Y-m-d');
         $date = date('Y-m-d', strtotime($date. ' + 2 days'));
@@ -545,4 +579,105 @@ class UpelaApi
 
         return $prices;
     }
+
+    /**
+     * API Get information payment
+     * @return array
+     */
+    public function getPayments(){
+        $ret = array(
+            'info' => false,
+            'method'=> '',
+            'avalaible' => false,
+            'amount'=>0,
+            'voucher'=>false,
+            'vamount'=>0
+        );
+
+        $this->action = self::API_POST;
+        $this->endpoint = 'api/'.self::API_VERSION.'/get_payments/';
+
+        $data = array(
+            'account'=>$this->getCredentials()
+        );
+
+        $paymentInfos = $this->makeCall($this->getBody($data), null, true, false);
+
+        if (isset($paymentInfos['success'])) {
+            $paymentInfos = $paymentInfos['paiments_info'];
+
+            if ($paymentInfos['cb']['activated']){
+                $ret['method'] = 'CB';
+                $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] > 0;
+                $ret['amount'] = (float)$paymentInfos['cb']['amount'] ;
+            }
+            if ($paymentInfos['sepa']['activated']){
+                $ret['method'] = 'SEPA';
+                $ret['avalaible'] = true;
+                $ret['amount'] = (float)$paymentInfos['sepa']['amount'] ;
+            }
+            if ($paymentInfos['voucher']['activated']){
+                $ret['voucher'] = (float)$paymentInfos['voucher']['amount'] > 0;
+                $ret['vamount'] = (float)$paymentInfos['voucher']['amount'] ;
+
+                if ($ret['avalaible'] === false){
+                    if ($ret['voucher'])
+                        $ret['avalaible'] = true;
+                }
+            }
+
+            $ret['info'] = true;
+            return $ret;
+        }else{
+            $ret['info'] = false;
+            return $ret;
+        }
+    }
+
+    /**
+     * @param $addressFrom
+     * @param $addressTo
+     * @param $parcel
+     * @return mixed
+     */
+    public function Ship($addressFrom, $addressTo, $parcel){
+        $date = date('Y-m-d');
+        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
+
+        $this->action = self::API_POST;
+        $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
+
+        $data = array(
+            'account'=>$this->getCredentials(),
+            'ship_from' => array(
+                'country_code' => $addressFrom['country'],
+                'postcode' => $addressFrom['cp'],
+                'city' => $addressFrom['city'],
+                'pro' => 1,
+            ),
+            'ship_to' => array(
+                'country_code' => $addressTo['country'],
+                'postcode' => $addressTo['cp'],
+                'city' => $addressTo['city'],
+                'pro' => 1,
+            ),
+            'parcels' => array(
+                array(
+                    'number' => 1,
+                    'weight' => (int)$parcel['weight'],
+                    'x' => (int)$parcel['length'],
+                    'y' => (int)$parcel['width'],
+                    'z' => (int)$parcel['height'],)
+            ),
+            'shipment_date' => $date,
+            'unit' => 'fr',
+            'selection'=> 'all',
+            'type' => 'parcel'
+        );
+
+        $prices = $this->makeCall($this->getBody($data), null, true, false);
+
+        return $prices;
+    }
+
 }

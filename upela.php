@@ -419,6 +419,7 @@ class Upela extends Module
         $upela_login = false;
         $stores = array();
         $user = '';
+        $infos = array();
 
         if (Tools::isSubmit('processChangeMode')) {
             $this->setMode((Tools::getValue('upela_mode')) ? UpelaApi::API_MODE_PROD : UpelaApi::API_MODE_TEST);
@@ -555,6 +556,19 @@ class Upela extends Module
             $carrierControllerUrl = $this->context->link->getAdminLink('AdminCarrierWizard');
         }
 
+        $paymentInfo = $this->api->getPayments();
+
+        if ($paymentInfo['info']){
+            if ($paymentInfo['method'] == 'CB')
+                $paymentInfo['method'] = $this->l('Credit card', 'upela');
+
+            if ($paymentInfo['avalaible'])
+                $înfos[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
+
+        }else{
+            $infos[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
+        }
+
         $this->context->smarty->assign(
             array(
                 'upela_register_link' => $this->context->link->getAdminLink('AdminModules').
@@ -573,11 +587,13 @@ class Upela extends Module
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&update_carriers=1',
                 'upela_user_link' => ($this->isConnected) ? $this->api->getUrlconnection() : '',
+                'upela_param_link' => ($this->isConnected) ? $this->api->getUrlparameter() : '',
                 'upela_create_account_post_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name,
                 'upela_link' => 'https://www.upela.com',
                 'upela_link_support' => 'https://addons.prestashop.com/fr/contactez-nous?id_product=26804',
+
                 'errors' => $this->errors,
                 '_path' => $this->_path,
                 'upela_user_connected' => $this->isConnected,
@@ -597,7 +613,9 @@ class Upela extends Module
                 'carriersListOthers' => $carriersListOthers,
                 'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY',
                 'carrierControllerUrl' => $carrierControllerUrl,
-                'carrier_select' => $carrier_select
+                'carrier_select' => $carrier_select,
+                'paymentInfos' => $paymentInfo,
+                'postInfos' => $infos
             )
         );
 

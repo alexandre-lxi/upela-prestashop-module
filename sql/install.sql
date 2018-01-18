@@ -1,25 +1,25 @@
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_order_points` (
-	`ps_id_order` int(10) unsigned NOT NULL,
-	`dp_company` varchar(30) NOT NULL,
-	`dp_name` VARCHAR (30) NOT NULL,
-	`dp_address1` VARCHAR (35) NOT NULL,
-	`dp_address2` VARCHAR (35) NOT NULL,
-	`dp_address3` VARCHAR (35) NOT NULL,
-	`dp_postcode` VARCHAR (30) NOT NULL,
-	`dp_city`     VARCHAR (35) NOT NULL,
-	`dp_country`  VARCHAR (3) NOT NULL,
-	`dp_id`       VARCHAR (20) NOT NULL,
-	PRIMARY KEY (`ps_id_order`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_order_points (
+	ps_id_order int(10) unsigned NOT NULL,
+	dp_company varchar(30) NOT NULL,
+	dp_name VARCHAR (30) NOT NULL,
+	dp_address1 VARCHAR (35) NOT NULL,
+	dp_address2 VARCHAR (35) NOT NULL,
+	dp_address3 VARCHAR (35) NOT NULL,
+	dp_postcode VARCHAR (30) NOT NULL,
+	dp_city     VARCHAR (35) NOT NULL,
+	dp_country  VARCHAR (3) NOT NULL,
+	dp_id       VARCHAR (20) NOT NULL,
+	PRIMARY KEY (ps_id_order)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_country_zone` (
-	`cz_co` VARCHAR(3) NOT NULL,
-	`cz_zo` varchar(3) NOT NULL,
-	PRIMARY KEY (`cz_co`, `cz_zo`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_country_zone (
+	cz_co VARCHAR(3) NOT NULL,
+	cz_zo varchar(3) NOT NULL,
+	PRIMARY KEY (cz_co, cz_zo)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-insert into `{PREFIXE}_upela_country_zone` (cz_co, cz_zo) values
+insert into {PREFIXE}upela_country_zone (cz_co, cz_zo) values
 ('DE','DE'),
 ('ES','ES'),
 ('BE','EU'),
@@ -267,30 +267,30 @@ insert into `{PREFIXE}_upela_country_zone` (cz_co, cz_zo) values
 ('US','USA'),
 ('MX','USA');
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_services` (
-  `id_service` int(3) NOT NULL AUTO_INCREMENT,
-  `id_carrier` int(11) NOT NULL DEFAULT 0,
-  `id_up_carrier` int(11) NOT NULL DEFAULT 0,
-  `id_up_service` int(11) NOT NULL DEFAULT 0,
-  `label` TEXT NOT NULL,
-  `desc_store` TEXT NOT NULL,
-  `service_name` TEXT NOT NULL,
-  `is_pickup_point` int(1) NOT NULL,
-  `is_dropoff_point` int(1) NOT NULL,
-  `is_express` int(1) NOT NULL,
-  `origine_point` VARCHAR(3) NOT NULL,
-  `is_active` int(1) NOT NULL DEFAULT 0,
-  `delay_day` int(11) NOT NULL DEFAULT 0,
-  `delay_text` VARCHAR(30) NOT NULL DEFAULT '',
-  `up_code_carrier` varchar(32) not null,
-	`up_code_service` varchar(128) not null
-  PRIMARY KEY (`id_service`),
-  KEY `id_carrier` (`id_carrier`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_services (
+  id_service int(3) NOT NULL AUTO_INCREMENT,
+  id_carrier int(11) NOT NULL DEFAULT 0,
+  id_up_carrier int(11) NOT NULL DEFAULT 0,
+  id_up_service int(11) NOT NULL DEFAULT 0,
+  label TEXT NOT NULL,
+  desc_store TEXT NOT NULL,
+  service_name TEXT NOT NULL,
+  is_pickup_point int(1) NOT NULL,
+  is_dropoff_point int(1) NOT NULL,
+  is_express int(1) NOT NULL,
+  origine_point VARCHAR(3) NOT NULL,
+  is_active int(1) NOT NULL DEFAULT 0,
+  delay_day int(11) NOT NULL DEFAULT 0,
+  delay_text VARCHAR(30) NOT NULL DEFAULT '',
+  up_code_carrier varchar(32) not null,
+	up_code_service varchar(128) not null,
+  PRIMARY KEY (id_service),
+  KEY id_carrier (id_carrier)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-INSERT INTO `{PREFIXE}upela_services` ( `id_up_carrier`, `id_up_service`, `label` ,  `desc_store` ,  `service_name`,
-  `is_pickup_point`,  `is_dropoff_point`, `is_express`, `origine_point`, `is_active`, `delay_text`, `delay_day`,
-  `up_code_carrier`, `up_code_service`)
+INSERT INTO {PREFIXE}upela_services ( id_up_carrier, id_up_service, label ,  desc_store ,  service_name,
+  is_pickup_point,  is_dropoff_point, is_express, origine_point, is_active, delay_text, delay_day,
+  up_code_carrier, up_code_service)
   VALUES
   (36,330,'Brt','DPD EUROPE','',0,0,0,'IT',0,'',0,'BRT','MONOCOLIS_INTERNATIONAL'),
 (36,305,'Brt','BASE SERVICE','',0,0,1,'IT',0,'',0,'BRT','BASE_SERVICE'),
