@@ -293,7 +293,7 @@ class Upela extends Module
      * @access public
      * @return Displayed Smarty template.
      */
-    public function hookheader($params)
+    public function hookHeader($params)
     {
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
@@ -349,7 +349,7 @@ class Upela extends Module
      * @param array $params Parameters array (cart object, address informations)
      * @return Display template.
      */
-    public function hookdisplayCarrierExtraContent(&$params)
+    public function hookDisplayCarrierExtraContent(&$params)
     {
         $tpl = '';
         $postcode = null ;
@@ -414,16 +414,31 @@ class Upela extends Module
 
     public function hookDisplayOrderConfirmation($params){
         $order = $params['order'];
+        $cart_id = $order->id_cart;
 
-        $carrierInfo = $this->carriers->getCarriers(false,false,false, $order['id_carrier']);
+        $query = 'select id_order from `'._DB_PREFIX_.'orders` where id_cart = '.$cart_id;
+        $ps_order = Db::getInstance()->getRow($query);
+        $order_id = $ps_order['id_order'];
 
-        print_r($carrierInfo);
+        if (isset($_COOKIE['dropoffLocation'])){
+            $location = json_decode($_COOKIE['dropoffLocation']);
 
-        if ($this->carriers->getCarriersServices($order['id_carrier'], true)['is_dropoff_point']){
-            print_r($this->context->cookie->dropoffLocation​);
+            var_dump($order);
+
+            /*object(stdClass)#250 (16) { ["location_id"]=> string(6) "002644" ["name"]=> string(31) "AUTO ECOLE RIVES DE SEINE " ["address1"]=> string(31) "10 RUE EUGENIE EBOUE " ["address2"]=> string(0) "" ["postcode"]=> string(5) "92600" ["city"]=> string(26) "ASNIERES " ["state"]=> NULL ["country_code"]=> string(2) "FR" ["latitude"]=> float(48.9181801) ["longitude"]=> float(2.3173442) ["distance"]=> int(0) ["hours"]=> array(6) { [0]=> object(stdClass)#251 (2) { ["day"]=> int(1) ["opening_hours"]=> string(11) "16:00-20:00" } [1]=> object(stdClass)#252 (2) { ["day"]=> int(2) ["opening_hours"]=> string(24) "11:00-14:00, 16:00-20:00" } [2]=> object(stdClass)#253 (2) { ["day"]=> int(3) ["opening_hours"]=> string(24) "11:00-14:00, 16:00-20:00" } [3]=> object(stdClass)#254 (2) { ["day"]=> int(4) ["opening_hours"]=> string(24) "11:00-14:00, 16:00-20:00" } [4]=> object(stdClass)#255 (2) { ["day"]=> int(5) ["opening_hours"]=> string(24) "11:00-14:00, 16:00-20:00" } [5]=> object(stdClass)#256 (2) { ["day"]=> int(6) ["opening_hours"]=> string(24) "11:00-14:00, 16:00-20:00" } } ["hours_html"]=> string(413) "Lundi : 16:00-20:00
+    Mardi : 11:00-14:00, 16:00-20:00
+    Mercredi : 11:00-14:00, 16:00-20:00
+    Jeudi : 11:00-14:00, 16:00-20:00
+    Vendredi : 11:00-14:00, 16:00-20:00
+    Samedi : 11:00-14:00, 16:00-20:00
+    " ["dropoff_location_id"]=> string(6) "002644" ["image_url"]=> string(0) "" ["number"]=> int(2) }
+    */
+            var_dump($location);
+
+
+
+
         }
-
-
 
         die();
 
