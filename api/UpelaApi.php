@@ -19,10 +19,10 @@
 
 class UpelaApi
 {
-    const URL_API = 'https://api.upela.com/';
-    //const URL_API_TEST = 'https://upelatest_web_1.upela.nuagic.fr/';
+    // TODO ALEX J AI FORCER LES URL DE DEV
+    const URL_API = 'https://dev.upela.com/';//'https://api.upela.com/';
     const URL_API_TEST = 'https://dev.upela.com/';
-    const URL_UPELA = 'https://www.upela.com/';
+    const URL_UPELA = 'https://dev.upela.com/';//'https://www.upela.com/';
     const URL_UPELA_TEST = 'https://dev.upela.com/';
 
     const API_MODE_PROD = 'prod';
@@ -236,9 +236,6 @@ class UpelaApi
             var_dump($uri_to_call);
             die();
         }
-
-
-
         if ($body != null) {
             if ($http_header) {
                 $stream_context = array(
@@ -275,7 +272,7 @@ class UpelaApi
      *
      * @return bool|mixed
      */
-    private function fileGetContents($url, $opts = null, $curl_timeout = 5)
+    private function fileGetContents($url, $opts = null, $curl_timeout = '20L')
     {
         if (function_exists('curl_init')) {
             $curl = curl_init();
@@ -313,7 +310,6 @@ class UpelaApi
             }
 
             $content = curl_exec($curl);
-
 
             curl_close($curl);
 
@@ -703,6 +699,19 @@ class UpelaApi
         $ship = $this->makeCall($this->getBody($data), null, true, false);
 
         return $ship;
+    }
+
+
+// TODO ALEX J AI FAIT UNE AUTRE METHOD
+
+    public function ShipDirect(Array $info ){
+        $date = date('Y-m-d');
+        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
+        $this->action = self::API_POST;
+        $this->endpoint = 'api/'.self::API_VERSION.'/directShipping/';
+        $data = $info;
+        $ship = $this->makeCall($this->getBody($data), null, true, false);
+        return json_encode($ship);
     }
 
 }

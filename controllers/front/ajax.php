@@ -27,6 +27,7 @@
 class UpelaAjaxModuleFrontController extends ModuleFrontController
 {
     protected $result;
+
     public function __construct()
     {
         $this->className = 'FrontUpelaController';
@@ -40,24 +41,19 @@ class UpelaAjaxModuleFrontController extends ModuleFrontController
         $upela = new Upela();
         $option =Tools::getValue('option');
 
+        if($option == 'directShiping')
+        {
+            // ALEX A CHANGERX
+            $posted_value =$_POST ;
+            $credential = ['id'=>111,'name'=>'name','login' => 'alexandre.laidin@iris-solutions.fr','password' => 'CpPu^QRCd#mF'];
+            $posted_value['account'] = $credential ;
+            $upelaApi = new UpelaApi($credential,UpelaApi::API_MODE_PROD);
+            $this->result = $upelaApi->ShipDirect($posted_value);
 
-//
-        //$option['dp_id'] = Tools::getValue('dp_id');
-        //$option['dp_number'] = Tools::getValue('dp_number');
-        //$option['dp_name'] = Tools::getValue('dp_name');
-        //$option['dp_address1'] = Tools::getValue('dp_address1');
-        //$option['dp_address2'] = Tools::getValue('dp_address2');
-        //$option['dp_postcode'] = Tools::getValue('dp_postcode');
-        //$option['dp_city'] = Tools::getValue('dp_city');
-        //$option['dp_country'] = Tools::getValue('dp_country');
-//
-        //switch ($option) {
-        //    case 'set_dropoff':
-        //        $this->result = $upela->setPoint($option);
-        //        break;
-        //}
-
-        $this->result = $option;
+        }
+        else {
+            $this->result = 'Route not found or option not Found';
+        }
 
         die($this->display());
     }
