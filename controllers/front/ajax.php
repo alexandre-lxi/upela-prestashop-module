@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 * @author    Upela <contact@upela.com>
-* @copyright 2007-2017 PrestaShop SA / 2011-2015 Upela
+* @copyright 2007-2017 PrestaShop SA / 2017-2018 Upela
 * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 * International Registred Trademark & Property of PrestaShop SA
 */
@@ -27,7 +27,6 @@
 class UpelaAjaxModuleFrontController extends ModuleFrontController
 {
     protected $result;
-
     public function __construct()
     {
         $this->className = 'FrontUpelaController';

@@ -634,33 +634,55 @@ class UpelaApi
         }
     }
 
-    /**
-     * @param $addressFrom
-     * @param $addressTo
-     * @param $parcel
-     * @return mixed
-     */
-    public function Ship($addressFrom, $addressTo, $parcel){
+
+    public function Ship($shipFrom, $shipTo, $dropoffTo, $service, $parcel ){
         $date = date('Y-m-d');
         $date = date('Y-m-d', strtotime($date. ' + 2 days'));
 
         $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
+        $this->endpoint = 'api/'.self::API_VERSION.'directShipping/';
 
         $data = array(
             'account'=>$this->getCredentials(),
-            'ship_from' => array(
-                'country_code' => $addressFrom['country'],
-                'postcode' => $addressFrom['cp'],
-                'city' => $addressFrom['city'],
-                'pro' => 1,
-            ),
-            'ship_to' => array(
-                'country_code' => $addressTo['country'],
-                'postcode' => $addressTo['cp'],
-                'city' => $addressTo['city'],
-                'pro' => 1,
-            ),
+            'carrier_code'=>$service['carrier_code'],
+            'service_code'=> $service['service_code'],
+            'ship_from'=>array(
+                'company'=>'1',
+                'name'=> $shipFrom['name'],
+                'phone'=> $shipFrom['phone'],
+                'email'=> $shipFrom['email'],
+                'address1'=> $shipFrom['address1'],
+                'address2'=> $shipFrom['address2'],
+                'address3'=> null,
+                'country_code'=> $shipFrom['country_code'],
+                'postcode'=> $shipFrom['postcode'],
+                'city'=> $shipFrom['city'],
+                'pro'=> '1'),
+            'ship_to'=>array(
+                'company'=>'1',
+                'name'=> $shipTo['name'],
+                'phone'=> $shipTo['phone'],
+                'email'=> $shipTo['email'],
+                'address1'=> $shipTo['address1'],
+                'address2'=> $shipTo['address2'],
+                'address3'=> null,
+                'country_code'=> $shipTo['country_code'],
+                'postcode'=> $shipTo['postcode'],
+                'city'=> $shipTo['city'],
+                'pro'=> '1'),
+            'dropoff_to'=> ($dropoffTo['active']==false)?null:
+                array(
+                'dropoff_location_id'=>$dropoffTo['name'],
+                'name'=> $dropoffTo['name'],
+                'phone'=> $dropoffTo['phone'],
+                'email'=> $dropoffTo['email'],
+                'address1'=> $dropoffTo['address1'],
+                'address2'=> '',
+                'address3'=> null,
+                'country_code'=> $dropoffTo['country_code'],
+                'postcode'=> $dropoffTo['postcode'],
+                'city'=> $dropoffTo['city'],
+                ),
             'parcels' => array(
                 array(
                     'number' => 1,
@@ -672,12 +694,15 @@ class UpelaApi
             'shipment_date' => $date,
             'unit' => 'fr',
             'selection'=> 'all',
-            'type' => 'parcel'
+            'type' => 'parcel',
+            'reason'=> 'Commercial',
+            'content' => $parcel['content'],
+            'labelFormat'=> 'PDF'
         );
 
-        $prices = $this->makeCall($this->getBody($data), null, true, false);
+        $ship = $this->makeCall($this->getBody($data), null, true, false);
 
-        return $prices;
+        return $ship;
     }
 
 }

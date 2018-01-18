@@ -5,6 +5,23 @@ DROP TABLE `{PREFIXE}upela_country_zone`;
 -- REQUEST --
 DROP TABLE `{PREFIXE}upela_services`;
 -- REQUEST --
+DROP TABLE {PREFIXE}upela_orders
+-- REQUEST --
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_orders
+(
+    id INT AUTO_INCREMENT,
+    ps_id_order INT NOT NULL,
+    customer_id INT NOT NULL,
+    shipment_id INT NOT NULL,
+    order_id INT NOT NULL,
+    carrier_code VARCHAR(30) NOT NULL,
+    carrier_name VARCHAR(255) NOT NULL,
+    waybill_code VARCHAR(50) NOT NULL,
+    waybill_url VARCHAR(255) NOT NULL,
+    tracking_number VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+)DEFAULT CHARSET=utf8;
+-- REQUEST --
 CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_order_points` (
 	`ps_id_order` int(10) unsigned NOT NULL,
 	`dp_company` varchar(30) NOT NULL,

@@ -52,7 +52,8 @@ class UpelaHelper
     protected $tables_names = array(
         'upela_order_points',
         'upela_services',
-        'upela_country_zone'
+        'upela_country_zone',
+        'upela_orders'
     );
 
     public static $countryCities = array(
