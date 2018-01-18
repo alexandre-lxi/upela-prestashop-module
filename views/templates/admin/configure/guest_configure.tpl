@@ -24,7 +24,12 @@
 
 {if isset($postErrors)}
     {foreach from=$postErrors item=pe}
-        <div class="alert alert-warning">{$pe|escape:'htmlall':'UTF-8'}</div>
+        <div class="alert alert-danger">{$pe|escape:'htmlall':'UTF-8'}</div>
+    {/foreach}
+{/if}
+{if isset($postInfos)}
+    {foreach from=$postInfos item=pe}
+        <div class="alert alert-info">{$pe|escape:'htmlall':'UTF-8'}</div>
     {/foreach}
 {/if}
 
@@ -34,18 +39,18 @@
 
 <div id="upela_mnu">
     <ul class="nav nav-tabs" id="upelaTabs">
-        {if {$upela_login}}
+        {if {$upela_login|escape:'htmlall':'UTF-8'} ==true || {$carrier_select|escape:'htmlall':'UTF-8'}==true}
         <li class="nav-item">
             {else}
-        <li class="active">
+        <li class="nav-item active">
             {/if}
             <a href="#home_form" data-toggle="tab" role="tab">
                 <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/logo-upela.png"/>
                 {l s='The Upela solution' mod='upela'}
             </a>
         </li>
-        {if {$upela_login}}
-        <li class="active">
+        {if {$upela_login|escape:'htmlall':'UTF-8'}==true}
+        <li class="nav-item active">
             {else}
         <li class="nav-item">
             {/if}
@@ -54,8 +59,12 @@
                 {l s='Parameters' mod='upela'}
             </a>
         </li>
-        {if {$upela_user_connected}}
-            <li class="nav-item">
+        {if {$upela_user_connected|escape:'htmlall':'UTF-8'}==true}
+            {if {$carrier_select|escape:'htmlall':'UTF-8'}==true}
+                <li class="nav-item active">
+                    {else}
+                <li class="nav-item">
+            {/if}
                 <a href="#carriers_form" data-toggle="tab" role="tab">
                     <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-carriers.png"/>
                     {l s='Carriers' mod='upela'}
@@ -63,7 +72,7 @@
             </li>
         {/if}
 
-        {if {$isnotpsready}}
+        {if {$isnotpsready|escape:'htmlall':'UTF-8'}==true}
             <li class="nav-item">
                 <a href="#guide_form" data-toggle="tab" role="tab">
                     <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
@@ -81,7 +90,7 @@
 </div>
 
 <div id="upela_content" class="tab-content">
-    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'}==false}active{/if}" id="home_form"
+    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'} ==false && {$carrier_select|escape:'htmlall':'UTF-8'}==false}active{/if}" id="home_form"
          role="tabpanel">
         <div class="row col-lg-12 col-md-12">
             <div class="upela_home_form_bg">
@@ -380,7 +389,7 @@
         </div>
     </div>
 
-    <div class="tab-pane" id="carriers_form" role="tabpanel">
+    <div class="tab-pane {if {$carrier_select|escape:'htmlall':'UTF-8'}==true}active{/if}" id="carriers_form" role="tabpanel">
         <div class="row">
             <div class="panel section8">
                 <div class="row">
@@ -687,7 +696,7 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'}}active{/if}" id="settings_form" role="tabpanel">
+    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'}==true}active{/if}" id="settings_form" role="tabpanel">
         {if $upela_user_connected}
             <div class="panel">
                 <div class="row">

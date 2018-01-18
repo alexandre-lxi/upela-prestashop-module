@@ -415,6 +415,11 @@ class Upela extends Module
      * @return string
      */
     public function getContent() {
+        $carrier_select = false;
+        $upela_login = false;
+        $stores = array();
+        $user = '';
+
         if (Tools::isSubmit('processChangeMode')) {
             $this->setMode((Tools::getValue('upela_mode')) ? UpelaApi::API_MODE_PROD : UpelaApi::API_MODE_TEST);
             $this->context->smarty->assign(array('postSuccess' =>
@@ -464,12 +469,13 @@ class Upela extends Module
         if (Tools::isSubmit('processLogin')) {
             $this->processLoginSubmitted();
             if (!count($this->postErrors)) {
-                $this->context->smarty->assign(array('upela_login' => false));
+                $upela_login = false;
             } else {
-                $this->context->smarty->assign(array('upela_login' => true));
+                $upela_login = true;
                 $this->context->smarty->assign(array('postErrors' => $this->postErrors));
             }
             if (count($this->postSuccess)) {
+                $upela_login = true;
                 $this->context->smarty->assign(array('postSuccess' => $this->postSuccess));
             }
         }
@@ -497,6 +503,7 @@ class Upela extends Module
             Configuration::updateValue('UPELA_SHIP_WIDTH', Tools::getValue('upela_width'));
             Configuration::updateValue('UPELA_SHIP_HEIGHT', Tools::getValue('upela_height'));
             $this->context->smarty->assign(array('postSuccess' => $this->l('Parameters updates!') ));
+            $upela_login = true;
         }
 
         if (Tools::isSubmit('update_carriers')) {
@@ -510,11 +517,11 @@ class Upela extends Module
                 $this->context->smarty->assign(array('postSuccess' => $this->l('Carriers updates!') ));
             else
                 $this->context->smarty->assign(array('postErrors' => $this->l('Carriers updates issue!') ));
+
+            $carrier_select = true;
         }
 
         $storeExists = 0;
-        $stores = array();
-        $user = '';
 
         if ($this->isConnected) {
             $user = $this->getUserConnected();
@@ -576,7 +583,7 @@ class Upela extends Module
                 'upela_user_connected' => $this->isConnected,
                 'upela_username' => ($this->isConnected) ? $user['name'] : '',
                 'upela_user_email' => ($this->isConnected) ? $user['login'] : '',
-                'upela_login' => false,
+                'upela_login' => $upela_login ,
                 'upela_nbstores' => count($stores),
                 'upela_storeexsists' => $storeExists,
                 'country' => Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID')),
@@ -589,7 +596,8 @@ class Upela extends Module
                 'carriersListRelay' => $carriersListRelay,
                 'carriersListOthers' => $carriersListOthers,
                 'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY',
-                'carrierControllerUrl' => $carrierControllerUrl
+                'carrierControllerUrl' => $carrierControllerUrl,
+                'carrier_select' => $carrier_select
             )
         );
 

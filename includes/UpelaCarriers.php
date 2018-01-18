@@ -176,7 +176,7 @@ class UpelaCarriers
     private function getPrice($upCarrier, $upService){
         $price = 0;
 
-        if (isset($this->prices['offers'])) {
+                if (isset($this->prices['offers'])) {
             foreach ($this->prices['offers'] as $offer) {
                 if ($offer['carrier_code'] == $upCarrier) {
                     if ($offer['service_code'] == $upService) {
