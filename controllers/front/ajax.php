@@ -18,8 +18,8 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-* @author    EnvoiMoinsCher <api@boxtal.com>
-* @copyright 2007-2017 PrestaShop SA / 2011-2015 EnvoiMoinsCher
+* @author    Upela <contact@upela.com>
+* @copyright 2007-2017 PrestaShop SA / 2011-2015 Upela
 * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 * International Registred Trademark & Property of PrestaShop SA
 */
@@ -39,22 +39,26 @@ class UpelaAjaxModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $upela = new Upela();
-        $option =[]; // Get option
+        $option =Tools::getValue('option');
 
-        $option['dp_id'] = Tools::getValue('dp_id');
-        $option['dp_number'] = Tools::getValue('dp_number');
-        $option['dp_name'] = Tools::getValue('dp_name');
-        $option['dp_address1'] = Tools::getValue('dp_address1');
-        $option['dp_address2'] = Tools::getValue('dp_address2');
-        $option['dp_postcode'] = Tools::getValue('dp_postcode');
-        $option['dp_city'] = Tools::getValue('dp_city');
-        $option['dp_country'] = Tools::getValue('dp_country');
 
-        switch ($option) {
-            case 'set_dropoff':
-                $this->result = $upela->setPoint($option);
-                break;
-        }
+//
+        //$option['dp_id'] = Tools::getValue('dp_id');
+        //$option['dp_number'] = Tools::getValue('dp_number');
+        //$option['dp_name'] = Tools::getValue('dp_name');
+        //$option['dp_address1'] = Tools::getValue('dp_address1');
+        //$option['dp_address2'] = Tools::getValue('dp_address2');
+        //$option['dp_postcode'] = Tools::getValue('dp_postcode');
+        //$option['dp_city'] = Tools::getValue('dp_city');
+        //$option['dp_country'] = Tools::getValue('dp_country');
+//
+        //switch ($option) {
+        //    case 'set_dropoff':
+        //        $this->result = $upela->setPoint($option);
+        //        break;
+        //}
+
+        $this->result = $option;
 
         die($this->display());
     }
