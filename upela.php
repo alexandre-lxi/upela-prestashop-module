@@ -228,6 +228,7 @@ class Upela extends Module
             // $this->uninstallTab('AdminUpela') &&
             $this->unregisterHook('displayAdminOrder') &&
             $this->unregisterHook('DisplayCarrierExtraContent') &&
+            $this->unregisterHook('Header') &&
             $this->uninstallDb() &&
             $this->removeConfig();
     }
