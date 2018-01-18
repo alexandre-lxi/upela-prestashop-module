@@ -751,7 +751,7 @@
 
 
                                 <div class="form-group">
-                                    <div class="col-sm-offset-1">
+                                    <div class="col-sm-offset-4">
                                         <button name="processParameters" type="submit"
                                                 class="btn btn-primary text-center part__button button--white">
 

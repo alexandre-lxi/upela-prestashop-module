@@ -136,9 +136,10 @@ class UpelaCarriers
      */
     public function getActiveCarriers() {
         $query = "
-         SELECT id_carrier  
+         SELECT id_reference, id_carrier
          FROM `"._DB_PREFIX_."carrier`             
-         WHERE external_module_name = 'upela'";
+         WHERE external_module_name = 'upela'
+         and deleted = 0";
 
         return $this->db->executes($query);
     }
@@ -234,9 +235,7 @@ class UpelaCarriers
                     continue;
 
                 $carrierInfo = $this->getCarriers(false, false, $serviceId);
-
                 $carrierId = $this->createCarrier($carrierInfo[0]);
-
                 $this->updateCarrierUpela($carrierInfo[0]['id_service'], $carrierId, 1);
             }
 
@@ -251,11 +250,8 @@ class UpelaCarriers
 
                     $carrierInfo =  $this->getCarriers(false,false, $serviceId);
 
-//                    print_r($carrierInfo);
-//                    print_r($activeCarrier);
-
-                    if (isset($carrierInfo[0]['id_carrier']) && isset($activeCarrier['id_carrier'])) {
-                        if ($carrierInfo[0]['id_carrier'] == $activeCarrier['id_carrier']) {
+                    if (isset($carrierInfo[0]['id_reference']) && isset($activeCarrier['id_reference'])) {
+                        if ($carrierInfo[0]['id_reference'] == $activeCarrier['id_reference']) {
                             $toDel = false;
                             break;
                         }
@@ -263,6 +259,7 @@ class UpelaCarriers
                 }
 
 
+                //die;
 
 
 
@@ -291,20 +288,23 @@ class UpelaCarriers
      * @return int
      */
     protected function createCarrier($aDefinition) {
-        Logger::addLog('UPELA_LOG: CreateCarrier'.$aDefinition['label']);
-
         $langs = Language::getLanguages(true);
 
         $old_carrier = $this->db->getRow(
             'SELECT * FROM ' . _DB_PREFIX_ . 'carrier 
-            WHERE id_carrier = "' . (int)$aDefinition['id_carrier'] .
+            WHERE id_reference = "' . (int)$aDefinition['id_reference'] .
             '" AND id_reference <> 0 ORDER BY id_carrier DESC'
         );
 
+        //print_r($old_carrier);
+
         // if old carrier is not deleted, we keep the current information
         if (isset($old_carrier['id_reference']) && $old_carrier['deleted'] == 0) {
-            return $old_carrier['id_carrier'];
+          //  print('OLD');
+            return $old_carrier['id_reference'];
         }
+
+        //die;
 
 
         $carrier = new Carrier();

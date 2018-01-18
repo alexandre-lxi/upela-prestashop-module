@@ -350,8 +350,6 @@ class Upela extends Module
      */
     public function hookdisplayCarrierExtraContent(&$params)
     {
-
-
         $tpl = '';
         $postcode = null ;
         $city = null ;
