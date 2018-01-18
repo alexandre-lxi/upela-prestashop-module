@@ -85,7 +85,7 @@ class UpelaCarriers
      * @param $where
      * @return array
      */
-    public function getCarriers($origin = false, $where = false, $id = false) {
+    public function getCarriers($origin = false, $where = false, $id = false, $idreference = false) {
         $query = '
          SELECT *
          FROM `'._DB_PREFIX_.'upela_services` us     
@@ -106,6 +106,10 @@ class UpelaCarriers
             $query .= ' AND us.id_service =' .$id . ' ';
         }
 
+        if ($idreference !== false){
+            $query .= ' AND c.id_carrier ='.$idreference. ' ';
+        }
+
         $query .= ' ORDER BY us.label';
         return $this->db->executes($query);
     }
@@ -117,13 +121,18 @@ class UpelaCarriers
      * @param $where
      * @return array
      */
-    public function getCarriersServices($idReference = false) {
+    public function getCarriersServices($idReference = false, $byRef = false) {
         $query = '
          SELECT  is_dropoff_point,id_up_service FROM '._DB_PREFIX_.'upela_services';
 
         // Get By Origin
         if ($idReference !== false) {
-            $query .= '  WHERE id_carrier= "'.$idReference.'" ';
+            if ($byRef === true){
+                $query .= '  WHERE id_carrier = (select id_reference from '._DB_PREFIX_.'carrier 
+                        where id_carrier = "'.$idReference.'")';
+            }else{
+                $query .= '  WHERE id_carrier= "'.$idReference.'" ';
+            }
         }
         return $this->db->getRow($query);
     }

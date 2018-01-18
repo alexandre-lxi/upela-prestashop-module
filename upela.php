@@ -415,6 +415,18 @@ class Upela extends Module
     public function hookDisplayOrderConfirmation($params){
         $order = $params['order'];
 
+        $carrierInfo = $this->carriers->getCarriers(false,false,false, $order['id_carrier']);
+
+        print_r($carrierInfo);
+
+        if ($this->carriers->getCarriersServices($order['id_carrier'], true)['is_dropoff_point']){
+            print_r($this->context->cookie->dropoffLocation​);
+        }
+
+
+
+        die();
+
 
     }
 
