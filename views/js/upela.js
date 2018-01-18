@@ -209,17 +209,36 @@ $('#checkout-delivery-step h1').on('click',function(){
 });
 
 
-function sendCommandeToUpela(){
-    var url = 'index.php?fc=module&module=upela&controller=ajax&option=';
+function sendCommandeToUpela($data){
+    var url = '/index.php?fc=module&module=upela&controller=ajax&option=directShiping';
 
-    var data = {id:'id'};
+    var data = $data;
+    data.content = $('#ship_content').val();
+    data.reason = 'Envoi site marchend';
+    data.parcels[0].number = 1;// todo ALEX A MODIFIER $('#').val();
+    data.parcels[0].weight = $('#upela_weight').val();
+    data.parcels[0].x = $('#upela_length').val();
+    data.parcels[0].y = $('#upela_width').val();
+    data.parcels[0].z = $('#upela_height').val();
+
+    $('#upela-expedier').html('Traitement en cours ....');
+    $('#upela-expedier').attr('onclick','');
 
     $.ajax({
         url: url,
         type: 'POST',
-        data: data,
+        data: $data,
         success:function(s){
-            console.log(s);
+            var result = JSON.parse(s);
+            if(result.success === false)
+            {
+                $('#upela-error').html('Une erreur est survenu, impossible de traiter votre demande');
+            }else
+            {
+                var WayBilllink = '<tr><td><a href="'+result.waybill.url+'" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
+                $('#table-body-upela').html(WayBilllink);
+            }
+
         },
         error:function(e){
             console.log(e);

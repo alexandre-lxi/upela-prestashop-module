@@ -382,6 +382,108 @@ class Upela extends Module
 
     public function hookdisplayAdminOrder(&$params)
     {
+        $controller = $this->context->controller;
+
+        if (method_exists($controller, 'registerJavascript')) {
+            $controller->registerJavascript(
+                'upela-jquery',
+                'https://code.jquery.com/jquery-3.2.1.min.js',
+                array('priority' => 100, 'server' => 'remote')
+            );
+            $controller->registerJavascript(
+                'upela',
+                'modules/upela/views/js/upela.js',
+                array('priority' => 100, 'server' => 'local')
+            );
+            $controller->registerStylesheet(
+                'upela',
+                'modules/upela/views/css/upela.css',
+                array('priority' => 100, 'server' => 'local')
+            );
+        } else {
+            $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
+            $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
+        }
+
+      $infoShipment =  array (
+          'account' =>
+              array (
+                  'login' => '####',
+                  'password' => '#####',
+              ),
+          'carrier_code' => 'UPS2',
+          'service_code' => '11',
+          'ship_from' =>
+              array (
+                  'company' => 'DEVLA',
+                  'name' => 'Tom Hucke',
+                  'phone' => '00330651600840',
+                  'email' => 'testit@test.fr',
+                  'address1' => 'Rue des Huiliers, 5',
+                  'address2' => '',
+                  'address3' => NULL,
+                  'country_code' => 'FR',
+                  'postcode' => '93310',
+                  'city' => 'Le Pré-Saint-Gervais',
+                  'pro' => '1',
+              ),
+          'ship_to' =>
+              array (
+                  'company' => 'red',
+                  'name' => 'Tom Hucke',
+                  'phone' => '0033651600840',
+                  'email' => NULL,
+                  'address1' => 'Rue des tests',
+                  'address2' => '',
+                  'address3' => NULL,
+                  'country_code' => 'FR',
+                  'postcode' => '83920',
+                  'city' => 'La motte',
+                  'pro' => '0',
+              ),
+          'dropoff_to' =>
+              array (
+                  'dropoff_location_id' => '125',
+                  'company' => '',
+                  'name' => 'Tom Hucke',
+                  'phone' => '0033651600840',
+                  'email' => NULL,
+                  'address1' => 'Rue des tests',
+                  'address2' => '',
+                  'address3' => NULL,
+                  'country_code' => 'FR',
+                  'postcode' => '83920',
+                  'city' => 'La motte',
+              ),
+          'parcels' =>
+              array (
+                  0 =>
+                      array (
+                          'number' => 1,
+                          'weight' => 1,
+                          'x' => 40,
+                          'y' => 30,
+                          'z' => 20,
+                      ),
+              ),
+          'shipment_date' => '2018-01-22',
+          'unit' => 'fr',
+          'selection' => 'all',
+          'reason' => 'Quality Issue - Supplier',
+          'content' => 'Produit non-soumis à règlementation',
+          'labelFormat' => 'PDF',
+      );
+
+
+
+        foreach($this->context->cart->getAddressCollection()  as $address)
+        {
+            $postcode = $address->postcode ;
+            $city =$address->city ;
+            $deleted = $address->deleted ;
+        }
+
+
         $this->context->smarty->assign(array(
             'simple_link' => $this->_path,
             'reference' => " ",
@@ -401,6 +503,7 @@ class Upela extends Module
             'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
             'upela_width' =>  Configuration::get('UPELA_SHIP_WIDTH'),
             'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
+            'jsonShipInfo' => json_encode($infoShipment),
         ));
 
         if (version_compare(_PS_VERSION_, '1.6', '<')) {

@@ -23,12 +23,16 @@
         padding-right:20px !important;  }
 
 </style>
-<script type="text/javascript">$(function () {
+<script type="text/javascript">
+    var infoExpedition = {$jsonShipInfo};
+
+    $(function () {
         $('#expeditionTab').insertBefore('#myTab');
         $('#UpelaExpedition').insertAfter('#expeditionTab');
     });
     //  $('#expeditionPl').after('hr');
 </script>
+
 <ul class="nav nav-tabs" id="expeditionTab">
     <li class="active">
         <a href="#shipping">
@@ -41,7 +45,7 @@
     <div class="tab-pane active">
         <div class="table-responsive">
 
-            <table class="table">
+            <table class="table" id="table-upela">
                 <thead>
                 <tr>
 
@@ -52,7 +56,7 @@
                 </tr>
 
                 </thead>
-                <tbody>
+                <tbody id="table-body-upela">
                 <tr >
                     <td class="up-exp-td">
                         <div class="form-group">
@@ -107,13 +111,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="3"></td>
+                    <td colspan="3"><span style="color:red;font-weight: bold;" id="upela-error"></span></td>
                     <td style="border:none;text-align:right;">
-                        <a class="btn btn-primary text-center part__button"
-                           style="background-color: #FF6600"
-                           target="{$target|escape:'html':'UTF-8'}"
-                           href="{$link_suivi|escape:'html':'UTF-8'}"><i
-                                    class="{$iconBtn|escape:'html':'UTF-8'}"></i> {$suivi|escape:'html':'UTF-8'}</a>
+                        <a id="upela-expedier" class="btn btn-primary text-center part__button"
+                           style="background-color: #FF6600" onclick="sendCommandeToUpela(infoExpedition)"> {$suivi|escape:'html':'UTF-8'}</a>
                     </td>
                 </tr>
                 </tbody>
