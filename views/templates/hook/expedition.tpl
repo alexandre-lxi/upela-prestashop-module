@@ -103,7 +103,6 @@
                                        placeholder="{l s='Shipment content' mod='upela'}"
                                        value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
                             </label>
-
                         </div>
                     </td>
                 </tr>

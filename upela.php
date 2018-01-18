@@ -158,6 +158,7 @@ class Upela extends Module
             $this->registerHook('displayAdminOrder') &&
             $this->registerHook('displayCarrierExtraContent') &&
             $this->registerHook('header') &&
+            $this->registerHook('displayOrderConfirmation') &&
             $this->installDb() &&
             $this->dumpConfigurations();
     }
@@ -409,6 +410,12 @@ class Upela extends Module
         }
 
         return $expedition;
+    }
+
+    public function hookDisplayOrderConfirmation($params){
+        $order = $params['order'];
+
+
     }
 
     /**
