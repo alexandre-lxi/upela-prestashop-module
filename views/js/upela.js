@@ -1,6 +1,7 @@
 /**
  * Created by Upela 12/01/2018
  */
+
 $.noConflict();
 
 var map;
@@ -213,15 +214,16 @@ function sendCommandeToUpela($data){
     var url = '/index.php?fc=module&module=upela&controller=ajax&option=directShiping';
 
     var data = $data;
+
     data.content = $('#ship_content').val();
-    data.reason = 'Envoi site marchend';
-    data.parcels[0].number = 1;// todo ALEX A MODIFIER $('#').val();
+    data.reason = $('#tr_reason').val();
+    data.parcels[0].number = $('#upela_count').val();
     data.parcels[0].weight = $('#upela_weight').val();
     data.parcels[0].x = $('#upela_length').val();
     data.parcels[0].y = $('#upela_width').val();
     data.parcels[0].z = $('#upela_height').val();
 
-    $('#upela-expedier').html('Traitement en cours ....');
+    $('#upela-expedier').html($('#tr_progress').val());
     $('#upela-expedier').attr('onclick','');
 
     $.ajax({
