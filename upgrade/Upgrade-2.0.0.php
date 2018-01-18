@@ -29,7 +29,8 @@ function upgrade_module_2_0_0($module)
  
     // Register old hooks to be safe
     $module->registerHook('displayAdminOrder');
-    $module->registerHook('DisplayCarrierExtraContent');
+    $module->registerHook('displayCarrierExtraContent');
+    $module->registerHook('header');
 
      // Execute the SQL upgrade
     $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_.'/upela/upgrade/2.0.0.sql');

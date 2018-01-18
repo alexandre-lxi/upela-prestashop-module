@@ -156,7 +156,8 @@ class Upela extends Module
             Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_PROD) &&
             //$this->installTab('AdminUpela', Tab::getIdFromClassName('AdminParentShipping'), 'Upela') &&
             $this->registerHook('displayAdminOrder') &&
-            $this->registerHook('DisplayCarrierExtraContent') &&
+            $this->registerHook('displayCarrierExtraContent') &&
+            $this->registerHook('header') &&
             $this->installDb() &&
             $this->dumpConfigurations();
     }
@@ -227,8 +228,8 @@ class Upela extends Module
         return parent::uninstall() &&
             // $this->uninstallTab('AdminUpela') &&
             $this->unregisterHook('displayAdminOrder') &&
-            $this->unregisterHook('DisplayCarrierExtraContent') &&
-            $this->unregisterHook('Header') &&
+            $this->unregisterHook('displayCarrierExtraContent') &&
+            $this->unregisterHook('header') &&
             $this->uninstallDb() &&
             $this->removeConfig();
     }
@@ -291,7 +292,7 @@ class Upela extends Module
      * @access public
      * @return Displayed Smarty template.
      */
-    public function hookHeader($params)
+    public function hookheader($params)
     {
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
@@ -347,7 +348,7 @@ class Upela extends Module
      * @param array $params Parameters array (cart object, address informations)
      * @return Display template.
      */
-    public function hookDisplayCarrierExtraContent(&$params)
+    public function hookdisplayCarrierExtraContent(&$params)
     {
 
 
