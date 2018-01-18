@@ -90,7 +90,7 @@ class UpelaCarriers
          SELECT *
          FROM `'._DB_PREFIX_.'upela_services` us     
          LEFT JOIN `'._DB_PREFIX_.'carrier` c
-         ON c.`id_carrier` = us.`id_carrier` AND c.`deleted` = 0 AND c.`external_module_name` = "upela" and c.id_reference <> 0
+         ON c.`id_reference` = us.`id_carrier` AND c.`deleted` = 0 AND c.`external_module_name` = "upela" and c.id_reference <> 0
          WHERE 1';
 
         // Get By Origin
@@ -313,7 +313,7 @@ class UpelaCarriers
         $carrier->deleted = 0;
         $carrier->shipping_handling = TRUE;
         $carrier->range_behavior = 0;
-        $carrier->shipping_external = TRUE;
+        $carrier->shipping_external = FALSE;
         $carrier->is_module = TRUE;
         $carrier->external_module_name = $this->module_name;
         $carrier->need_range = TRUE;
@@ -431,9 +431,6 @@ class UpelaCarriers
         foreach ($oCarrier->getZones() as $aZone) {
             Db::getInstance()->Execute('INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `price`)
 				VALUES ('.(int)($oCarrier->id).', NULL, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).', '.$price.')');
-
-            Db::getInstance()->Execute('INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `price`)
-				VALUES ('.(int)($oCarrier->id).', NULL, '.(int)($oRangePrice->id).', '.(int)($aZone['id_zone']).', '.$price.')');
         }
     }
 
