@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_country_zone (
 	PRIMARY KEY (cz_co, cz_zo)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
+truncate table {PREFIXE}upela_country_zone;
+-- REQUEST --
 insert into {PREFIXE}upela_country_zone (cz_co, cz_zo) values
 ('DE','DE'),
 ('ES','ES'),
@@ -287,6 +289,8 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_services (
   PRIMARY KEY (id_service),
   KEY id_carrier (id_carrier)
 ) DEFAULT CHARSET=utf8;
+-- REQUEST --
+truncate table {PREFIXE}upela_services;
 -- REQUEST --
 INSERT INTO {PREFIXE}upela_services ( id_up_carrier, id_up_service, label ,  desc_store ,  service_name,
   is_pickup_point,  is_dropoff_point, is_express, origine_point, is_active, delay_text, delay_day,

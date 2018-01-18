@@ -603,8 +603,10 @@ class UpelaApi
 
         $paymentInfos = $this->makeCall($this->getBody($data), null, true, false);
 
-        if (isset($paymentInfos['success'])) {
+        if (isset($paymentInfos['success']) && ($paymentInfos['success'] === true)) {
             $paymentInfos = $paymentInfos['paiments_info'];
+
+
 
             if ($paymentInfos['cb']['activated']){
                 $ret['method'] = 'CB';
