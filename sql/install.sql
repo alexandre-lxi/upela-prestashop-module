@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_services (
   origine_point VARCHAR(3) NOT NULL,
   is_active int(1) NOT NULL DEFAULT 0,
   delay_day int(11) NOT NULL DEFAULT 0,
-  delay_text VARCHAR(30) NOT NULL DEFAULT '',
+  delay_text VARCHAR(255) NOT NULL DEFAULT '',
   up_code_carrier varchar(32) not null,
 	up_code_service varchar(128) not null,
   PRIMARY KEY (id_service),

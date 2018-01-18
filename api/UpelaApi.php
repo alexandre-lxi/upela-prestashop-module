@@ -606,8 +606,6 @@ class UpelaApi
         if (isset($paymentInfos['success']) && ($paymentInfos['success'] === true)) {
             $paymentInfos = $paymentInfos['paiments_info'];
 
-
-
             if ($paymentInfos['cb']['activated']){
                 $ret['method'] = 'CB';
                 $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] > 0;
