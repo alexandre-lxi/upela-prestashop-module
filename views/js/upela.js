@@ -9,6 +9,10 @@ var infoWindow;
 var first = false;
 var listDroppOff =false;
 
+if(typeof carrier_id === 'undefined')
+{
+    var carrier_id = false;
+}
 
 function createCookie(name, value, days) {
     var expires;
@@ -40,13 +44,14 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 
-
 function initializeMap(options) {
     var uluru = {lat: options.lat, lng: options.lng};
     map = new google.maps.Map(document.getElementById(options.id), {
         zoom: options.zoom,
         center: uluru
     });
+    google.maps.event.trigger(map, 'resize');
+
     infoWindow = new google.maps.InfoWindow();
 }
 function setSelectedVal(dropoffLocation)
@@ -149,9 +154,14 @@ $(document).ready(function() {
                     {
                         first = JSON.parse(readCookie('dropoffLocation'))
                     }
-                    initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:1});
+                    initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:12});
                     listDroppOff = s.rows;
                     setSelectedVal(first);
+                    var latlng = new google.maps.LatLng(
+                        parseFloat(first.latitude),
+                        parseFloat(first.longitude));
+                    first.number = 1;
+                    createMarker(latlng, first);
                 }
             },
             error: function (e) {
@@ -167,6 +177,8 @@ $('#upelaModal').on('shown.bs.modal', function() {
     setSelectedVal(first);
     setDropOffPoints(listDroppOff);
 });
+
+
 $('body').on('click','.upela-marker-click',function(){
     var number = $(this).data('href');
     setSelectedVal(listDroppOff[number]);

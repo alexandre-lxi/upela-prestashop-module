@@ -110,6 +110,24 @@ class UpelaCarriers
         return $this->db->executes($query);
     }
 
+
+    /**
+     * Get Carriers list
+     * @param $origin
+     * @param $where
+     * @return array
+     */
+    public function getCarriersServices($idReference = false) {
+        $query = '
+         SELECT  is_dropoff_point,id_up_service FROM '._DB_PREFIX_.'upela_services';
+
+        // Get By Origin
+        if ($idReference !== false) {
+            $query .= '  WHERE id_carrier= "'.$idReference.'" ';
+        }
+        return $this->db->getRow($query);
+    }
+
     /**
      * Get Active Carriers list
      * @param $origin

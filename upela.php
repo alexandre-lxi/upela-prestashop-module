@@ -349,18 +349,16 @@ class Upela extends Module
     public function hookDisplayCarrierExtraContent(&$params)
     {
 
-        $controller = $this->context->controller;
-        // initialisation de l address
 
+        $tpl = '';
         $postcode = null ;
         $city = null ;
         $deleted = null ;
-
-        $sql = 'SELECT  is_dropoff_point,id_up_service FROM '._DB_PREFIX_.'upela_services WHERE id_carrier='.$params['carrier']['id'];
-        $results = Db::getInstance()->getRow($sql,false);
+        $results = $this->carriers->getCarriersServices($params['carrier']['id_reference']);
         $is_dropoff = $results['is_dropoff_point'];
         $upela_service = $results['id_up_service'];
-        $carrier_id = $params['carrier']['id'];
+        // ici on utilise le pointeur vers le carrier de reference
+        $carrier_id = $params['carrier']['id_reference'];
 
         foreach($this->context->cart->getAddressCollection()  as $address)
         {
@@ -369,16 +367,15 @@ class Upela extends Module
             $deleted = $address->deleted ;
         }
 
-
         if($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted)
         {
             $this->context->smarty->assign(
                 ['address'=>
                      ['postcode'=>$postcode,'city'=>$city,'upela_service'=>$upela_service,'carrier_id'=>$carrier_id]]);
-            return $this->display(__FILE__, 'displayCarrierExtraContent.tpl');;
+            $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
         }
 
-        return '';
+        return $tpl;
 
        }
 
