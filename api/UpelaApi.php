@@ -201,7 +201,6 @@ class UpelaApi
 
         $ret = $this->makeCall($this->getBody($data), null, true);
 
-
         if (isset($ret['success'])) {
             if ($ret['success']) {
                 $this->setCredentials($username, $password);
@@ -314,7 +313,6 @@ class UpelaApi
             $content = curl_exec($curl);
 
             curl_close($curl);
-
 
             return $content;
         } else {
@@ -598,11 +596,9 @@ class UpelaApi
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/get_payments/';
 
-
         $data = array(
             'account' => $this->getCredentials()
         );
-
 
         $paymentInfos = $this->makeCall($this->getBody($data), null, true, false);
 
@@ -630,7 +626,7 @@ class UpelaApi
                 }
             }
 
-            if ($ret['method'] == ''){
+            if ($ret['method'] == '') {
                 $ret['method'] = 'CB';
                 $ret['amount'] = 0;
             }

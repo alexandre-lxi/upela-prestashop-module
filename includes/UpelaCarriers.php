@@ -184,7 +184,6 @@ class UpelaCarriers
                     'height' => Configuration::get('UPELA_SHIP_HEIGHT'),
                 );
 
-
                 $this->prices = $this->api->getPrices($addressFrom, $addressTo, $parcel);
             }
 
@@ -201,7 +200,7 @@ class UpelaCarriers
 
         $activeCarriers = $this->getActiveCarriers();
 
-        if (count($activeCarriers) == 0){
+        if (count($activeCarriers) == 0) {
             $query = 'update `'._DB_PREFIX_.'upela_services` us
                         set is_active=0, id_carrier=0';
             $this->db->execute($query);
@@ -239,7 +238,8 @@ class UpelaCarriers
                 $this->db->execute($query);
             }
         }
-            //die();
+
+        //die();
 
         return $ret;
     }
@@ -268,7 +268,6 @@ class UpelaCarriers
         }
 
         //die;
-
 
         $carrier = new Carrier();
         $carrier->name = $aDefinition['label'];
@@ -422,30 +421,27 @@ class UpelaCarriers
 
         $price = $this->getPrice($upCarrier, $upService);
 
-
-            foreach ($oCarrier->getZones() as $aZone) {
-                Db::getInstance()->Execute(
-                    'UPDATE `'._DB_PREFIX_.'delivery` 
+        foreach ($oCarrier->getZones() as $aZone) {
+            Db::getInstance()->Execute(
+                'UPDATE `'._DB_PREFIX_.'delivery` 
                     set `price` = '.$price.' 
                     where `id_carrier` = '.(int)($oCarrier->id).' 
                     and `id_zone` = '.(int)($aZone['id_zone']).' 
                     and `id_range_price` =   '.(int)$oRangePrice->id);
 
-                Db::getInstance()->Execute(
-                    'UPDATE `'._DB_PREFIX_.'delivery` 
+            Db::getInstance()->Execute(
+                'UPDATE `'._DB_PREFIX_.'delivery` 
                     set `price` = '.$price.' 
                     where `id_carrier` = '.(int)($oCarrier->id).' 
                     and `id_zone` = '.(int)($aZone['id_zone']).' 
                     and `id_range_weight` =   '.(int)$oRangeWeight->id);
 
-//                    (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
-//				VALUES ('.(int)($oCarrier->id).', '.(int)$oRangePrice->id.', null, '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
-//                Db::getInstance()->Execute(
-//                    'INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
-//				VALUES ('.(int)($oCarrier->id).', null, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
-            }
-
-        
+            //                    (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
+            //				VALUES ('.(int)($oCarrier->id).', '.(int)$oRangePrice->id.', null, '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
+            //                Db::getInstance()->Execute(
+            //                    'INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
+            //				VALUES ('.(int)($oCarrier->id).', null, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
+        }
     }
 
     private function getPrice($upCarrier, $upService)
