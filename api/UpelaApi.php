@@ -632,6 +632,11 @@ class UpelaApi
                 }
             }
 
+            if ($ret['method'] == ''){
+                $ret['method'] = 'CB';
+                $ret['amount'] = 0;
+            }
+
             $ret['info'] = true;
 
             return $ret;

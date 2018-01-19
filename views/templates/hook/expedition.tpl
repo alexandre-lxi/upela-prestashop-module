@@ -60,90 +60,114 @@
 
             <table class="table" id="table-upela">
                 <thead>
-                <tr>
-
-                    <th style="border:none; background-color: #FF6600" colspan="3"><img
-                                style="height: 38px; width: 38px;"
-                                src="{$simple_link|escape:'html':'UTF-8'}views/img/logo-upela-w.png"
-                                width="150px;"></th>
-                </tr>
-
+                    <tr>
+                        <th style="border:none; background-color: #FF6600" colspan="3"><img
+                                    style="height: 38px; width: 38px;"
+                                    src="{$simple_link|escape:'html':'UTF-8'}views/img/logo-upela-w.png"
+                                    width="150px;"></th>
+                    </tr>
                 </thead>
+                {if {$is_connected|escape:'htmlall':'UTF-8'} == true}
                 <tbody id="table-body-upela">
-                <tr >
-                    <td class="up-exp-td">
-                        <div class="form-group">
-                            <label for="co" class="col-sm-4">{l s='No.' mod='upela'}</label>
-                            <div class="col-sm-4">
-                                <input name="upela_count" type="text" class="form-control" id="upela_count"
-                                       placeholder="1"
-                                       value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                    <tr >
+                        <td class="up-exp-td">
+                            <div class="form-group">
+                                <label for="co" class="col-sm-4">{l s='No.' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_count" type="text" class="form-control" id="upela_count"
+                                           placeholder="1"
+                                           value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group">
-                            <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
-                            <div class="col-sm-4">
-                                <input name="upela_weight" type="text" class="form-control" id="upela_weight"
-                                       placeholder="{l s='Weight (Kg)' mod='upela'}"
-                                       value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Weight (Kg)' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_weight" type="text" class="form-control" id="upela_weight"
+                                           placeholder="{l s='Weight (Kg)' mod='upela'}"
+                                           value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td></td>
-                </tr>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_length" type="text" class="form-control" id="upela_length"
+                                           placeholder="{l s='Length' mod='upela'}"
+                                           value="{$upela_length|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_width" type="text" class="form-control" id="upela_width"
+                                           placeholder="{l s='Width' mod='upela'}"
+                                           value="{$upela_width|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
+                                <div class="col-sm-4">
+                                    <input name="upela_height" type="text" class="form-control" id="upela_height"
+                                           placeholder="{l s='Height' mod='upela'}"
+                                           value="{$upela_height|escape:'htmlall':'UTF-8'}">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="up-exp-td">
+                            <div class="form-group">
+                                <label for="ship_content" class="col-sm-4">{l s='Shipment content' mod='upela'}
+                                    <input name="ship_content" type="text" class="form-control" id="ship_content"
+                                           placeholder="{l s='Shipment content' mod='upela'}"
+                                           value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <span style="color:red;font-weight: bold;" id="upela-error">
+                                {if {$paymentInfos['avalaible']|escape:'htmlall':'UTF-8'} == false}
+                                    {l s='Please update your payment method!' mod='upela'}
+                                {/if}
+                            </span>
+                        </td>
+                        <td style="border:none;text-align:right;">
+                            {if {$paymentInfos['avalaible']|escape:'htmlall':'UTF-8'} == false}
+                                <a href="{$upela_param_link|escape:'htmlall':'UTF-8'}"
+                                   class="btn btn-primary text-center part__button"
+                                   target="_blank"
+                                   style="text-align: center; background-color: #FF6600;">
+                                    {l s='Go to payment update' mod='upela'}
+                                </a>
+                            {else}
+                                <a id="upela-expedier" class="btn btn-primary text-center part__button"
+                                   style="background-color: #FF6600" onclick="sendCommandeToUpela(infoExpedition)"
+                                        > {$suivi|escape:'html':'UTF-8'}</a>
+                            {/if}
+                        </td>
+                    </tr>
+                </tbody>
+                {else}
+                <tbody id="table-body-upela">
                 <tr>
-                    <td>
-                        <div class="form-group">
-                            <label for="wt" class="col-sm-4">{l s='Length' mod='upela'}</label>
-                            <div class="col-sm-4">
-                                <input name="upela_length" type="text" class="form-control" id="upela_length"
-                                       placeholder="{l s='Length' mod='upela'}"
-                                       value="{$upela_length|escape:'htmlall':'UTF-8'}">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group">
-                            <label for="wt" class="col-sm-4">{l s='Width' mod='upela'}</label>
-                            <div class="col-sm-4">
-                                <input name="upela_width" type="text" class="form-control" id="upela_width"
-                                       placeholder="{l s='Width' mod='upela'}"
-                                       value="{$upela_width|escape:'htmlall':'UTF-8'}">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group">
-                            <label for="wt" class="col-sm-4">{l s='Height' mod='upela'}</label>
-                            <div class="col-sm-4">
-                                <input name="upela_height" type="text" class="form-control" id="upela_height"
-                                       placeholder="{l s='Height' mod='upela'}"
-                                       value="{$upela_height|escape:'htmlall':'UTF-8'}">
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="up-exp-td">
-                        <div class="form-group">
-                            <label for="ship_content" class="col-sm-4">{l s='Shipment content' mod='upela'}
-                                <input name="ship_content" type="text" class="form-control" id="ship_content"
-                                       placeholder="{l s='Shipment content' mod='upela'}"
-                                       value="{$upela_ship_content|escape:'htmlall':'UTF-8'}">
-                            </label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2"><span style="color:red;font-weight: bold;" id="upela-error"></span></td>
-                    <td style="border:none;text-align:right;">
-                        <a id="upela-expedier" class="btn btn-primary text-center part__button"
-                           style="background-color: #FF6600" onclick="sendCommandeToUpela(infoExpedition)"> {$suivi|escape:'html':'UTF-8'}</a>
+                    <td style="border:none;" colspan="3">
+                        {l s='You are not connected!' mod='upela'}
                     </td>
                 </tr>
                 </tbody>
+                {/if}
             </table>
         </div>
     </div>

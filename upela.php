@@ -276,6 +276,19 @@ class Upela extends Module
         Configuration::deleteByName('UPELA_API_MODE');
         Configuration::deleteByName('UPELA_WEBSERVICE_KEY');
 
+        Configuration::deleteByName('UPELA_STORE_FIRSTNAME');
+        Configuration::deleteByName('UPELA_STORE_LASTNAME');
+        Configuration::deleteByName('UPELA_STORE_EMAIL');
+        Configuration::deleteByName('UPELA_STORE_NAME');
+        Configuration::deleteByName('UPELA_STORE_PHONE');
+        Configuration::deleteByName('UPELA_STORE_COUNTRY');
+        Configuration::deleteByName('UPELA_STORE_ADDRESS1');
+        Configuration::deleteByName('UPELA_STORE_ADDRESS2');
+        Configuration::deleteByName('UPELA_STORE_ADDRESS3');
+        Configuration::deleteByName('UPELA_STORE_CITY');
+        Configuration::deleteByName('UPELA_STORE_ZIPCODE');
+        Configuration::deleteByName('UPELA_STORE_BUSINESS');
+
         return true;
     }
 
@@ -427,11 +440,11 @@ class Upela extends Module
                 $controller->addJs(_MODULE_DIR_.'/upela/views/js/upela.js');
             }
 
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
-                $fromCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
-            } else {
-                $fromCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
-            }
+//            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+//                $fromCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+//            } else {
+//                $fromCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+//            }
 
 
             if ($carrierInfo['is_dropoff_point'] == true) {
@@ -444,10 +457,12 @@ class Upela extends Module
             $deliveryAdress = new Address((int)$this->context->cart->id_address_delivery);
             $deliveryPhone = ($deliveryAdress->phone_mobile == '') ? (($deliveryAdress->phone == '') ? '' : $deliveryAdress->phone) : $deliveryAdress->phone_mobile;
             if ($deliveryPhone == '') {
-                $deliveryPhone = Configuration::get('BLOCKCONTACTINFOS_PHONE');
+                $deliveryPhone = Configuration::get('UPELA_STORE_PHONE');
             }
 
             $toCountry = Country::getIsoById($deliveryAdress->id_country);
+
+            $paymentInfo = $this->api->getPayments();
 
             $infoShipment = array(
                 'account' =>
@@ -457,20 +472,19 @@ class Upela extends Module
                     ),
                 'carrier_code' => $carrierInfo['up_code_carrier'],
                 'service_code' => $carrierInfo['up_code_service'],
-
                 'ship_from' =>
                     array(
-                        'company' => Configuration::get('PS_SHOP_NAME'),
-                        'name' => $this->context->employee->firstname.' '.$this->context->employee->lastname,
-                        'phone' => Configuration::get('BLOCKCONTACTINFOS_PHONE'),
-                        'email' => $this->context->employee->email,
-                        'address1' => Configuration::get('PS_SHOP_ADDR1'),
-                        'address2' => Configuration::get('PS_SHOP_ADDR2'),
-                        'address3' => null,
-                        'country_code' => $fromCountry,
-                        'postcode' => Configuration::get('PS_SHOP_CITY'),
-                        'city' => Configuration::get('PS_SHOP_CODE'),
-                        'pro' => '1',
+                        'company' => Configuration::get('UPELA_STORE_NAME'),
+                        'name' => Configuration::get('UPELA_STORE_FIRSTNAME').' '.Configuration::get('UPELA_STORE_LASTNAME'),
+                        'phone' => Configuration::get('UPELA_STORE_PHONE'),
+                        'email' => Configuration::get('UPELA_STORE_EMAIL'),
+                        'address1' => Configuration::get('UPELA_STORE_ADDRESS1'),
+                        'address2' => Configuration::get('UPELA_STORE_ADDRESS2'),
+                        'address3' => Configuration::get('UPELA_STORE_COUNTRY'),
+                        'country_code' => Configuration::get('UPELA_STORE_COUNTRY'),
+                        'postcode' => Configuration::get('UPELA_STORE_CITY'),
+                        'city' => Configuration::get('UPELA_STORE_ZIPCODE'),
+                        'pro' => Configuration::get('UPELA_STORE_BUSINESS'),
                     ),
                 'ship_to' =>
                     array(
@@ -541,6 +555,9 @@ class Upela extends Module
                 'upela_width' => Configuration::get('UPELA_SHIP_WIDTH'),
                 'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
                 'jsonShipInfo' => json_encode($infoShipment),
+                'paymentInfos' => $paymentInfo,
+                'upela_param_link' => ($this->isConnected) ? $this->api->getUrlparameter() : '',
+                'is_connected' => $this->isConnected
             ));
 
             if (version_compare(_PS_VERSION_, '1.6', '<')) {
@@ -685,6 +702,26 @@ class Upela extends Module
             $upela_login = true;
         }
 
+        if (Tools::isSubmit('updatestore')) {
+            $storeInfos = $this->getStoreFormValuesContent();            
+            Configuration::updateValue('UPELA_STORE_FIRSTNAME', $storeInfos['upela_store_firstname']);
+            Configuration::updateValue('UPELA_STORE_LASTNAME', $storeInfos['upela_store_lastname']);
+            Configuration::updateValue('UPELA_STORE_EMAIL', $storeInfos['upela_store_email']);
+            Configuration::updateValue('UPELA_STORE_NAME', $storeInfos['upela_store_name']);
+            Configuration::updateValue('UPELA_STORE_PHONE', $storeInfos['upela_store_phone']);
+            Configuration::updateValue('UPELA_STORE_COUNTRY', $storeInfos['upela_store_country']);
+            Configuration::updateValue('UPELA_STORE_ADDRESS1', $storeInfos['upela_store_address1']);
+            Configuration::updateValue('UPELA_STORE_ADDRESS2', $storeInfos['upela_store_address2']);
+            Configuration::updateValue('UPELA_STORE_ADDRESS3', $storeInfos['upela_store_address3']);
+            Configuration::updateValue('UPELA_STORE_CITY', $storeInfos['upela_store_city']);
+            Configuration::updateValue('UPELA_STORE_ZIPCODE', $storeInfos['upela_store_zipcode']);
+            Configuration::updateValue('UPELA_STORE_BUSINESS', $storeInfos['upela_store_business']);
+            Configuration::updateValue('UPELA_STORE_DEFINE', true);
+            
+            $this->context->smarty->assign(array('postSuccess' => $this->l('Store update!')));
+            $upela_login = true;
+        }
+
         if (Tools::isSubmit('update_carriers')) {
             $offers1 = (array)Tools::getValue('offers1');
             $offers2 = (array)Tools::getValue('offers2');
@@ -715,6 +752,12 @@ class Upela extends Module
                     }
                 }
             }
+        }else{
+            $info[] = $this->l('You must login to use Upela shipping!');
+        }
+
+        if (!Configuration::get('UPELA_STORE_DEFINE')){
+            $info[] = $this->l('You must update your store information in the settings!');
         }
 
         if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
@@ -743,12 +786,13 @@ class Upela extends Module
                 $paymentInfo['method'] = $this->l('Credit card', 'upela');
             }
 
-            if ($paymentInfo['avalaible'] && $paymentInfo['amount'] < 1) {
+            if (!$paymentInfo['avalaible']) {
                 $info[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
             }
         } else {
             $info[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
         }
+
 
         $this->context->smarty->assign(
             array(
@@ -761,6 +805,9 @@ class Upela extends Module
                 'upela_store_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&newstore=1',
+                'upela_store_update_link' => $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name.'&updatestore=1',
                 'upela_login_link' => $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&login=1',
@@ -796,7 +843,13 @@ class Upela extends Module
                 'carrierControllerUrl' => $carrierControllerUrl,
                 'carrier_select' => $carrier_select,
                 'paymentInfos' => $paymentInfo,
-                'postInfos' => $info
+                'postInfos' => $info,
+                'tpl_params' => $this->getTemplatePath('views/templates/admin/configure/conf_parameters.tpl'),
+                'tpl_guide' => $this->getTemplatePath('views/templates/admin/configure/conf_guide.tpl'),
+                'tpl_carriers' => $this->getTemplatePath('views/templates/admin/configure/conf_carriers.tpl'),
+                'tpl_home' => $this->getTemplatePath('views/templates/admin/configure/conf_home.tpl'),
+                'tpl_contact' => $this->getTemplatePath('views/templates/admin/configure/conf_contact.tpl'),
+                'storeInfos' => $this->getStoreFormValuesContent(),
             )
         );
 
@@ -861,6 +914,66 @@ class Upela extends Module
         return $this->context->smarty->fetch(
             $this->getLocalPath().'views/templates/admin/configure/guest_configure.tpl'
         );
+    }
+
+    public function getStoreFormValuesContent()
+    {
+        if (Configuration::get('UPELA_STORE_DEFINE') == true){
+            $return = array(
+                'upela_store_firstname' => Configuration::get('UPELA_STORE_FIRSTNAME'),
+                'upela_store_lastname' => Configuration::get('UPELA_STORE_LASTNAME'),
+                'upela_store_email' => Configuration::get('UPELA_STORE_EMAIL'),
+                'upela_store_name' => Configuration::get('UPELA_STORE_NAME'),
+                'upela_store_phone' => Configuration::get('UPELA_STORE_PHONE'),
+                'upela_store_country' => Configuration::get('UPELA_STORE_COUNTRY'),
+                'upela_store_address1' => Configuration::get('UPELA_STORE_ADDRESS1'),
+                'upela_store_address2' => Configuration::get('UPELA_STORE_ADDRESS2'),
+                'upela_store_address3' => Configuration::get('UPELA_STORE_ADDRESS3'),
+                'upela_store_city' => Configuration::get('UPELA_STORE_CITY'),
+                'upela_store_zipcode' => Configuration::get('UPELA_STORE_ZIPCODE'),
+                'upela_store_business' => Configuration::get('UPELA_STORE_BUSINESS'),
+            );
+        }else {
+            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+                $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+            } else {
+                $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+            }
+            
+            if (!Tools::isSubmit('updatestore')) {
+                $return = array(
+                    'upela_store_firstname' => $this->context->employee->firstname,
+                    'upela_store_lastname' => $this->context->employee->lastname,
+                    'upela_store_email' => $this->context->employee->email,
+                    'upela_store_name' => Configuration::get('PS_SHOP_NAME'),
+                    'upela_store_phone' => Configuration::get('BLOCKCONTACTINFOS_PHONE'),
+                    'upela_store_country' => $defaultCountry,
+                    'upela_store_address1' => Configuration::get('PS_SHOP_ADDR1'),
+                    'upela_store_address2' => Configuration::get('PS_SHOP_ADDR2'),
+                    'upela_store_address3' => '',
+                    'upela_store_city' => Configuration::get('PS_SHOP_CITY'),
+                    'upela_store_zipcode' => Configuration::get('PS_SHOP_CODE'),
+                    'upela_store_business' => true,
+                );
+            } else {
+                $return = array(
+                    'upela_store_firstname' => Tools::getValue('store_firstname'),
+                    'upela_store_lastname' => Tools::getValue('store_lastname'),
+                    'upela_store_email' => Tools::getValue('store_email'),
+                    'upela_store_name' => Tools::getValue('store_name'),
+                    'upela_store_phone' => Tools::getValue('store_phone'),
+                    'upela_store_country' => $defaultCountry, //Tools::getValue('store_country'),
+                    'upela_store_address1' => Tools::getValue('store_address_1'),
+                    'upela_store_address2' => Tools::getValue('store_address_2'),
+                    'upela_store_address3' => Tools::getValue('store_address_3'),
+                    'upela_store_city' => Tools::getValue('store_city'),
+                    'upela_store_zipcode' => Tools::getValue('store_zipcode'),
+                    'upela_store_business' => true,
+                );
+            }
+        }
+
+        return $return;
     }
 
     private function postValidation()

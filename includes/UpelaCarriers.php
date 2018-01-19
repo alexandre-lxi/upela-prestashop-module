@@ -167,15 +167,15 @@ class UpelaCarriers
 
             dump( $defaultCountry );
             dump( UpelaHelper::$countryCities );
-            dump( Configuration::get('PS_SHOP_CITY') );
+            dump( Configuration::get('UPELA_STORE_CITY') );
 
             $this->prices = array();
 
             if (array_key_exists($defaultCountry, UpelaHelper::$countryCities)) {
                 $addressFrom = array(
                     'country' => $defaultCountry,
-                    'city' => Configuration::get('PS_SHOP_CITY'),
-                    'cp' => Configuration::get('PS_SHOP_CODE')
+                    'city' => Configuration::get('UPELA_STORE_CITY'),
+                    'cp' => Configuration::get('UPELA_STORE_ZIPCODE')
                 );
                 $addressTo = array(
                     'country' => $defaultCountry,
