@@ -517,6 +517,7 @@ class Upela extends Module
                 'reason' => '',
                 'content' => '',
                 'labelFormat' => 'PDF',
+                'cart_id' => $cart_id
             );
 
 
@@ -1787,10 +1788,31 @@ class Upela extends Module
         $this->postSuccess[] = $this->l('Connection success!');
     }
 
-    public function shipDirect($data)
+    public function shipDirect(array $data)
     {
-        $ret = $this->api->ShipDirect($data);
+        $ret = $this->api->shipDirect($data);
 
-        return $ret;
+        if (isset($ret['success']) && $ret['success']){
+            $datas = array(
+                'id_cart_ps' => $data['cart_id'],
+                'customer_id' => $ret['customer_id'],
+                'shipment_id' => $ret['shipment_id'] ,
+                'order_id' => $ret['order_id'],
+                'carrier_code' => $data['carrier_code'],
+                'carrier_name' => $data['carrier_code'],
+                'waybill_code' => $ret['waybill']['code'],
+                'waybill_url' => $ret['waybill']['url'],
+                'tracking_number' => $ret['tracking_number'],
+            );
+
+            try{
+                Db::getInstance()->insert('upela_orders', $datas);
+            }catch (Exception $e){}
+
+            $order = Order::getByCartId($data['cart_id']);
+            $order->setCurrentState(4);
+        }
+
+        return json_encode($ret);
     }
 }

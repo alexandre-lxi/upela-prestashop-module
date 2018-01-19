@@ -719,6 +719,6 @@ class UpelaApi
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);
 
-        return json_encode($ship);
+        return $ship;
     }
 }

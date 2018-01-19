@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS {PREFIXE}upela_orders
 (
     id INT AUTO_INCREMENT,
-    ps_id_order INT NOT NULL,
+    id_cart_ps INT NOT NULL,
     customer_id INT NOT NULL,
     shipment_id INT NOT NULL,
     order_id INT NOT NULL,

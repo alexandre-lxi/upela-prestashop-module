@@ -10,7 +10,7 @@ DROP TABLE {PREFIXE}upela_orders
 CREATE TABLE IF NOT EXISTS {PREFIXE}upela_orders
 (
     id INT AUTO_INCREMENT,
-    ps_id_order INT NOT NULL,
+    id_cart_ps INT NOT NULL,
     customer_id INT NOT NULL,
     shipment_id INT NOT NULL,
     order_id INT NOT NULL,
@@ -22,27 +22,29 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_orders
     PRIMARY KEY (id)
 )DEFAULT CHARSET=utf8;
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_order_points` (
-	`ps_id_order` int(10) unsigned NOT NULL,
-	`dp_company` varchar(30) NOT NULL,
-	`dp_name` VARCHAR (30) NOT NULL,
-	`dp_address1` VARCHAR (35) NOT NULL,
-	`dp_address2` VARCHAR (35) NOT NULL,
-	`dp_address3` VARCHAR (35) NOT NULL,
-	`dp_postcode` VARCHAR (30) NOT NULL,
-	`dp_city`     VARCHAR (35) NOT NULL,
-	`dp_country`  VARCHAR (3) NOT NULL,
-	`dp_id`       VARCHAR (20) NOT NULL,
-	PRIMARY KEY (`ps_id_order`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_order_points (
+	id_cart_ps int(10) unsigned NOT NULL,
+	dp_company varchar(30) NOT NULL,
+	dp_name VARCHAR (30) NOT NULL,
+	dp_address1 VARCHAR (35) NOT NULL,
+	dp_address2 VARCHAR (35) NOT NULL,
+	dp_address3 VARCHAR (35) NOT NULL,
+	dp_postcode VARCHAR (30) NOT NULL,
+	dp_city     VARCHAR (35) NOT NULL,
+	dp_country  VARCHAR (3) NOT NULL,
+	dp_id       VARCHAR (20) NOT NULL,
+	PRIMARY KEY (ps_id_order)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_country_zone` (
-	`cz_co` VARCHAR(3) NOT NULL,
-	`cz_zo` varchar(3) NOT NULL,
-	PRIMARY KEY (`cz_co`, `cz_zo`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_country_zone (
+	cz_co VARCHAR(3) NOT NULL,
+	cz_zo varchar(3) NOT NULL,
+	PRIMARY KEY (cz_co, cz_zo)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-insert into `{PREFIXE}_upela_country_zone` (cz_co, cz_zo) values
+truncate table {PREFIXE}upela_country_zone;
+-- REQUEST --
+insert into {PREFIXE}upela_country_zone (cz_co, cz_zo) values
 ('DE','DE'),
 ('ES','ES'),
 ('BE','EU'),
@@ -290,30 +292,32 @@ insert into `{PREFIXE}_upela_country_zone` (cz_co, cz_zo) values
 ('US','USA'),
 ('MX','USA');
 -- REQUEST --
-CREATE TABLE IF NOT EXISTS `{PREFIXE}upela_services` (
-  `id_service` int(3) NOT NULL AUTO_INCREMENT,
-  `id_carrier` int(11) NOT NULL DEFAULT 0,
-  `id_up_carrier` int(11) NOT NULL DEFAULT 0,
-  `id_up_service` int(11) NOT NULL DEFAULT 0,
-  `label` TEXT NOT NULL,
-  `desc_store` TEXT NOT NULL,
-  `service_name` TEXT NOT NULL,
-  `is_pickup_point` int(1) NOT NULL,
-  `is_dropoff_point` int(1) NOT NULL,
-  `is_express` int(1) NOT NULL,
-  `origine_point` VARCHAR(3) NOT NULL,
-  `is_active` int(1) NOT NULL DEFAULT 0,
-  `delay_day` int(11) NOT NULL DEFAULT 0,
-  `delay_text` VARCHAR(30) NOT NULL DEFAULT '',
-  `up_code_carrier` varchar(32) not null,
-	`up_code_service` varchar(128) not null
-  PRIMARY KEY (`id_service`),
-  KEY `id_carrier` (`id_carrier`)
+CREATE TABLE IF NOT EXISTS {PREFIXE}upela_services (
+  id_service int(3) NOT NULL AUTO_INCREMENT,
+  id_carrier int(11) NOT NULL DEFAULT 0,
+  id_up_carrier int(11) NOT NULL DEFAULT 0,
+  id_up_service int(11) NOT NULL DEFAULT 0,
+  label TEXT NOT NULL,
+  desc_store TEXT NOT NULL,
+  service_name TEXT NOT NULL,
+  is_pickup_point int(1) NOT NULL,
+  is_dropoff_point int(1) NOT NULL,
+  is_express int(1) NOT NULL,
+  origine_point VARCHAR(3) NOT NULL,
+  is_active int(1) NOT NULL DEFAULT 0,
+  delay_day int(11) NOT NULL DEFAULT 0,
+  delay_text VARCHAR(255) NOT NULL DEFAULT '',
+  up_code_carrier varchar(32) not null,
+	up_code_service varchar(128) not null,
+  PRIMARY KEY (id_service),
+  KEY id_carrier (id_carrier)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
-INSERT INTO `{PREFIXE}upela_services` ( `id_up_carrier`, `id_up_service`, `label` ,  `desc_store` ,  `service_name`,
-  `is_pickup_point`,  `is_dropoff_point`, `is_express`, `origine_point`, `is_active`, `delay_text`, `delay_day`,
-  `up_code_carrier`, `up_code_service`)
+truncate table {PREFIXE}upela_services;
+-- REQUEST --
+INSERT INTO {PREFIXE}upela_services ( id_up_carrier, id_up_service, label ,  desc_store ,  service_name,
+  is_pickup_point,  is_dropoff_point, is_express, origine_point, is_active, delay_text, delay_day,
+  up_code_carrier, up_code_service)
   VALUES
   (36,330,'Brt','DPD EUROPE','',0,0,0,'IT',0,'',0,'BRT','MONOCOLIS_INTERNATIONAL'),
 (36,305,'Brt','BASE SERVICE','',0,0,1,'IT',0,'',0,'BRT','BASE_SERVICE'),
@@ -365,9 +369,9 @@ INSERT INTO `{PREFIXE}upela_services` ( `id_up_carrier`, `id_up_service`, `label
 (2,21,'FedEx','Europe First International Priority','',0,0,1,'EU',0,'',0,'FEDEX','EUROPE_FIRST_INTERNATIONAL_PRIORITY'),
 (2,36,'FedEx','Priority Freight','',0,0,1,'EU',0,'',0,'FEDEX','INTERNATIONAL_PRIORITY_FREIGHT'),
 (20,269,'FLASH','Coursier','',0,0,1,'EU',0,'',0,'FLASH','1'),
-(23,274,'Mondial Relay','Mondial Relay','',1,1,0,'FR',0,'',0,'MONDIALRELAY','1'),
-(24,275,'Mondial Relay','Mondial Relay','',1,0,0,'FR',0,'',0,'MONDIALRELAY2','1'),
-(31,288,'Mondial Relay','Mondial Relay','',1,1,0,'ES',0,'',0,'MONDIALRELAYES','1'),
+(23,274,'Mondial Relay','Mondial Relay','',1,1,0,'FR',0,'',0,'MONDIALRELAY','01'),
+(24,275,'Mondial Relay','Mondial Relay','',1,0,0,'FR',0,'',0,'MONDIALRELAY2','01'),
+(31,288,'Mondial Relay','Mondial Relay','',1,1,0,'ES',0,'',0,'MONDIALRELAYES','01'),
 (35,303,'Nexive','SISTEMA ESPRESSO','',0,0,1,'IT',0,'',0,'NEXIVE','SISTEMA_ESPRESSO'),
 (35,304,'Nexive','SISTEMA COMPLETO','',0,0,0,'IT',0,'',0,'NEXIVE','SISTEMA_COMPLETO'),
 (37,308,'Sda','Extra Large Basic','',0,0,0,'IT',0,'',0,'SDA','EXTRALARGEBASIC'),
