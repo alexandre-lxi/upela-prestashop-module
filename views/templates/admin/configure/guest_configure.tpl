@@ -39,7 +39,7 @@
 
 <div id="upela_mnu">
     <ul class="nav nav-tabs" id="upelaTabs">
-        {if {$upela_login|escape:'htmlall':'UTF-8'} ==true || {$carrier_select|escape:'htmlall':'UTF-8'}==true}
+        {if {$param_select|escape:'htmlall':'UTF-8'} ==true || {$carrier_select|escape:'htmlall':'UTF-8'}==true}
         <li class="nav-item">
             {else}
         <li class="nav-item active">
@@ -49,7 +49,7 @@
                 {l s='The Upela solution' mod='upela'}
             </a>
         </li>
-        {if {$upela_login|escape:'htmlall':'UTF-8'}==true}
+        {if {$param_select|escape:'htmlall':'UTF-8'}==true}
         <li class="nav-item active">
             {else}
         <li class="nav-item">
@@ -90,7 +90,7 @@
 </div>
 
 <div id="upela_content" class="tab-content">
-    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'} ==false && {$carrier_select|escape:'htmlall':'UTF-8'}==false}active{/if}"
+    <div class="tab-pane {if {$param_select|escape:'htmlall':'UTF-8'} ==false && {$carrier_select|escape:'htmlall':'UTF-8'}==false}active{/if}"
          id="home_form"
          role="tabpanel">
         {include file="$tpl_home"}
@@ -103,7 +103,7 @@
     <div class="tab-pane" id="guide_form" role="tabpanel">
         {include file="$tpl_guide"}
     </div>
-    <div class="tab-pane {if {$upela_login|escape:'htmlall':'UTF-8'}==true}active{/if}" id="settings_form"
+    <div class="tab-pane {if {$param_select|escape:'htmlall':'UTF-8'}==true}active{/if}" id="settings_form"
          role="tabpanel">
         {include file="$tpl_params"}
     </div>

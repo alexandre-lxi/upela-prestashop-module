@@ -59,6 +59,14 @@
                                                value="{$storeInfos['upela_store_phone']|escape:'htmlall':'UTF-8'}">
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="store_email" class="col-sm-4">{l s='Email' mod='upela'}</label>
+                                    <div class="col-sm-4">
+                                        <input name="store_email" type="text" class="form-control" id="store_email"
+                                               placeholder="{l s='Email' mod='upela'}"
+                                               value="{$storeInfos['upela_store_email']|escape:'htmlall':'UTF-8'}">
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">

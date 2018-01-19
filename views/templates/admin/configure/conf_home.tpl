@@ -29,12 +29,6 @@
                 {if $upela_user_connected}
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 cadre">
                         <p>{l s='You are logged in. Welcome' mod='upela'} {$upela_username|escape:'htmlall':'UTF-8'}</p>
-                        <a href="" onClick="this.href='{$upela_user_link|escape:'htmlall':'UTF-8'}'"
-                           class="part__button" target="_blank">
-                            {l s='Go to Upela.com' mod='upela'}
-                            <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-06-w.png"
-                                 alt="Upela - icon">
-                        </a>
                     </div>
                 {else}
                     <p>{l s='Not logged in yet!' mod='upela'}</p>

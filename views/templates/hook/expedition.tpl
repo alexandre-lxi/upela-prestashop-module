@@ -72,7 +72,7 @@
                     <tr >
                         <td class="up-exp-td">
                             <div class="form-group">
-                                <label for="co" class="col-sm-4">{l s='No.' mod='upela'}</label>
+                                <label for="co" class="col-sm-4">{l s='Number of parcels' mod='upela'}</label>
                                 <div class="col-sm-4">
                                     <input name="upela_count" type="text" class="form-control" id="upela_count"
                                            placeholder="1"

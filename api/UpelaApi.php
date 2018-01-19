@@ -395,7 +395,7 @@ class UpelaApi
             'pro' => '1'
         );
 
-        $ret = $this->makeCall($this->getBody($data), null, false, false);
+        $ret = $this->makeCall($this->getBody($data), null, false, true);
 
         $result = false;
 
@@ -408,7 +408,7 @@ class UpelaApi
                 'iso' => $values['country']
             );
 
-            $countryId = $this->makeCall($this->getBody($data), null, true);
+            $countryId = $this->makeCall($this->getBody($data), null, false);
             $countryId = $countryId['id'];
 
             $this->action = self::API_POST;
