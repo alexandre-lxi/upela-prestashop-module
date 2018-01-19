@@ -32,8 +32,6 @@
                     <p>{l s='MPG UPELA' mod='upela'}</p>
                     <p>{l s='17 RUE DE SURENE' mod='upela'}</p>
                     <p>{l s='75008 PARIS - FRANCE' mod='upela'}</p>
-                    <p>{l s='RCS Paris 750 389 769' mod='upela'}</p>
-                    <p>{l s='N° TVA FR12750389769' mod='upela'}</p>
                     </p>
                 </div>
             </div>
