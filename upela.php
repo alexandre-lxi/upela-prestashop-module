@@ -288,6 +288,7 @@ class Upela extends Module
         Configuration::deleteByName('UPELA_STORE_CITY');
         Configuration::deleteByName('UPELA_STORE_ZIPCODE');
         Configuration::deleteByName('UPELA_STORE_BUSINESS');
+        Configuration::deleteByName('UPELA_STORE_DEFINE');
 
         return true;
     }
@@ -702,21 +703,25 @@ class Upela extends Module
             $upela_login = true;
         }
 
+        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+        } else {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+        }
+
         if (Tools::isSubmit('updatestore')) {
-            Configuration::updateValue('UPELA_STORE_DEFINE', false);
-            $storeInfos = $this->getStoreFormValuesContent();            
-            Configuration::updateValue('UPELA_STORE_FIRSTNAME', $storeInfos['upela_store_firstname']);
-            Configuration::updateValue('UPELA_STORE_LASTNAME', $storeInfos['upela_store_lastname']);
-            Configuration::updateValue('UPELA_STORE_EMAIL', $storeInfos['upela_store_email']);
-            Configuration::updateValue('UPELA_STORE_NAME', $storeInfos['upela_store_name']);
-            Configuration::updateValue('UPELA_STORE_PHONE', $storeInfos['upela_store_phone']);
-            Configuration::updateValue('UPELA_STORE_COUNTRY', $storeInfos['upela_store_country']);
-            Configuration::updateValue('UPELA_STORE_ADDRESS1', $storeInfos['upela_store_address1']);
-            Configuration::updateValue('UPELA_STORE_ADDRESS2', $storeInfos['upela_store_address2']);
-            Configuration::updateValue('UPELA_STORE_ADDRESS3', $storeInfos['upela_store_address3']);
-            Configuration::updateValue('UPELA_STORE_CITY', $storeInfos['upela_store_city']);
-            Configuration::updateValue('UPELA_STORE_ZIPCODE', $storeInfos['upela_store_zipcode']);
-            Configuration::updateValue('UPELA_STORE_BUSINESS', $storeInfos['upela_store_business']);
+            Configuration::updateValue('UPELA_STORE_FIRSTNAME', Tools::getValue('store_firstname'));
+            Configuration::updateValue('UPELA_STORE_LASTNAME', Tools::getValue('store_lastname'));
+            Configuration::updateValue('UPELA_STORE_EMAIL', Tools::getValue('store_email'));
+            Configuration::updateValue('UPELA_STORE_NAME', Tools::getValue('store_email'));
+            Configuration::updateValue('UPELA_STORE_PHONE', Tools::getValue('store_phone'));
+            Configuration::updateValue('UPELA_STORE_COUNTRY', $defaultCountry);
+            Configuration::updateValue('UPELA_STORE_ADDRESS1', Tools::getValue('store_address1'));
+            Configuration::updateValue('UPELA_STORE_ADDRESS2', Tools::getValue('store_address2'));
+            Configuration::updateValue('UPELA_STORE_ADDRESS3', Tools::getValue('store_address3'));
+            Configuration::updateValue('UPELA_STORE_CITY', Tools::getValue('store_city'));
+            Configuration::updateValue('UPELA_STORE_ZIPCODE', Tools::getValue('store_zipcode'));
+            Configuration::updateValue('UPELA_STORE_BUSINESS', '1');
             Configuration::updateValue('UPELA_STORE_DEFINE', true);
             
             $this->context->smarty->assign(array('postSuccess' => $this->l('Store update!')));
@@ -761,11 +766,7 @@ class Upela extends Module
             $info[] = $this->l('You must update your store information in the settings!');
         }
 
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
-            $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
-        } else {
-            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
-        }
+
 
         $zone = $this->upela_helper->getCountryZone($defaultCountry);
 
@@ -941,7 +942,7 @@ class Upela extends Module
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
             }
             
-            if (!Tools::isSubmit('updatestore')) {
+
                 $return = array(
                     'upela_store_firstname' => $this->context->employee->firstname,
                     'upela_store_lastname' => $this->context->employee->lastname,
@@ -956,22 +957,7 @@ class Upela extends Module
                     'upela_store_zipcode' => Configuration::get('PS_SHOP_CODE'),
                     'upela_store_business' => true,
                 );
-            } else {
-                $return = array(
-                    'upela_store_firstname' => Tools::getValue('store_firstname'),
-                    'upela_store_lastname' => Tools::getValue('store_lastname'),
-                    'upela_store_email' => Tools::getValue('store_email'),
-                    'upela_store_name' => Tools::getValue('store_name'),
-                    'upela_store_phone' => Tools::getValue('store_phone'),
-                    'upela_store_country' => $defaultCountry, //Tools::getValue('store_country'),
-                    'upela_store_address1' => Tools::getValue('store_address1'),
-                    'upela_store_address2' => Tools::getValue('store_address2'),
-                    'upela_store_address3' => Tools::getValue('store_address3'),
-                    'upela_store_city' => Tools::getValue('store_city'),
-                    'upela_store_zipcode' => Tools::getValue('store_zipcode'),
-                    'upela_store_business' => true,
-                );
-            }
+
         }
 
         return $return;
