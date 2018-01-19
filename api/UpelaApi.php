@@ -19,10 +19,9 @@
 
 class UpelaApi
 {
-    // TODO ALEX J AI FORCER LES URL DE DEV
-    const URL_API = 'https://dev.upela.com/';//'https://api.upela.com/';
+    const URL_API = 'https://api.upela.com/';
     const URL_API_TEST = 'https://dev.upela.com/';
-    const URL_UPELA = 'https://dev.upela.com/';//'https://www.upela.com/';
+    const URL_UPELA = 'https://www.upela.com/';
     const URL_UPELA_TEST = 'https://dev.upela.com/';
 
     const API_MODE_PROD = 'prod';
@@ -525,7 +524,7 @@ class UpelaApi
     /**
      * @return array
      */
-    protected function getCredentials()
+    public function getCredentials()
     {
         return array('login' => $this->user, 'password' => $this->passwd);
     }
@@ -701,15 +700,13 @@ class UpelaApi
         return $ship;
     }
 
-
-// TODO ALEX J AI FAIT UNE AUTRE METHOD
-
     public function ShipDirect(Array $info ){
-        $date = date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/directShipping/';
         $data = $info;
+        $data['account'] =$this->getCredentials();
+        print_r($data);
+
         $ship = $this->makeCall($this->getBody($data), null, true, false);
         return json_encode($ship);
     }

@@ -123,7 +123,8 @@ class UpelaCarriers
      */
     public function getCarriersServices($idReference = false, $byRef = false) {
         $query = '
-         SELECT  is_dropoff_point,id_up_service FROM '._DB_PREFIX_.'upela_services';
+         SELECT  is_dropoff_point,id_up_service, id_service, up_code_service, up_code_carrier
+         FROM '._DB_PREFIX_.'upela_services';
 
         // Get By Origin
         if ($idReference !== false) {
@@ -136,6 +137,33 @@ class UpelaCarriers
         }
         return $this->db->getRow($query);
     }
+
+    /**
+     * Get Carriers list
+     * @param $origin
+     * @param $where
+     * @return array
+     */
+    public function getDropoffPointByCart($cart_id) {
+        $query = '
+         SELECT  *
+         FROM '._DB_PREFIX_.'upela_order_points
+         WHERE ps_id_cart = '.$cart_id;
+
+        return $this->db->getRow($query);
+    }
+
+
+    /**
+     * Get Carriers by Cart ID
+     * @param $cart_id
+     * @return array
+     */
+    public function getCarriersByCart($cart_id) {
+        $cart =new Cart($cart_id);
+        return $this->getCarriersServices($cart->id_carrier, true);
+    }
+
 
     /**
      * Get Active Carriers list

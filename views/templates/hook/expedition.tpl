@@ -40,13 +40,11 @@
     //  $('#expeditionPl').after('hr');
 </script>
 
-<input type="hidden" id="tr_reason" value="{l s='Commercial' mod='upela'}">
-<input type="hidden" id="tr_progress" value="{l s='In progress...' mod='upela'}">
-<input type="hidden" id="reason" value="{l s='Commercial' mod='upela'}">
-<input type="hidden" id="reason" value="{l s='Commercial' mod='upela'}">
-<input type="hidden" id="reason" value="{l s='Commercial' mod='upela'}">
-<input type="hidden" id="reason" value="{l s='Commercial' mod='upela'}">
-
+<div>
+    <input type="hidden" name="tr_reason" id="tr_reason" value="{l s='Commercial' mod='upela'}">
+    <input type="hidden" name="tr_progress" id="tr_progress" value="{l s='In progress...' mod='upela'}">
+    <input type="hidden" name="tr_error1" id="tr_error1" value="{l s='An error occurred, unable to process your request' mod='upela'}">
+</div>
 
 <ul class="nav nav-tabs" id="expeditionTab">
     <li class="active">

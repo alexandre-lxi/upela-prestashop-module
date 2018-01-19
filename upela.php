@@ -52,8 +52,8 @@ class Upela extends Module
 
         parent::__construct();
 
-        require_once(_PS_MODULE_DIR_ . '/upela/includes/UpelaHelper.php');
-        require_once(_PS_MODULE_DIR_ . '/upela/includes/UpelaCarriers.php');
+        require_once(_PS_MODULE_DIR_.'/upela/includes/UpelaHelper.php');
+        require_once(_PS_MODULE_DIR_.'/upela/includes/UpelaCarriers.php');
 
         $this->initAPI();
 
@@ -166,8 +166,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    private function installDb(){
-        $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_ . '/upela/sql/install.sql');
+    private function installDb() {
+        $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_.'/upela/sql/install.sql');
         $sql_file = str_replace('{PREFIXE}', _DB_PREFIX_, $sql_file);
 
         $query = explode('-- REQUEST --', $sql_file);
@@ -184,7 +184,23 @@ class Upela extends Module
                 }
             }
         }
+
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function uninstallDb() {
+
+        $tables = array();
+        foreach ($this->upela_helper->getTablesNames() as $table) {
+            Logger::addLog('UPELA: remove '.$table);
+            $tables[] = '`'._DB_PREFIX_.$table.'`';
+        }
+        $remove_tables = 'SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS '.implode(',', $tables);
+
+        return DB::getInstance()->execute($remove_tables);
     }
 
     /**
@@ -238,21 +254,6 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function uninstallDb() {
-
-        $tables = array();
-        foreach ($this->upela_helper->getTablesNames() as $table) {
-            Logger::addLog('UPELA: remove '.$table);
-            $tables[] = '`' . _DB_PREFIX_ . $table . '`';
-        }
-        $remove_tables = 'SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS ' . implode(',', $tables);
-
-        return DB::getInstance()->execute($remove_tables);
-    }
-
-    /**
-     * @return bool
-     */
     private function removeConfig() {
         Configuration::deleteByName('UPELA_USER_LOGIN');
         Configuration::deleteByName('UPELA_USER_PASSWORD');
@@ -293,11 +294,10 @@ class Upela extends Module
      * @access public
      * @return Displayed Smarty template.
      */
-    public function hookHeader($params)
-    {
+    public function hookHeader($params) {
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
-        $smarty->assign('upelaBaseDir', _MODULE_DIR_ . '/upela/');
+        $smarty->assign('upelaBaseDir', _MODULE_DIR_.'/upela/');
         $controllerClass = get_class($controller);
 
         if (method_exists($controller, 'registerJavascript')) {
@@ -336,7 +336,7 @@ class Upela extends Module
             $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw');
             $controller->addJs('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js');
             $controller->addJs('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js');
-            $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
+            $controller->addJs(_MODULE_DIR_.'/upela/views/js/upela.js');
         }
 
         return $this->display(__FILE__, '/views/templates/hook/header_hook.tpl');
@@ -349,195 +349,212 @@ class Upela extends Module
      * @param array $params Parameters array (cart object, address informations)
      * @return Display template.
      */
-    public function hookDisplayCarrierExtraContent(&$params)
-    {
+    public function hookDisplayCarrierExtraContent(&$params) {
         $tpl = '';
-        $postcode = null ;
-        $city = null ;
-        $deleted = null ;
+        $postcode = null;
+        $city = null;
+        $deleted = null;
         $results = $this->carriers->getCarriersServices($params['carrier']['id_reference']);
         $is_dropoff = $results['is_dropoff_point'];
         $upela_service = $results['id_up_service'];
         // ici on utilise le pointeur vers le carrier de reference
         $carrier_id = $params['carrier']['id_reference'];
 
-        foreach($this->context->cart->getAddressCollection()  as $address)
-        {
-            $postcode = $address->postcode ;
-            $city =$address->city ;
-            $deleted = $address->deleted ;
+        foreach ($this->context->cart->getAddressCollection() as $address) {
+            $postcode = $address->postcode;
+            $city = $address->city;
+            $deleted = $address->deleted;
         }
 
-        if($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted)
-        {
+        if ($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted) {
             $this->context->smarty->assign(
-                ['address'=>
-                     ['postcode'=>$postcode,'city'=>$city,'upela_service'=>$upela_service,'carrier_id'=>$carrier_id]]);
+                ['address' =>
+                    ['postcode' => $postcode, 'city' => $city, 'upela_service' => $upela_service, 'carrier_id' => $carrier_id]]);
             $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
         }
 
         return $tpl;
 
-       }
-
-    public function hookdisplayAdminOrder(&$params)
-    {
-        $controller = $this->context->controller;
-
-        if (method_exists($controller, 'registerJavascript')) {
-            $controller->registerJavascript(
-                'upela-jquery',
-                'https://code.jquery.com/jquery-3.2.1.min.js',
-                array('priority' => 100, 'server' => 'remote')
-            );
-            $controller->registerJavascript(
-                'upela',
-                'modules/upela/views/js/upela.js',
-                array('priority' => 100, 'server' => 'local')
-            );
-            $controller->registerStylesheet(
-                'upela',
-                'modules/upela/views/css/upela.css',
-                array('priority' => 100, 'server' => 'local')
-            );
-        } else {
-            $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
-            $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
-        }
-
-      $infoShipment =  array (
-          'account' =>
-              array (
-                  'login' => '####',
-                  'password' => '#####',
-              ),
-          'carrier_code' => 'UPS2',
-          'service_code' => '11',
-          'ship_from' =>
-              array (
-                  'company' => 'DEVLA',
-                  'name' => 'Tom Hucke',
-                  'phone' => '00330651600840',
-                  'email' => 'testit@test.fr',
-                  'address1' => 'Rue des Huiliers, 5',
-                  'address2' => '',
-                  'address3' => NULL,
-                  'country_code' => 'FR',
-                  'postcode' => '93310',
-                  'city' => 'Le Pré-Saint-Gervais',
-                  'pro' => '1',
-              ),
-          'ship_to' =>
-              array (
-                  'company' => 'red',
-                  'name' => 'Tom Hucke',
-                  'phone' => '0033651600840',
-                  'email' => NULL,
-                  'address1' => 'Rue des tests',
-                  'address2' => '',
-                  'address3' => NULL,
-                  'country_code' => 'FR',
-                  'postcode' => '83920',
-                  'city' => 'La motte',
-                  'pro' => '0',
-              ),
-          'dropoff_to' =>
-              array (
-                  'dropoff_location_id' => '125',
-                  'company' => '',
-                  'name' => 'Tom Hucke',
-                  'phone' => '0033651600840',
-                  'email' => NULL,
-                  'address1' => 'Rue des tests',
-                  'address2' => '',
-                  'address3' => NULL,
-                  'country_code' => 'FR',
-                  'postcode' => '83920',
-                  'city' => 'La motte',
-              ),
-          'parcels' =>
-              array (
-                  0 =>
-                      array (
-                          'number' => 1,
-                          'weight' => 1,
-                          'x' => 40,
-                          'y' => 30,
-                          'z' => 20,
-                      ),
-              ),
-          'shipment_date' => '2018-01-22',
-          'unit' => 'fr',
-          'selection' => 'all',
-          'reason' => 'Quality Issue - Supplier',
-          'content' => 'Produit non-soumis à règlementation',
-          'labelFormat' => 'PDF',
-      );
-
-
-
-        foreach($this->context->cart->getAddressCollection()  as $address)
-        {
-            $postcode = $address->postcode ;
-            $city =$address->city ;
-            $deleted = $address->deleted ;
-        }
-
-
-        $this->context->smarty->assign(array(
-            'simple_link' => $this->_path,
-            'reference' => " ",
-            'suivi' => $this->l('Ship', 'upela'),
-            'iconBtn' => "icon-plus-sign",
-            'link_suivi' => ($this->isConnected) ?
-                 $this->context->link->getAdminLink('AdminModules').
-                    '&configure='.$this->name.'&tab_module='.$this->tab.
-                    '&module_name='.$this->name.'&sendorder=1' :
-                $this->context->link->getAdminLink('AdminModules').
-                '&configure='.$this->name.'&tab_module='.$this->tab.
-                '&module_name='.$this->name,
-            'img15' => 'views/img/add.gif',
-            'target' => ($this->isConnected) ? '_blank' : '',
-            'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
-            'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
-            'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
-            'upela_width' =>  Configuration::get('UPELA_SHIP_WIDTH'),
-            'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
-            'jsonShipInfo' => json_encode($infoShipment),
-        ));
-
-        if (version_compare(_PS_VERSION_, '1.6', '<')) {
-            $expedition = $this->display(__FILE__, 'expedition15.tpl');
-        } else {
-            $expedition = $this->display(__FILE__, 'expedition.tpl');
-        }
-
-        return $expedition;
     }
 
-    public function hookDisplayOrderConfirmation($params){
+    /**
+     * @param $params
+     * @return string
+     */
+    public function hookdisplayAdminOrder($params) {
+        $cart_id = $this->context->cart->id;
+        $carrierInfo = $this->carriers->getCarriersServices($this->context->cart->id_carrier, true);
+
+        if ($carrierInfo['up_code_carrier'] != '') {
+            $controller = $this->context->controller;
+
+            if (method_exists($controller, 'registerJavascript')) {
+                $controller->registerJavascript(
+                    'upela-jquery',
+                    'https://code.jquery.com/jquery-3.2.1.min.js',
+                    array('priority' => 100, 'server' => 'remote')
+                );
+                $controller->registerJavascript(
+                    'upela',
+                    'modules/upela/views/js/upela.js',
+                    array('priority' => 100, 'server' => 'local')
+                );
+                $controller->registerStylesheet(
+                    'upela',
+                    'modules/upela/views/css/upela.css',
+                    array('priority' => 100, 'server' => 'local')
+                );
+            } else {
+                $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
+                $controller->addJs(_MODULE_DIR_.'/upela/views/js/upela.js');
+            }
+
+            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+                $fromCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+            } else {
+                $fromCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+            }
+
+            if ($carrierInfo['is_dropoff_point'] == true) {
+                $dropoffPoint = $this->carriers->getDropoffPointByCart($cart_id);
+                $is_dropoff = $dropoffPoint['dp_address1'] != '' ;
+            } else {
+                $is_dropoff = false;
+            }
+
+            $deliveryAdress = new Address((int)$this->context->cart->id_address_delivery);
+            $deliveryPhone = ($deliveryAdress->phone_mobile == '') ? (($deliveryAdress->phone == '') ? '' : $deliveryAdress->phone) : $deliveryAdress->phone_mobile;
+            if ($deliveryPhone == '')
+                $deliveryPhone = Configuration::get('BLOCKCONTACTINFOS_PHONE');
+
+            $infoShipment = array(
+                'account' =>
+                    array(
+                        'login' => '####',
+                        'password' => '#####',
+                    ),
+                'carrier_code' => $carrierInfo['up_code_carrier'],
+                'service_code' => $carrierInfo['up_code_service'],
+
+                'ship_from' =>
+                    array(
+                        'company' => Configuration::get('PS_SHOP_NAME'),
+                        'name' => $this->context->employee->firstname.' '.$this->context->employee->lastname,
+                        'phone' => Configuration::get('BLOCKCONTACTINFOS_PHONE'),
+                        'email' => $this->context->employee->email,
+                        'address1' => Configuration::get('PS_SHOP_ADDR1'),
+                        'address2' => Configuration::get('PS_SHOP_ADDR2'),
+                        'address3' => null,
+                        'country_code' => $fromCountry,
+                        'postcode' => Configuration::get('PS_SHOP_CITY'),
+                        'city' => Configuration::get('PS_SHOP_CODE'),
+                        'pro' => '1',
+                    ),
+                'ship_to' =>
+                    array(
+                        'company' => $deliveryAdress->company,
+                        'name' => $deliveryAdress->firstname.' '.$deliveryAdress->lastname,
+                        'phone' => $deliveryPhone,
+                        'email' => null,
+                        'address1' => $deliveryAdress->address1,
+                        'address2' => $deliveryAdress->address2,
+                        'address3' => null,
+                        'country_code' => $deliveryAdress->country,
+                        'postcode' => $deliveryAdress->postcode,
+                        'city' => $deliveryAdress->city,
+                        'pro' => ($deliveryAdress->company == '') ? 0 : 1,
+                    ),
+                'dropoff_to' => ($is_dropoff) ?
+                    array(
+                        'dropoff_location_id' => $dropoffPoint['dp_id'],
+                        'company' => $dropoffPoint['dp_company'],
+                        'name' => $dropoffPoint['dp_name'],
+                        'phone' => '',
+                        'email' => null,
+                        'address1' => $dropoffPoint['dp_address1'],
+                        'address2' => $dropoffPoint['dp_address2'],
+                        'address3' => null,
+                        'country_code' => $dropoffPoint['dp_country'],
+                        'postcode' => $dropoffPoint['dp_postcode'],
+                        'city' => $dropoffPoint['dp_city'],
+                    ) : null,
+                'parcels' =>
+                    array(
+                        0 =>
+                            array(
+                                'number' => 1,
+                                'weight' => 1,
+                                'x' => 40,
+                                'y' => 30,
+                                'z' => 20,
+                            ),
+                    ),
+                'shipment_date' => date('Y-m-d'),
+                'unit' => 'fr',
+                'selection' => 'all',
+                'reason' => '',
+                'content' => '',
+                'labelFormat' => 'PDF',
+            );
+
+
+            $this->context->smarty->assign(array(
+                'simple_link' => $this->_path,
+                'reference' => " ",
+                'suivi' => $this->l('Ship', 'upela'),
+                'iconBtn' => "icon-plus-sign",
+                'link_suivi' => ($this->isConnected) ?
+                    $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name.'&sendorder=1' :
+                    $this->context->link->getAdminLink('AdminModules').
+                    '&configure='.$this->name.'&tab_module='.$this->tab.
+                    '&module_name='.$this->name,
+                'img15' => 'views/img/add.gif',
+                'target' => ($this->isConnected) ? '_blank' : '',
+                'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
+                'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
+                'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
+                'upela_width' => Configuration::get('UPELA_SHIP_WIDTH'),
+                'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
+                'jsonShipInfo' => json_encode($infoShipment),
+            ));
+
+            if (version_compare(_PS_VERSION_, '1.6', '<')) {
+                $expedition = $this->display(__FILE__, 'expedition15.tpl');
+            } else {
+                $expedition = $this->display(__FILE__, 'expedition.tpl');
+            }
+
+            return $expedition;
+        }else
+            return '';
+    }
+
+    /**
+     * @param $params
+     * @throws PrestaShopDatabaseException
+     */
+    public function hookDisplayOrderConfirmation($params) {
         $order = $params['order'];
         $cart_id = $order->id_cart;
-        $query = 'select id_order from `'._DB_PREFIX_.'orders` where id_cart = '.$cart_id;
-        $ps_order = Db::getInstance()->getRow($query);
-        $order_id = $ps_order['id_order'];
         $carrier_id = $order->id_carrier;
         $service = $this->carriers->getCarriersServices($carrier_id, true);
 
-        if ($service['is_dropoff_point'] == true){
-            if (isset($_COOKIE['dropoffLocation'])){
+        if ($service['is_dropoff_point'] == true) {
+            if (isset($_COOKIE['dropoffLocation'])) {
                 $location = json_decode($_COOKIE['dropoffLocation']);
 
                 $data = array(
-                    'ps_id_order' => $order_id,
+                    'ps_id_order' => $cart_id,
                     'dp_company' => pSQL(trim($location->name)),
                     'dp_name' => pSQL(trim($location->name)),
                     'dp_address1' => pSQL(trim($location->address1)),
                     'dp_address2' => pSQL(trim($location->address2)),
-                    'dp_address3'=> '',
-                    'dp_postcode' =>  pSQL(trim($location->postcode)),
+                    'dp_address3' => '',
+                    'dp_postcode' => pSQL(trim($location->postcode)),
                     'dp_city' => pSQL(trim($location->city)),
-                    'dp_country' =>   pSQL($location->country_code),
+                    'dp_country' => pSQL($location->country_code),
                     'dp_id' => pSQL($location->dropoff_location_id)
                 );
 
@@ -639,7 +656,7 @@ class Upela extends Module
             Configuration::updateValue('UPELA_SHIP_LENGTH', Tools::getValue('upela_length'));
             Configuration::updateValue('UPELA_SHIP_WIDTH', Tools::getValue('upela_width'));
             Configuration::updateValue('UPELA_SHIP_HEIGHT', Tools::getValue('upela_height'));
-            $this->context->smarty->assign(array('postSuccess' => $this->l('Parameters updates!') ));
+            $this->context->smarty->assign(array('postSuccess' => $this->l('Parameters updates!')));
             $upela_login = true;
         }
 
@@ -651,9 +668,9 @@ class Upela extends Module
             $offers = array_merge($offers1, $offers2, $offers3);
 
             if ($this->carriers->createCarriers($offers))
-                $this->context->smarty->assign(array('postSuccess' => $this->l('Carriers updates!') ));
+                $this->context->smarty->assign(array('postSuccess' => $this->l('Carriers updates!')));
             else
-                $this->context->smarty->assign(array('postErrors' => $this->l('Carriers updates issue!') ));
+                $this->context->smarty->assign(array('postErrors' => $this->l('Carriers updates issue!')));
 
             $carrier_select = true;
         }
@@ -682,9 +699,9 @@ class Upela extends Module
 
         $zone = $this->upela_helper->getCountryZone($defaultCountry);
 
-        $carriersListExpress = $this->carriers->getCarriersForTpl($zone, 'and is_express=1 and is_dropoff_point=0',false, Language::getLanguages(true, $this->context->shop->id));
-        $carriersListRelay = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=1 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
-        $carriersListOthers = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=0 and is_express=0',false, Language::getLanguages(true, $this->context->shop->id));
+        $carriersListExpress = $this->carriers->getCarriersForTpl($zone, 'and is_express=1 and is_dropoff_point=0', false, Language::getLanguages(true, $this->context->shop->id));
+        $carriersListRelay = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=1 and is_express=0', false, Language::getLanguages(true, $this->context->shop->id));
+        $carriersListOthers = $this->carriers->getCarriersForTpl($zone, 'and is_dropoff_point=0 and is_express=0', false, Language::getLanguages(true, $this->context->shop->id));
 
         if (!file_exists(_PS_ROOT_DIR_.'/controllers/admin/AdminCarrierWizardController.php')) {
             $carrierControllerUrl = $this->context->link->getAdminLink('AdminCarriers').'&updatecarrier';
@@ -694,14 +711,14 @@ class Upela extends Module
 
         $paymentInfo = $this->api->getPayments();
 
-        if ($paymentInfo['info']){
+        if ($paymentInfo['info']) {
             if ($paymentInfo['method'] == 'CB')
                 $paymentInfo['method'] = $this->l('Credit card', 'upela');
 
             if ($paymentInfo['avalaible'])
                 $înfos[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
 
-        }else{
+        } else {
             $infos[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
         }
 
@@ -735,19 +752,19 @@ class Upela extends Module
                 'upela_user_connected' => $this->isConnected,
                 'upela_username' => ($this->isConnected) ? $user['name'] : '',
                 'upela_user_email' => ($this->isConnected) ? $user['login'] : '',
-                'upela_login' => $upela_login ,
+                'upela_login' => $upela_login,
                 'upela_nbstores' => count($stores),
                 'upela_storeexsists' => $storeExists,
                 'country' => Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID')),
                 'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
                 'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
                 'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
-                'upela_width' =>  Configuration::get('UPELA_SHIP_WIDTH'),
+                'upela_width' => Configuration::get('UPELA_SHIP_WIDTH'),
                 'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
                 'carriersListExpress' => $carriersListExpress,
                 'carriersListRelay' => $carriersListRelay,
                 'carriersListOthers' => $carriersListOthers,
-                'isnotpsready' => getenv ( 'PLATEFORM' )!='PSREADY',
+                'isnotpsready' => getenv('PLATEFORM') != 'PSREADY',
                 'carrierControllerUrl' => $carrierControllerUrl,
                 'carrier_select' => $carrier_select,
                 'paymentInfos' => $paymentInfo,
@@ -980,6 +997,38 @@ class Upela extends Module
         return $return;
     }
 
+    /**
+     * Create the WebserviceKey
+     * @return string
+     */
+    private function getWebServiceKey() {
+        $wskey = Configuration::get('UPELA_WEBSERVICE_KEY');
+
+        $webservice_key = new WebserviceKey();
+
+        if (($wskey != '') && $webservice_key->keyExists($wskey)) {
+            return $wskey;
+        } else {
+            Configuration::updateValue('PS_WEBSERVICE', 1);
+            Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
+
+            Tools::generateHtaccess();
+
+            $key = Tools::passwdGen(32);
+
+            $webservice_key->key = $key;
+            $webservice_key->description = 'Upela';
+
+            $webservice_key->add();
+            WebserviceKey::setPermissionForAccount($webservice_key->id, $this->upela_helper->getPermissions());
+
+            Configuration::updateValue('UPELA_WEBSERVICE_KEY', $key);
+
+            return $key;
+        }
+
+    }
+
     public function getAccountFormValues() {
         if (!Tools::isSubmit('processAccountCreation')) {
 
@@ -1192,37 +1241,6 @@ class Upela extends Module
                 $this->postSuccess[] = $this->l('Store created !');
             }
         }
-    }
-
-    /**
-     * Create the WebserviceKey
-     * @return string
-     */
-    private function getWebServiceKey(){
-        $wskey = Configuration::get('UPELA_WEBSERVICE_KEY');
-
-        $webservice_key = new WebserviceKey();
-
-        if (($wskey != '') && $webservice_key->keyExists($wskey)){
-                return $wskey;
-        }else{
-            Configuration::updateValue('PS_WEBSERVICE', 1);
-            Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
-
-            Tools::generateHtaccess();
-
-            $key = Tools::passwdGen(32);
-
-            $webservice_key->key = $key;
-            $webservice_key->description = 'Upela';
-
-            $webservice_key->add();
-            WebserviceKey::setPermissionForAccount($webservice_key->id, $this->upela_helper->getPermissions());
-
-            Configuration::updateValue('UPELA_WEBSERVICE_KEY', $key);
-            return $key;
-        }
-
     }
 
     /**
@@ -1741,5 +1759,8 @@ class Upela extends Module
         $this->postSuccess[] = $this->l('Connection success!');
     }
 
+    public function shipDirect($data) {
+        $this->api->ShipDirect($data);
+    }
 
 }

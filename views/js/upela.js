@@ -143,7 +143,7 @@ $(document).ready(function() {
             success: function (s) {
                 console.log('request dropoff');
                 if (s.rows.length == 0) {
-                    $('#selected-delivery-point').text('Impossible de trouver un point relais');
+                    $('#selected-delivery-point').text($('#tr_nodp').val());
                 }
                 else {
                     if( readCookie('dropoffLocation') === null)
@@ -166,7 +166,7 @@ $(document).ready(function() {
             },
             error: function (e) {
                 console.log(e);
-                $('#selected-delivery-point').text('Impossible de trouver un point relais');
+                $('#selected-delivery-point').text($('#tr_nodp').val());
             }
         }
     );
@@ -234,7 +234,7 @@ function sendCommandeToUpela($data){
             var result = JSON.parse(s);
             if(result.success === false)
             {
-                $('#upela-error').html('Une erreur est survenu, impossible de traiter votre demande');
+                $('#upela-error').html($('#tr_error1').val());
             }else
             {
                 var WayBilllink = '<tr><td class="up-sended-td">';

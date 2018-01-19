@@ -43,13 +43,11 @@ class UpelaAjaxModuleFrontController extends ModuleFrontController
 
         if($option == 'directShiping')
         {
-            // ALEX A CHANGERX
             $posted_value =$_POST ;
-            $credential = ['id'=>111,'name'=>'name','login' => 'alexandre.laidin@iris-solutions.fr','password' => 'CpPu^QRCd#mF'];
-            $posted_value['account'] = $credential ;
-            $upelaApi = new UpelaApi($credential,UpelaApi::API_MODE_PROD);
-            $this->result = $upelaApi->ShipDirect($posted_value);
-
+//            $credential = ['id'=>111,'name'=>'name','login' => 'alexandre.laidin@iris-solutions.fr','password' => 'CpPu^QRCd#mF'];
+//            $posted_value['account'] = $credential ;
+//            $upelaApi = new UpelaApi($credential,UpelaApi::API_MODE_PROD);
+            $this->result = $upela->ShipDirect($posted_value);
         }
         else {
             $this->result = 'Route not found or option not Found';

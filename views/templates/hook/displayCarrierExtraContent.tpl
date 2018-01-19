@@ -16,11 +16,14 @@
 * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *}
 
+<div>
+    <input type="hidden" name="tr_nodp" id="tr_nodp" value="{l s='Can not find a relay point!' mod='upela'}">
+</div>
 <div class="row" id="upela-delivery">
     <p>
-            <strong id="selected-delivery-point">Recherche en cours ...</strong>
+            <strong id="selected-delivery-point">{l s='Search in progress...' mod='upela'}</strong>
         <br>
-        <a id="choose-delivery" class="text-underline" href="#">Choisir un autre Point Relais</a>
+        <a id="choose-delivery" class="text-underline" href="#">{l s='Choose another Relay Point' mod='upela'}</a>
         <input type="hidden" value="null" name="dp_number" id="number">
         <input type="hidden" value="null" name="dp_id" id="dp_id">
         <input type="hidden" value="null" name="dp_name" id="dp_name">
@@ -41,7 +44,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Trouver un point relais</h5>
+                <h5 class="modal-title" id="exampleModalLabel">{l s='Choose a Relay Point' mod='upela'}</h5>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -50,7 +53,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <p id="no-delivery-point-found" style="display:none;">Aucun point relais</p>
+                        <p id="no-delivery-point-found" style="display:none;">{l s='No Relay Point' mod='upela'}</p>
                         <div id="delivery-point-list">
                         </div>
                     </div>
@@ -58,7 +61,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{l s='Close'}</button>
             </div>
         </div>
     </div>
