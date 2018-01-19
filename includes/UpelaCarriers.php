@@ -157,12 +157,17 @@ class UpelaCarriers
     {
         $ret = true;
 
+        dump( $servicesId );
         if (count($servicesId) > 0) {
             if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
             }
+
+            dump( $defaultCountry );
+            dump( UpelaHelper::$countryCities );
+            dump( Configuration::get('PS_SHOP_CITY') );
 
             $this->prices = array();
 
@@ -184,11 +189,12 @@ class UpelaCarriers
                     'height' => Configuration::get('UPELA_SHIP_HEIGHT'),
                 );
 
+
                 $this->prices = $this->api->getPrices($addressFrom, $addressTo, $parcel);
             }
 
             foreach ($servicesId as $serviceId) {
-                if ($serviceId == '') {
+                if ($serviceId == '' || !$serviceId) {
                     continue;
                 }
 

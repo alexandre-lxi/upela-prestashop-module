@@ -569,6 +569,8 @@ class UpelaApi
 
         $prices = $this->makeCall($this->getBody($data), null, true, false);
 
+        dump( $prices );
+
         return $prices;
     }
 
@@ -598,9 +600,11 @@ class UpelaApi
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/get_payments/';
 
+
         $data = array(
             'account' => $this->getCredentials()
         );
+
 
         $paymentInfos = $this->makeCall($this->getBody($data), null, true, false);
 
