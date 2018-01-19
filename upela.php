@@ -485,8 +485,8 @@ class Upela extends Module
                         'address2' => Configuration::get('UPELA_STORE_ADDRESS2'),
                         'address3' => Configuration::get('UPELA_STORE_COUNTRY'),
                         'country_code' => Configuration::get('UPELA_STORE_COUNTRY'),
-                        'postcode' => Configuration::get('UPELA_STORE_CITY'),
-                        'city' => Configuration::get('UPELA_STORE_ZIPCODE'),
+                        'postcode' => Configuration::get('UPELA_STORE_ZIPCODE'),
+                        'city' => Configuration::get('UPELA_STORE_CITY'),
                         'pro' => Configuration::get('UPELA_STORE_BUSINESS'),
                     ),
                 'ship_to' =>
@@ -536,8 +536,6 @@ class Upela extends Module
                 'labelFormat' => 'PDF',
                 'cart_id' => $cart_id
             );
-
-            dump($infoShipment);
 
             $this->context->smarty->assign(array(
                 'simple_link' => $this->_path,
@@ -751,6 +749,10 @@ class Upela extends Module
             $carrier_select = true;
         }
 
+        if (Tools::isSubmit('login')) {
+            $param_select = true;
+        }
+
         $storeExists = 0;
 
         if ($this->isConnected) {
@@ -801,8 +803,6 @@ class Upela extends Module
         } else {
             $info[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
         }
-
-        dump($upela_login);
 
         $this->context->smarty->assign(
             array(

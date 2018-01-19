@@ -233,9 +233,9 @@ class UpelaApi
         }
 
         if ($vardump) {
-            var_dump($body);
-            var_dump($uri_to_call);
-            die();
+            print_r($body);
+            print_r($uri_to_call);
+            die;
         }
         if ($body != null) {
             if ($http_header) {
@@ -569,8 +569,6 @@ class UpelaApi
 
         $prices = $this->makeCall($this->getBody($data), null, true, false);
 
-        dump( $prices );
-
         return $prices;
     }
 
@@ -613,7 +611,7 @@ class UpelaApi
 
             if ($paymentInfos['cb']['activated']) {
                 $ret['method'] = 'CB';
-                $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] > 0;
+                $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] >= 0;
                 $ret['amount'] = (float)$paymentInfos['cb']['amount'];
             }
             if ($paymentInfos['sepa']['activated']) {
