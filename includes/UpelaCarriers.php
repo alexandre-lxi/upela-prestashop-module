@@ -197,47 +197,49 @@ class UpelaCarriers
                 $carrierId = $this->createCarrier($carrierInfo[0]);
                 $this->updateCarrierUpela($carrierInfo[0]['id_service'], $carrierId, 1);
             }
+        }
 
-            $activeCarriers = $this->getActiveCarriers();
+        $activeCarriers = $this->getActiveCarriers();
 
-            foreach ($activeCarriers as $activeCarrier) {
-                $toDel = true;
+        if (count($activeCarriers) == 0){
+            $query = 'update `'._DB_PREFIX_.'upela_services` us
+                        set is_active=0, id_carrier=0';
+            $this->db->execute($query);
+        }
 
-                foreach ($servicesId as $serviceId) {
-                    if ($serviceId == '') {
-                        continue;
-                    }
+        foreach ($activeCarriers as $activeCarrier) {
+            $toDel = true;
 
-                    $carrierInfo = $this->getCarriers(false, false, $serviceId);
-
-                    if (isset($carrierInfo[0]['id_reference']) && isset($activeCarrier['id_reference'])) {
-                        if ($carrierInfo[0]['id_reference'] == $activeCarrier['id_reference']) {
-                            $toDel = false;
-                            break;
-                        }
-                    }
+            foreach ($servicesId as $serviceId) {
+                if ($serviceId == '') {
+                    continue;
                 }
 
+                $carrierInfo = $this->getCarriers(false, false, $serviceId);
 
-                //die;
-
-
-                if ($toDel) {
-                    $carrier = new Carrier($activeCarrier['id_carrier']);
-                    $carrier->deleted = 1;
-                    try {
-                        $carrier->save();
-                    } catch (Exception $e) {
+                if (isset($carrierInfo[0]['id_reference']) && isset($activeCarrier['id_reference'])) {
+                    if ($carrierInfo[0]['id_reference'] == $activeCarrier['id_reference']) {
+                        $toDel = false;
+                        break;
                     }
-
-                    $query = 'update `'._DB_PREFIX_.'upela_services` us
-                            set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
-
-                    $this->db->execute($query);
                 }
             }
-            //die();
+
+            if ($toDel) {
+                $carrier = new Carrier($activeCarrier['id_carrier']);
+                $carrier->deleted = 1;
+                try {
+                    $carrier->save();
+                } catch (Exception $e) {
+                }
+
+                $query = 'update `'._DB_PREFIX_.'upela_services` us
+                        set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
+
+                $this->db->execute($query);
+            }
         }
+            //die();
 
         return $ret;
     }
@@ -420,10 +422,30 @@ class UpelaCarriers
 
         $price = $this->getPrice($upCarrier, $upService);
 
-        foreach ($oCarrier->getZones() as $aZone) {
-            Db::getInstance()->Execute('INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `price`)
-				VALUES ('.(int)($oCarrier->id).', NULL, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).', '.$price.')');
-        }
+
+            foreach ($oCarrier->getZones() as $aZone) {
+                Db::getInstance()->Execute(
+                    'UPDATE `'._DB_PREFIX_.'delivery` 
+                    set `price` = '.$price.' 
+                    where `id_carrier` = '.(int)($oCarrier->id).' 
+                    and `id_zone` = '.(int)($aZone['id_zone']).' 
+                    and `id_range_price` =   '.(int)$oRangePrice->id);
+
+                Db::getInstance()->Execute(
+                    'UPDATE `'._DB_PREFIX_.'delivery` 
+                    set `price` = '.$price.' 
+                    where `id_carrier` = '.(int)($oCarrier->id).' 
+                    and `id_zone` = '.(int)($aZone['id_zone']).' 
+                    and `id_range_weight` =   '.(int)$oRangeWeight->id);
+
+//                    (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
+//				VALUES ('.(int)($oCarrier->id).', '.(int)$oRangePrice->id.', null, '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
+//                Db::getInstance()->Execute(
+//                    'INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
+//				VALUES ('.(int)($oCarrier->id).', null, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
+            }
+
+        
     }
 
     private function getPrice($upCarrier, $upService)
@@ -489,6 +511,21 @@ class UpelaCarriers
          and deleted = 0";
 
         return $this->db->executes($query);
+    }
+
+    /**
+     * Get Active Carriers list
+     * @param $origin
+     * @param $where
+     * @return array
+     */
+    public function removeCarriers()
+    {
+        $query = "
+         delete FROM `"._DB_PREFIX_."carrier`             
+         WHERE external_module_name = 'upela'";
+
+        return $this->db->execute($query);
     }
 
     /**

@@ -73,12 +73,14 @@
         {/if}
 
         {if {$isnotpsready|escape:'htmlall':'UTF-8'}==true}
+            {if false}
             <li class="nav-item">
                 <a href="#guide_form" data-toggle="tab" role="tab">
                     <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-guide.png"/>
                     {l s='User manual' mod='upela'}
                 </a>
             </li>
+            {/if}
             <li class="nav-item">
                 <a href="#contact_form" data-toggle="tab" role="tab">
                     <img src="{$_path|escape:'htmlall':'UTF-8'}views/img/icons/icon-contact.png"/>

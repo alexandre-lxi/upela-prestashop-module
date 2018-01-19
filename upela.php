@@ -203,6 +203,8 @@ class Upela extends Module
      */
     public function uninstallDb()
     {
+        $this->carriers->removeCarriers();
+
         $tables = array();
         foreach ($this->upela_helper->getTablesNames() as $table) {
             Logger::addLog('UPELA: remove '.$table);
