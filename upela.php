@@ -1811,6 +1811,7 @@ class Upela extends Module
 
             $order = Order::getByCartId($data['cart_id']);
             $order->setCurrentState(4);
+            $order->setWsShippingNumber($ret['tracking_number']);
         }
 
         return json_encode($ret);
