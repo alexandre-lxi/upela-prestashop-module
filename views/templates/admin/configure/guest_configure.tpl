@@ -846,6 +846,7 @@
                                         <div class="col-sm-offset-3">
                                             <a href="{$upela_param_link|escape:'htmlall':'UTF-8'}"
                                                class="part__button button--white"
+                                               target="_blank"
                                                style="text-align: center;">
                                                 {l s='Go to payment update' mod='upela'}
                                             </a>

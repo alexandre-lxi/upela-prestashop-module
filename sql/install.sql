@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_order_points (
 	dp_city     VARCHAR (35) NOT NULL,
 	dp_country  VARCHAR (3) NOT NULL,
 	dp_id       VARCHAR (20) NOT NULL,
-	PRIMARY KEY (ps_id_order)
+	PRIMARY KEY (id_cart_ps)
 ) DEFAULT CHARSET=utf8;
 -- REQUEST --
 CREATE TABLE IF NOT EXISTS {PREFIXE}upela_country_zone (

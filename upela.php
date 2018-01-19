@@ -736,12 +736,13 @@ class Upela extends Module
 
         $paymentInfo = $this->api->getPayments();
 
+
         if ($paymentInfo['info']) {
             if ($paymentInfo['method'] == 'CB') {
                 $paymentInfo['method'] = $this->l('Credit card', 'upela');
             }
 
-            if ($paymentInfo['avalaible']) {
+            if ($paymentInfo['avalaible'] && $paymentInfo['amount'] < 1) {
                 $info[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
             }
         } else {
