@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS {PREFIXE}upela_orders
 )DEFAULT CHARSET=utf8;
 -- REQUEST --
 CREATE TABLE IF NOT EXISTS {PREFIXE}upela_order_points (
-	ps_id_cart int(10) unsigned NOT NULL,
+	id_cart_ps int(10) unsigned NOT NULL,
 	dp_company varchar(30) NOT NULL,
 	dp_name VARCHAR (30) NOT NULL,
 	dp_address1 VARCHAR (35) NOT NULL,

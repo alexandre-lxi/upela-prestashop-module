@@ -41,7 +41,8 @@ class Upela extends Module
     /**
      * Upela constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->name = 'upela';
         $this->tab = 'shipping_logistics';
         $this->version = '2.0.0';
@@ -69,7 +70,8 @@ class Upela extends Module
     /**
      * API Initialization
      */
-    private function initAPI() {
+    private function initAPI()
+    {
         $this->loadMode();
         $hasAccountConnected = $this->hasAccountConnected();
 
@@ -84,7 +86,8 @@ class Upela extends Module
     /**
      * Mode initialization
      */
-    private function loadMode() {
+    private function loadMode()
+    {
         $apiMode = Configuration::get('UPELA_API_MODE');
 
         if ($apiMode == 'prod') {
@@ -98,7 +101,8 @@ class Upela extends Module
      * True if Account is define in configuration
      * @return bool
      */
-    private function hasAccountConnected() {
+    private function hasAccountConnected()
+    {
         return Configuration::get('UPELA_USER_LOGIN') &&
             Configuration::get('UPELA_USER_PASSWORD') &&
             Configuration::get('UPELA_USER_ID') &&
@@ -108,7 +112,8 @@ class Upela extends Module
     /**
      * @return array
      */
-    private function getUserConnected() {
+    private function getUserConnected()
+    {
         return array(
             'login' => Configuration::get('UPELA_USER_LOGIN'),
             'password' => Configuration::get('UPELA_USER_PASSWORD'),
@@ -120,14 +125,16 @@ class Upela extends Module
     /**
      * @return UpelaAPI::MODE
      */
-    public function getMode() {
+    public function getMode()
+    {
         return $this->mode;
     }
 
     /**
      * @param null $mode
      */
-    public function setMode($mode) {
+    public function setMode($mode)
+    {
         if (($this->mode != $mode) && ($this->isConnected)) {
             $this->dumpConfigurations();
             $this->isConnected = false;
@@ -142,14 +149,16 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function isAccountConnected() {
+    public function isAccountConnected()
+    {
         return $this->isConnected;
     }
 
     /**
      * @return bool
      */
-    public function install() {
+    public function install()
+    {
         Logger::addLog('UPELA: Install module');
 
         return parent::install() &&
@@ -166,7 +175,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    private function installDb() {
+    private function installDb()
+    {
         $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_.'/upela/sql/install.sql');
         $sql_file = str_replace('{PREFIXE}', _DB_PREFIX_, $sql_file);
 
@@ -191,8 +201,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function uninstallDb() {
-
+    public function uninstallDb()
+    {
         $tables = array();
         foreach ($this->upela_helper->getTablesNames() as $table) {
             Logger::addLog('UPELA: remove '.$table);
@@ -206,7 +216,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function dumpConfigurations() {
+    public function dumpConfigurations()
+    {
         return Configuration::updateValue('UPELA_USER_LOGIN', '') &&
             Configuration::updateValue('UPELA_USER_PASSWORD', '') &&
             Configuration::updateValue('UPELA_USER_ID', '') &&
@@ -221,7 +232,8 @@ class Upela extends Module
      *
      * @return mixed
      */
-    public function installTab($class_name, $id_parent, $name) {
+    public function installTab($class_name, $id_parent, $name)
+    {
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $class_name;
@@ -239,7 +251,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    public function uninstall() {
+    public function uninstall()
+    {
         Logger::addLog('UPELA: Uninstall module');
 
         return parent::uninstall() &&
@@ -254,7 +267,8 @@ class Upela extends Module
     /**
      * @return bool
      */
-    private function removeConfig() {
+    private function removeConfig()
+    {
         Configuration::deleteByName('UPELA_USER_LOGIN');
         Configuration::deleteByName('UPELA_USER_PASSWORD');
         Configuration::deleteByName('UPELA_USER_ID');
@@ -270,7 +284,8 @@ class Upela extends Module
      *
      * @return bool
      */
-    public function uninstallTab($class_name) {
+    public function uninstallTab($class_name)
+    {
         $id_tab = Tab::getIdFromClassName($class_name);
         if ($id_tab) {
             $tab = new Tab($id_tab);
@@ -284,7 +299,8 @@ class Upela extends Module
     /**
      * @return mixed
      */
-    public function getModulePath() {
+    public function getModulePath()
+    {
         return $this->_path;
     }
 
@@ -294,7 +310,8 @@ class Upela extends Module
      * @access public
      * @return Displayed Smarty template.
      */
-    public function hookHeader($params) {
+    public function hookHeader($params)
+    {
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
         $smarty->assign('upelaBaseDir', _MODULE_DIR_.'/upela/');
@@ -340,7 +357,6 @@ class Upela extends Module
         }
 
         return $this->display(__FILE__, '/views/templates/hook/header_hook.tpl');
-
     }
 
     /**
@@ -349,7 +365,8 @@ class Upela extends Module
      * @param array $params Parameters array (cart object, address informations)
      * @return Display template.
      */
-    public function hookDisplayCarrierExtraContent(&$params) {
+    public function hookDisplayCarrierExtraContent(&$params)
+    {
         $tpl = '';
         $postcode = null;
         $city = null;
@@ -368,20 +385,21 @@ class Upela extends Module
 
         if ($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted) {
             $this->context->smarty->assign(
-                ['address' =>
-                    ['postcode' => $postcode, 'city' => $city, 'upela_service' => $upela_service, 'carrier_id' => $carrier_id]]);
+                array('address' =>
+                array('postcode' => $postcode, 'city' => $city, 'upela_service' => $upela_service, 'carrier_id' => $carrier_id))
+            );
             $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
         }
 
         return $tpl;
-
     }
 
     /**
      * @param $params
      * @return string
      */
-    public function hookdisplayAdminOrder($params) {
+    public function hookdisplayAdminOrder($params)
+    {
         $cart_id = $this->context->cart->id;
         $carrierInfo = $this->carriers->getCarriersServices($this->context->cart->id_carrier, true);
 
@@ -416,18 +434,18 @@ class Upela extends Module
             }
 
 
-
             if ($carrierInfo['is_dropoff_point'] == true) {
                 $dropoffPoint = $this->carriers->getDropoffPointByCart($cart_id);
-                $is_dropoff = $dropoffPoint['dp_address1'] != '' ;
+                $is_dropoff = $dropoffPoint['dp_address1'] != '';
             } else {
                 $is_dropoff = false;
             }
 
             $deliveryAdress = new Address((int)$this->context->cart->id_address_delivery);
             $deliveryPhone = ($deliveryAdress->phone_mobile == '') ? (($deliveryAdress->phone == '') ? '' : $deliveryAdress->phone) : $deliveryAdress->phone_mobile;
-            if ($deliveryPhone == '')
+            if ($deliveryPhone == '') {
                 $deliveryPhone = Configuration::get('BLOCKCONTACTINFOS_PHONE');
+            }
 
             $toCountry = Country::getIsoById($deliveryAdress->id_country);
 
@@ -531,15 +549,17 @@ class Upela extends Module
             }
 
             return $expedition;
-        }else
+        } else {
             return '';
+        }
     }
 
     /**
      * @param $params
      * @throws PrestaShopDatabaseException
      */
-    public function hookDisplayOrderConfirmation($params) {
+    public function hookDisplayOrderConfirmation($params)
+    {
         $order = $params['order'];
         $cart_id = $order->id_cart;
         $carrier_id = $order->id_carrier;
@@ -550,7 +570,7 @@ class Upela extends Module
                 $location = json_decode($_COOKIE['dropoffLocation']);
 
                 $data = array(
-                    'ps_id_order' => $cart_id,
+                    'id_cart_ps' => $cart_id,
                     'dp_company' => pSQL(trim($location->name)),
                     'dp_name' => pSQL(trim($location->name)),
                     'dp_address1' => pSQL(trim($location->address1)),
@@ -565,18 +585,18 @@ class Upela extends Module
                 Db::getInstance()->insert('upela_order_points', $data);
             }
         }
-
     }
 
     /**
      * @return string
      */
-    public function getContent() {
+    public function getContent()
+    {
         $carrier_select = false;
         $upela_login = false;
         $stores = array();
         $user = '';
-        $infos = array();
+        $info = array();
 
         if (Tools::isSubmit('processChangeMode')) {
             $this->setMode((Tools::getValue('upela_mode')) ? UpelaApi::API_MODE_PROD : UpelaApi::API_MODE_TEST);
@@ -671,10 +691,11 @@ class Upela extends Module
 
             $offers = array_merge($offers1, $offers2, $offers3);
 
-            if ($this->carriers->createCarriers($offers))
+            if ($this->carriers->createCarriers($offers)) {
                 $this->context->smarty->assign(array('postSuccess' => $this->l('Carriers updates!')));
-            else
+            } else {
                 $this->context->smarty->assign(array('postErrors' => $this->l('Carriers updates issue!')));
+            }
 
             $carrier_select = true;
         }
@@ -716,14 +737,15 @@ class Upela extends Module
         $paymentInfo = $this->api->getPayments();
 
         if ($paymentInfo['info']) {
-            if ($paymentInfo['method'] == 'CB')
+            if ($paymentInfo['method'] == 'CB') {
                 $paymentInfo['method'] = $this->l('Credit card', 'upela');
+            }
 
-            if ($paymentInfo['avalaible'])
-                $înfos[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
-
+            if ($paymentInfo['avalaible']) {
+                $info[] = $this->l('You can not ship your orders directly. You must switch your account to SEPA payment or credit your account!', 'upela');
+            }
         } else {
-            $infos[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
+            $info[] = $this->l('Payment informations are not avalaible, you can not ship from PrestaShop!', 'upela');
         }
 
         $this->context->smarty->assign(
@@ -772,7 +794,7 @@ class Upela extends Module
                 'carrierControllerUrl' => $carrierControllerUrl,
                 'carrier_select' => $carrier_select,
                 'paymentInfos' => $paymentInfo,
-                'postInfos' => $infos
+                'postInfos' => $info
             )
         );
 
@@ -839,7 +861,8 @@ class Upela extends Module
         );
     }
 
-    private function postValidation() {
+    private function postValidation()
+    {
         if (Tools::isSubmit('processStoreCreation')) {
             $values = $this->getStoreFormValues();
 
@@ -858,9 +881,9 @@ class Upela extends Module
                 $this->postErrors[] = $this->l('Incorrect phone number');
             }
 
-//            if (empty($values['webservicekey'])) {
-//                $this->postErrors[] = $this->l('Webservice key is required');
-//            }
+            //            if (empty($values['webservicekey'])) {
+            //                $this->postErrors[] = $this->l('Webservice key is required');
+            //            }
 
             if (empty($values['store_name'])) {
                 $this->postErrors[] = $this->l('Store name is required');
@@ -907,9 +930,9 @@ class Upela extends Module
                 $this->postErrors[] = $this->l('Password check failed');
             }
 
-//            if (empty($values['webservicekey'])) {
-//                $this->postErrors[] = $this->l('Webservice key is required');
-//            }
+            //            if (empty($values['webservicekey'])) {
+            //                $this->postErrors[] = $this->l('Webservice key is required');
+            //            }
 
             if (empty($values['company_name'])) {
                 $this->postErrors[] = $this->l('Company name is required');
@@ -957,7 +980,8 @@ class Upela extends Module
         }
     }
 
-    public function getStoreFormValues() {
+    public function getStoreFormValues()
+    {
         if (!Tools::isSubmit('processStoreCreation')) {
             if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
@@ -1005,7 +1029,8 @@ class Upela extends Module
      * Create the WebserviceKey
      * @return string
      */
-    private function getWebServiceKey() {
+    private function getWebServiceKey()
+    {
         $wskey = Configuration::get('UPELA_WEBSERVICE_KEY');
 
         $webservice_key = new WebserviceKey();
@@ -1030,12 +1055,11 @@ class Upela extends Module
 
             return $key;
         }
-
     }
 
-    public function getAccountFormValues() {
+    public function getAccountFormValues()
+    {
         if (!Tools::isSubmit('processAccountCreation')) {
-
             if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
@@ -1102,7 +1126,8 @@ class Upela extends Module
         return $return;
     }
 
-    private function postProcess() {
+    private function postProcess()
+    {
         if (Tools::isSubmit('processStoreCreation')) {
             $orderStates = OrderState::getOrderStates($this->context->language->id);
             $statusList = array();
@@ -1251,7 +1276,8 @@ class Upela extends Module
      * @param     $msg
      * @param int $level
      */
-    private function quickLog($msg, $level = 1) {
+    private function quickLog($msg, $level = 1)
+    {
         if (version_compare(_PS_VERSION_, '1.6.0.0', '>')) {
             PrestaShopLogger::addLog('UPELA_LOG: '.strip_tags(print_r($msg, true)), $level, null, 'upela');
         } else {
@@ -1262,22 +1288,18 @@ class Upela extends Module
     /**
      * @return bool
      */
-    private function saveUser() {
+    private function saveUser()
+    {
         return (bool)Configuration::updateValue('UPELA_USER_LOGIN', $this->api->getUser()) &&
             (bool)Configuration::updateValue('UPELA_USER_PASSWORD', $this->api->getPassword()) &&
             (bool)Configuration::updateValue('UPELA_USER_ID', $this->api->getId()) &&
             (bool)Configuration::updateValue('UPELA_USER_NAME', $this->api->getName());
     }
 
-    private function displayRegistrationForm2() {
+    private function displayRegistrationForm2()
+    {
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
-            $default_Country = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
-        } else {
-            $default_Country = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
-        }
 
         // Init Fields form array
         $fields_form[0]['form'] = array(
@@ -1518,14 +1540,14 @@ class Upela extends Module
                     'required' => true,
                     'tab' => 'store',
                 ),
-//                array(
-//                    'col' => 3,
-//                    'type' => 'text',
-//                    'name' => 'webservicekey',
-//                    'label' => $this->l('Webservice key'),
-//                    'required' => true,
-//                    'tab' => 'store',
-//                ),
+                //                array(
+                //                    'col' => 3,
+                //                    'type' => 'text',
+                //                    'name' => 'webservicekey',
+                //                    'label' => $this->l('Webservice key'),
+                //                    'required' => true,
+                //                    'tab' => 'store',
+                //                ),
             ),
             'submit' => array(
                 'title' => $this->l('   Create Account   ')
@@ -1566,7 +1588,8 @@ class Upela extends Module
     /**
      * @return mixed
      */
-    private function displayCreateStoreForm2() {
+    private function displayCreateStoreForm2()
+    {
         $countries = Country::getCountries($this->context->language->id);
         $lCountries = array();
 
@@ -1731,7 +1754,8 @@ class Upela extends Module
     /**
      * @return string
      */
-    private function processLoginSubmitted() {
+    private function processLoginSubmitted()
+    {
         // Get vars
         $username = Tools::getValue('upela_email');
         $password = Tools::getValue('upela_password');
@@ -1763,12 +1787,10 @@ class Upela extends Module
         $this->postSuccess[] = $this->l('Connection success!');
     }
 
-    public function shipDirect($data) {
+    public function shipDirect($data)
+    {
         $ret = $this->api->ShipDirect($data);
-
-        
 
         return $ret;
     }
-
 }

@@ -47,7 +47,7 @@ class UpelaApi
     /**
      * UpelaApi constructor.
      *
-     * @param array|bool  $user
+     * @param array|bool $user
      * @param null|string $mode
      */
     public function __construct($user, $mode)
@@ -142,25 +142,8 @@ class UpelaApi
     {
         $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
         $url .= $this->getId().'&url='.$this->url_upela.'store/orders.php';
-        return $url;
-    }
 
-    /**
-     * @return string
-     */
-    public function getUrlparameter()
-    {
-        $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
-        $url .= $this->getId().'&url='.$this->url_upela.'mon-compte/prelevement-sepa';
         return $url;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBaseUrl()
-    {
-        return $this->url_upela;
     }
 
     /**
@@ -177,6 +160,25 @@ class UpelaApi
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlparameter()
+    {
+        $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
+        $url .= $this->getId().'&url='.$this->url_upela.'mon-compte/prelevement-sepa';
+
+        return $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->url_upela;
     }
 
     /**
@@ -214,10 +216,10 @@ class UpelaApi
     /**
      * Make call
      *
-     * @param  mixed  $body        body content
-     * @param  mixed  $http_header header content
-     * @param  string $user        User login
-     * @param  string $passwd      User password
+     * @param  mixed $body body content
+     * @param  mixed $http_header header content
+     * @param  string $user User login
+     * @param  string $passwd User password
      *
      * @return mixed               Call
      */
@@ -230,7 +232,7 @@ class UpelaApi
             $uri_to_call = $this->host.$this->endpoint;
         }
 
-        if ( $vardump ) {
+        if ($vardump) {
             var_dump($body);
             var_dump($uri_to_call);
             die();
@@ -261,13 +263,14 @@ class UpelaApi
         if ($response != false) {
             $response = Tools::jsonDecode($response, true);
         }
+
         return $response;
     }
 
     /**
      * @param string $url
-     * @param null   $stream_context
-     * @param int    $curl_timeout
+     * @param null $stream_context
+     * @param int $curl_timeout
      *
      * @return bool|mixed
      */
@@ -446,6 +449,7 @@ class UpelaApi
                 );
             }
         }
+
         return $result;
     }
 
@@ -522,28 +526,21 @@ class UpelaApi
     }
 
     /**
-     * @return array
-     */
-    public function getCredentials()
-    {
-        return array('login' => $this->user, 'password' => $this->passwd);
-    }
-
-    /**
      * @param $addressFrom
      * @param $addressTo
      * @param $parcel
      * @return mixed
      */
-    public function getPrices($addressFrom, $addressTo, $parcel){
+    public function getPrices($addressFrom, $addressTo, $parcel)
+    {
         $date = date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
+        $date = date('Y-m-d', strtotime($date.' + 2 days'));
 
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
 
         $data = array(
-            'account'=>$this->getCredentials(),
+            'account' => $this->getCredentials(),
             'ship_from' => array(
                 'country_code' => $addressFrom['country'],
                 'postcode' => $addressFrom['cp'],
@@ -566,7 +563,7 @@ class UpelaApi
             ),
             'shipment_date' => $date,
             'unit' => 'fr',
-            'selection'=> 'all',
+            'selection' => 'all',
             'type' => 'parcel'
         );
 
@@ -576,24 +573,33 @@ class UpelaApi
     }
 
     /**
+     * @return array
+     */
+    public function getCredentials()
+    {
+        return array('login' => $this->user, 'password' => $this->passwd);
+    }
+
+    /**
      * API Get information payment
      * @return array
      */
-    public function getPayments(){
+    public function getPayments()
+    {
         $ret = array(
             'info' => false,
-            'method'=> '',
+            'method' => '',
             'avalaible' => false,
-            'amount'=>0,
-            'voucher'=>false,
-            'vamount'=>0
+            'amount' => 0,
+            'voucher' => false,
+            'vamount' => 0
         );
 
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/get_payments/';
 
         $data = array(
-            'account'=>$this->getCredentials()
+            'account' => $this->getCredentials()
         );
 
         $paymentInfos = $this->makeCall($this->getBody($data), null, true, false);
@@ -601,82 +607,86 @@ class UpelaApi
         if (isset($paymentInfos['success']) && ($paymentInfos['success'] === true)) {
             $paymentInfos = $paymentInfos['paiments_info'];
 
-            if ($paymentInfos['cb']['activated']){
+            if ($paymentInfos['cb']['activated']) {
                 $ret['method'] = 'CB';
                 $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] > 0;
-                $ret['amount'] = (float)$paymentInfos['cb']['amount'] ;
+                $ret['amount'] = (float)$paymentInfos['cb']['amount'];
             }
-            if ($paymentInfos['sepa']['activated']){
+            if ($paymentInfos['sepa']['activated']) {
                 $ret['method'] = 'SEPA';
                 $ret['avalaible'] = true;
-                $ret['amount'] = (float)$paymentInfos['sepa']['amount'] ;
+                $ret['amount'] = (float)$paymentInfos['sepa']['amount'];
             }
-            if ($paymentInfos['voucher']['activated']){
+            if ($paymentInfos['voucher']['activated']) {
                 $ret['voucher'] = (float)$paymentInfos['voucher']['amount'] > 0;
-                $ret['vamount'] = (float)$paymentInfos['voucher']['amount'] ;
+                $ret['vamount'] = (float)$paymentInfos['voucher']['amount'];
 
-                if ($ret['avalaible'] === false){
-                    if ($ret['voucher'])
+                if ($ret['avalaible'] === false) {
+                    if ($ret['voucher']) {
                         $ret['avalaible'] = true;
+                    }
                 }
             }
 
             $ret['info'] = true;
+
             return $ret;
-        }else{
+        } else {
             $ret['info'] = false;
+
             return $ret;
         }
     }
 
 
-    public function Ship($shipFrom, $shipTo, $dropoffTo, $service, $parcel ){
+    public function ship($shipFrom, $shipTo, $dropoffTo, $service, $parcel)
+    {
         $date = date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date. ' + 2 days'));
+        $date = date('Y-m-d', strtotime($date.' + 2 days'));
 
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'directShipping/';
 
         $data = array(
-            'account'=>$this->getCredentials(),
-            'carrier_code'=>$service['carrier_code'],
-            'service_code'=> $service['service_code'],
-            'ship_from'=>array(
-                'company'=>'1',
-                'name'=> $shipFrom['name'],
-                'phone'=> $shipFrom['phone'],
-                'email'=> $shipFrom['email'],
-                'address1'=> $shipFrom['address1'],
-                'address2'=> $shipFrom['address2'],
-                'address3'=> null,
-                'country_code'=> $shipFrom['country_code'],
-                'postcode'=> $shipFrom['postcode'],
-                'city'=> $shipFrom['city'],
-                'pro'=> '1'),
-            'ship_to'=>array(
-                'company'=>'1',
-                'name'=> $shipTo['name'],
-                'phone'=> $shipTo['phone'],
-                'email'=> $shipTo['email'],
-                'address1'=> $shipTo['address1'],
-                'address2'=> $shipTo['address2'],
-                'address3'=> null,
-                'country_code'=> $shipTo['country_code'],
-                'postcode'=> $shipTo['postcode'],
-                'city'=> $shipTo['city'],
-                'pro'=> '1'),
-            'dropoff_to'=> ($dropoffTo['active']==false)?null:
+            'account' => $this->getCredentials(),
+            'carrier_code' => $service['carrier_code'],
+            'service_code' => $service['service_code'],
+            'ship_from' => array(
+                'company' => '1',
+                'name' => $shipFrom['name'],
+                'phone' => $shipFrom['phone'],
+                'email' => $shipFrom['email'],
+                'address1' => $shipFrom['address1'],
+                'address2' => $shipFrom['address2'],
+                'address3' => null,
+                'country_code' => $shipFrom['country_code'],
+                'postcode' => $shipFrom['postcode'],
+                'city' => $shipFrom['city'],
+                'pro' => '1'),
+            'ship_to' => array(
+                'company' => '1',
+                'name' => $shipTo['name'],
+                'phone' => $shipTo['phone'],
+                'email' => $shipTo['email'],
+                'address1' => $shipTo['address1'],
+                'address2' => $shipTo['address2'],
+                'address3' => null,
+                'country_code' => $shipTo['country_code'],
+                'postcode' => $shipTo['postcode'],
+                'city' => $shipTo['city'],
+                'pro' => '1'),
+            'dropoff_to' => ($dropoffTo['active'] == false) ? null :
                 array(
-                'dropoff_location_id'=>$dropoffTo['name'],
-                'name'=> $dropoffTo['name'],
-                'phone'=> $dropoffTo['phone'],
-                'email'=> $dropoffTo['email'],
-                'address1'=> $dropoffTo['address1'],
-                'address2'=> '',
-                'address3'=> null,
-                'country_code'=> $dropoffTo['country_code'],
-                'postcode'=> $dropoffTo['postcode'],
-                'city'=> $dropoffTo['city'],
+                    'dropoff_location_id' => $dropoffTo['name'],
+                    'name' => $dropoffTo['name'],
+                    'phone' => $dropoffTo['phone'],
+                    'email' => $dropoffTo['email'],
+                    'address1' => $dropoffTo['address1'],
+                    'address2' => '',
+                    'address3' => null,
+                    'country_code' => $dropoffTo['country_code'],
+                    'postcode' => $dropoffTo['postcode'],
+                    'city' => $dropoffTo['city'],
                 ),
             'parcels' => array(
                 array(
@@ -688,11 +698,11 @@ class UpelaApi
             ),
             'shipment_date' => $date,
             'unit' => 'fr',
-            'selection'=> 'all',
+            'selection' => 'all',
             'type' => 'parcel',
-            'reason'=> 'Commercial',
+            'reason' => 'Commercial',
             'content' => $parcel['content'],
-            'labelFormat'=> 'PDF'
+            'labelFormat' => 'PDF'
         );
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);
@@ -700,14 +710,15 @@ class UpelaApi
         return $ship;
     }
 
-    public function ShipDirect(Array $info ){
+    public function shipDirect(array $info)
+    {
         $this->action = self::API_POST;
         $this->endpoint = 'api/'.self::API_VERSION.'/directShipping/';
         $data = $info;
-        $data['account'] =$this->getCredentials();
+        $data['account'] = $this->getCredentials();
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);
+
         return json_encode($ship);
     }
-
 }

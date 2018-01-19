@@ -26,13 +26,12 @@
 
 function upgrade_module_2_0_0($module)
 {
- 
     // Register old hooks to be safe
     $module->registerHook('displayAdminOrder');
     $module->registerHook('displayCarrierExtraContent');
     $module->registerHook('header');
 
-     // Execute the SQL upgrade
+    // Execute the SQL upgrade
     $sql_file = Tools::file_get_contents(_PS_MODULE_DIR_.'/upela/upgrade/2.0.0.sql');
     $sql_file = str_replace('{PREFIXE}', _DB_PREFIX_, $sql_file);
 
@@ -43,10 +42,11 @@ function upgrade_module_2_0_0($module)
     foreach ($query as $q) {
         if (trim($q) != '' && Db::getInstance()->execute($q) === false) {
             Db::getInstance()->execute('ROLLBACK;');
+
             return false;
         }
     }
-   
+
     // Validate upgrade
     Db::getInstance()->execute('COMMIT;');
 

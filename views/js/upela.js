@@ -1,5 +1,20 @@
 /**
- * Created by Upela 12/01/2018
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * @author    UPELA
+ * @copyright 2017-2018 MPG Upela
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
  */
 
 $.noConflict();
@@ -8,10 +23,9 @@ var map;
 var markers = [];
 var infoWindow;
 var first = false;
-var listDroppOff =false;
+var listDroppOff = false;
 
-if(typeof carrier_id === 'undefined')
-{
+if (typeof carrier_id === 'undefined') {
     var carrier_id = false;
 }
 
@@ -54,8 +68,8 @@ function initializeMap(options) {
     infoWindow = new google.maps.InfoWindow();
     google.maps.event.trigger(map, 'resize');
 }
-function setSelectedVal(dropoffLocation)
-{
+
+function setSelectedVal(dropoffLocation) {
     $('#dp_id').val(dropoffLocation.dropoff_location_id);
     $('#dp_number').val(dropoffLocation.number);
     $('#dp_name').val(dropoffLocation.name);
@@ -84,18 +98,18 @@ function createMarker(latlng, data) {
         markerData.icon = 'https://www.upela.com/images/markers/marker-' + data.number + '.png';
     }
     var marker = new google.maps.Marker(markerData);
-    closeInfoWindow = function() {
+    closeInfoWindow = function () {
         infoWindow.close();
     };
-    google.maps.event.addListener(marker, 'click', function() {
+    google.maps.event.addListener(marker, 'click', function () {
         infoWindow.setContent(html);
         infoWindow.open(map, marker);
     });
     google.maps.event.addListener(map, 'click', closeInfoWindow);
     markers.push(marker);
 }
-function setDropOffPoints(dropOfflist)
-{
+
+function setDropOffPoints(dropOfflist) {
     var html = [], idx = 0;
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < dropOfflist.length; i++) {
@@ -118,24 +132,23 @@ function setDropOffPoints(dropOfflist)
 
 $('#delivery_option_' + carrier_id).change(
     function (e) {
-        if ($(this).is(':checked') ) {
+        if ($(this).is(':checked')) {
             e.stopPropagation();
             $('#upela-delivery').parent('div').show();
-            initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:11});
+            initializeMap({id: 'map-upela-selected', lat: first.latitude, lng: first.longitude, zoom: 11});
             var latlng = new google.maps.LatLng(
                 parseFloat(first.latitude),
                 parseFloat(first.longitude));
-                first.number = 1;
-                createMarker(latlng, first);
+            first.number = 1;
+            createMarker(latlng, first);
             google.maps.event.trigger(map, 'resize');
         }
     });
 
-$(document).ready(function() {
+$(document).ready(function () {
 
-    if(typeof url === 'undefined' )
-    {
-      return;
+    if (typeof url === 'undefined') {
+        return;
     }
     $.ajax({
             url: url,
@@ -146,15 +159,13 @@ $(document).ready(function() {
                     $('#selected-delivery-point').text($('#tr_nodp').val());
                 }
                 else {
-                    if( readCookie('dropoffLocation') === null)
-                    {
+                    if (readCookie('dropoffLocation') === null) {
                         first = s.rows[0];
                     }
-                    else
-                    {
+                    else {
                         first = JSON.parse(readCookie('dropoffLocation'))
                     }
-                    initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:12});
+                    initializeMap({id: 'map-upela-selected', lat: first.latitude, lng: first.longitude, zoom: 12});
                     listDroppOff = s.rows;
                     setSelectedVal(first);
                     var latlng = new google.maps.LatLng(
@@ -171,15 +182,17 @@ $(document).ready(function() {
         }
     );
 });
-$('#choose-delivery').on('click',function(){$('#upelaModal').modal('show');});
-$('#upelaModal').on('shown.bs.modal', function() {
-    initializeMap({id:'map-upela',lat:first.latitude,lng:first.longitude,zoom:12});
+$('#choose-delivery').on('click', function () {
+    $('#upelaModal').modal('show');
+});
+$('#upelaModal').on('shown.bs.modal', function () {
+    initializeMap({id: 'map-upela', lat: first.latitude, lng: first.longitude, zoom: 12});
     setSelectedVal(first);
     setDropOffPoints(listDroppOff);
 });
 
 
-$('body').on('click','.upela-marker-click',function(){
+$('body').on('click', '.upela-marker-click', function () {
     var number = $(this).data('href');
     setSelectedVal(listDroppOff[number]);
     // enregistrement en bdd
@@ -187,7 +200,7 @@ $('body').on('click','.upela-marker-click',function(){
     eraseCookie('dropoffLocation');
     createCookie('dropoffLocation', JSON.stringify(data), 1);
     $('#upelaModal').modal('hide');
-    initializeMap({id:'map-upela-selected',lat:data.latitude,lng:data.longitude,zoom:11});
+    initializeMap({id: 'map-upela-selected', lat: data.latitude, lng: data.longitude, zoom: 11});
     var latlng = new google.maps.LatLng(
         parseFloat(data.latitude),
         parseFloat(data.longitude));
@@ -196,21 +209,21 @@ $('body').on('click','.upela-marker-click',function(){
     google.maps.event.trigger(map, 'resize');
 });
 
-$('#checkout-delivery-step h1').on('click',function(){
+$('#checkout-delivery-step h1').on('click', function () {
     $('#map-upela-selected').html('Loading map ...');
-    setTimeout(function(){
-        initializeMap({id:'map-upela-selected',lat:first.latitude,lng:first.longitude,zoom:11});
+    setTimeout(function () {
+        initializeMap({id: 'map-upela-selected', lat: first.latitude, lng: first.longitude, zoom: 11});
         var latlng = new google.maps.LatLng(
             parseFloat(first.latitude),
             parseFloat(first.longitude));
         first.number = 1;
         createMarker(latlng, first);
         google.maps.event.trigger(first, 'resize');
-    },500);
+    }, 500);
 });
 
 
-function sendCommandeToUpela($data){
+function sendCommandeToUpela($data) {
     var url = '/index.php?fc=module&module=upela&controller=ajax&option=directShiping';
 
     var data = $data;
@@ -224,28 +237,26 @@ function sendCommandeToUpela($data){
     data.parcels[0].z = $('#upela_height').val();
 
     $('#upela-expedier').html($('#tr_progress').val());
-    $('#upela-expedier').attr('onclick','');
+    $('#upela-expedier').attr('onclick', '');
 
     $.ajax({
         url: url,
         type: 'POST',
         data: $data,
-        success:function(s){
+        success: function (s) {
             var result = JSON.parse(s);
-            if(result.success === false)
-            {
+            if (result.success === false) {
                 $('#upela-error').html($('#tr_error1').val());
-            }else
-            {
+            } else {
                 var WayBilllink = '<tr><td class="up-sended-td">';
-                WayBilllink += '<img  src="'+pdfImg+'" width="150px;">';
-                WayBilllink = WayBilllink+'<br><a href="'+result.waybill.url+'" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
+                WayBilllink += '<img  src="' + pdfImg + '" width="150px;">';
+                WayBilllink = WayBilllink + '<br><a href="' + result.waybill.url + '" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
                 $('#table-body-upela').html(WayBilllink);
             }
         },
-        error:function(e){
+        error: function (e) {
             console.log(e);
-    }
+        }
 
     });
 }
