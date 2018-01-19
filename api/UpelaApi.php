@@ -705,7 +705,6 @@ class UpelaApi
         $this->endpoint = 'api/'.self::API_VERSION.'/directShipping/';
         $data = $info;
         $data['account'] =$this->getCredentials();
-        print_r($data);
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);
         return json_encode($ship);

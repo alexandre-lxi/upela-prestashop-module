@@ -415,6 +415,8 @@ class Upela extends Module
                 $fromCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
             }
 
+
+
             if ($carrierInfo['is_dropoff_point'] == true) {
                 $dropoffPoint = $this->carriers->getDropoffPointByCart($cart_id);
                 $is_dropoff = $dropoffPoint['dp_address1'] != '' ;
@@ -426,6 +428,8 @@ class Upela extends Module
             $deliveryPhone = ($deliveryAdress->phone_mobile == '') ? (($deliveryAdress->phone == '') ? '' : $deliveryAdress->phone) : $deliveryAdress->phone_mobile;
             if ($deliveryPhone == '')
                 $deliveryPhone = Configuration::get('BLOCKCONTACTINFOS_PHONE');
+
+            $toCountry = Country::getIsoById($deliveryAdress->id_country);
 
             $infoShipment = array(
                 'account' =>
@@ -459,7 +463,7 @@ class Upela extends Module
                         'address1' => $deliveryAdress->address1,
                         'address2' => $deliveryAdress->address2,
                         'address3' => null,
-                        'country_code' => $deliveryAdress->country,
+                        'country_code' => $toCountry,
                         'postcode' => $deliveryAdress->postcode,
                         'city' => $deliveryAdress->city,
                         'pro' => ($deliveryAdress->company == '') ? 0 : 1,
@@ -469,7 +473,7 @@ class Upela extends Module
                         'dropoff_location_id' => $dropoffPoint['dp_id'],
                         'company' => $dropoffPoint['dp_company'],
                         'name' => $dropoffPoint['dp_name'],
-                        'phone' => '',
+                        'phone' => Configuration::get('BLOCKCONTACTINFOS_PHONE'),
                         'email' => null,
                         'address1' => $dropoffPoint['dp_address1'],
                         'address2' => $dropoffPoint['dp_address2'],
@@ -1760,7 +1764,11 @@ class Upela extends Module
     }
 
     public function shipDirect($data) {
-        $this->api->ShipDirect($data);
+        $ret = $this->api->ShipDirect($data);
+
+        
+
+        return $ret;
     }
 
 }
