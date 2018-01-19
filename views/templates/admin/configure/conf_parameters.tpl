@@ -88,7 +88,7 @@
                                 <div class="form-group">
                                     <label for="store_zipcode" class="col-sm-4">{l s='ZIP Code' mod='upela'}</label>
                                     <div class="col-sm-4">
-                                        <input name="store_address1" type="text" class="form-control" id="store_zipcode"
+                                        <input name="store_zipcode" type="text" class="form-control" id="store_zipcode"
                                                placeholder="{l s='Zip code' mod='upela'}"
                                                value="{$storeInfos['upela_store_zipcode']|escape:'htmlall':'UTF-8'}">
                                     </div>

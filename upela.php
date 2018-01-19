@@ -703,6 +703,7 @@ class Upela extends Module
         }
 
         if (Tools::isSubmit('updatestore')) {
+            Configuration::updateValue('UPELA_STORE_DEFINE', false);
             $storeInfos = $this->getStoreFormValuesContent();            
             Configuration::updateValue('UPELA_STORE_FIRSTNAME', $storeInfos['upela_store_firstname']);
             Configuration::updateValue('UPELA_STORE_LASTNAME', $storeInfos['upela_store_lastname']);
@@ -918,7 +919,7 @@ class Upela extends Module
 
     public function getStoreFormValuesContent()
     {
-        if (Configuration::get('UPELA_STORE_DEFINE') == true){
+        if ((Configuration::get('UPELA_STORE_DEFINE') == true)){
             $return = array(
                 'upela_store_firstname' => Configuration::get('UPELA_STORE_FIRSTNAME'),
                 'upela_store_lastname' => Configuration::get('UPELA_STORE_LASTNAME'),
@@ -963,9 +964,9 @@ class Upela extends Module
                     'upela_store_name' => Tools::getValue('store_name'),
                     'upela_store_phone' => Tools::getValue('store_phone'),
                     'upela_store_country' => $defaultCountry, //Tools::getValue('store_country'),
-                    'upela_store_address1' => Tools::getValue('store_address_1'),
-                    'upela_store_address2' => Tools::getValue('store_address_2'),
-                    'upela_store_address3' => Tools::getValue('store_address_3'),
+                    'upela_store_address1' => Tools::getValue('store_address1'),
+                    'upela_store_address2' => Tools::getValue('store_address2'),
+                    'upela_store_address3' => Tools::getValue('store_address3'),
                     'upela_store_city' => Tools::getValue('store_city'),
                     'upela_store_zipcode' => Tools::getValue('store_zipcode'),
                     'upela_store_business' => true,
