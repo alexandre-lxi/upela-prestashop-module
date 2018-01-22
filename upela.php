@@ -118,7 +118,8 @@ class Upela extends Module
             'login' => Configuration::get('UPELA_USER_LOGIN'),
             'password' => Configuration::get('UPELA_USER_PASSWORD'),
             'id' => Configuration::get('UPELA_USER_ID'),
-            'name' => Configuration::get('UPELA_USER_NAME')
+            'name' => Configuration::get('UPELA_USER_NAME'),
+            'firstname' => Configuration::get('UPELA_STORE_FIRSTNAME')
         );
     }
 
@@ -591,7 +592,7 @@ class Upela extends Module
                 $location = json_decode($_COOKIE['dropoffLocation']);
 
                 $data = array(
-                    'id_cart_ps' => $cart_id,
+                    'id_cart_ps' => (int)$cart_id,
                     'dp_company' => pSQL(trim($location->name)),
                     'dp_name' => pSQL(trim($location->name)),
                     'dp_address1' => pSQL(trim($location->address1)),
@@ -833,7 +834,8 @@ class Upela extends Module
                 'errors' => $this->errors,
                 '_path' => $this->_path,
                 'upela_user_connected' => $this->isConnected,
-                'upela_username' => ($this->isConnected) ? $user['name'] : '',
+                'upela_firstname' => ($this->isConnected) ? $user['firstname'] : '',
+                'upela_first' => ($this->isConnected) ? $user['name'] : '',
                 'upela_user_email' => ($this->isConnected) ? $user['login'] : '',
                 'upela_login' => $upela_login,
                 'upela_nbstores' => count($stores),
@@ -1926,15 +1928,15 @@ class Upela extends Module
 
         if (isset($ret['success']) && $ret['success']) {
             $datas = array(
-                'id_cart_ps' => $data['cart_id'],
-                'customer_id' => $ret['customer_id'],
-                'shipment_id' => $ret['shipment_id'],
-                'order_id' => $ret['order_id'],
-                'carrier_code' => $data['carrier_code'],
-                'carrier_name' => $data['carrier_code'],
-                'waybill_code' => $ret['waybill']['code'],
-                'waybill_url' => $ret['waybill']['url'],
-                'tracking_number' => $ret['tracking_number'],
+                'id_cart_ps' => (int)$data['cart_id'],
+                'customer_id' => (int)$ret['customer_id'],
+                'shipment_id' => (int)$ret['shipment_id'],
+                'order_id' => (int)$ret['order_id'],
+                'carrier_code' => pSQL($data['carrier_code']),
+                'carrier_name' => pSQL($data['carrier_code']),
+                'waybill_code' => pSQL($ret['waybill']['code']),
+                'waybill_url' => pSQL($ret['waybill']['url']),
+                'tracking_number' => pSQL($ret['tracking_number']),
             );
 
             try {

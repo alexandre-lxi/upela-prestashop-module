@@ -424,24 +424,18 @@ class UpelaCarriers
         foreach ($oCarrier->getZones() as $aZone) {
             Db::getInstance()->Execute(
                 'UPDATE `'._DB_PREFIX_.'delivery` 
-                    set `price` = '.$price.' 
+                    set `price` = '.(float)$price.' 
                     where `id_carrier` = '.(int)($oCarrier->id).' 
                     and `id_zone` = '.(int)($aZone['id_zone']).' 
                     and `id_range_price` =   '.(int)$oRangePrice->id);
 
             Db::getInstance()->Execute(
                 'UPDATE `'._DB_PREFIX_.'delivery` 
-                    set `price` = '.$price.' 
+                    set `price` = '.(float)$price.' 
                     where `id_carrier` = '.(int)($oCarrier->id).' 
                     and `id_zone` = '.(int)($aZone['id_zone']).' 
                     and `id_range_weight` =   '.(int)$oRangeWeight->id);
-
-            //                    (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
-            //				VALUES ('.(int)($oCarrier->id).', '.(int)$oRangePrice->id.', null, '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
-            //                Db::getInstance()->Execute(
-            //                    'INSERT INTO `'._DB_PREFIX_.'delivery` (`id_carrier`, `id_range_price`, `id_range_weight`, `id_zone`, `id_shop`, `id_shop_group`,  `price`)
-            //				VALUES ('.(int)($oCarrier->id).', null, '.(int)($oRangeWeight->id).', '.(int)($aZone['id_zone']).',null, null ,'.$price.')');
-        }
+  }
     }
 
     private function getPrice($upCarrier, $upService)
