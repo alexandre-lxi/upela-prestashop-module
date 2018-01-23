@@ -44,7 +44,7 @@ class UpelaCarriers
         $query = '
          SELECT  *
          FROM ' . _DB_PREFIX_ . 'upela_order_points
-         WHERE id_cart_ps = ' . $cart_id;
+         WHERE id_cart_ps = ' . (int)$cart_id;
 
         return $this->db->getRow( $query );
     }
