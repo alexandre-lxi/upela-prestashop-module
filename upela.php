@@ -325,7 +325,6 @@ class Upela extends Module
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
         $smarty->assign('upelaBaseDir', _MODULE_DIR_.'/upela/');
-        //$controllerClass = get_class($controller);
 
         if (method_exists($controller, 'registerJavascript')) {
             $controller->registerJavascript(
@@ -635,6 +634,9 @@ class Upela extends Module
         $service = $this->carriers->getCarriersServices($carrier_id, true);
 
         if ($service['is_dropoff_point'] == true) {
+
+            // $_COOKIE here it s used too store dropOff point shipment information
+            // from external service. I don't know how to create Prestashop Cookie in JS
             if (isset($_COOKIE['dropoffLocation'])) {
                 $location = json_decode($_COOKIE['dropoffLocation']);
 
@@ -956,6 +958,7 @@ class Upela extends Module
 
         $this->context->controller->addCSS($this->_path.'views/css/back.css');
         $this->context->smarty->assign(array('upela_login' => Tools::isSubmit('login')));
+        $fields_form = array();
 
         $fields_form[0]['form'] = array(
             'input'  => array(
@@ -1160,12 +1163,12 @@ class Upela extends Module
             );
         } else {
             $return = array(
-                'firstname'       => Tools::getValue('firstname'),
-                'lastname'        => Tools::getValue('lastname'),
-                'email'           => Tools::getValue('email'),
-                'store_name'      => Tools::getValue('store_name'),
-                'phone'           => Tools::getValue('phone'),
-                'store_country'   => Tools::getValue('store_country'),
+                'firstname' => Tools::getValue('firstname'),
+                'lastname' => Tools::getValue('lastname'),
+                'email' => Tools::getValue('email'),
+                'store_name' => Tools::getValue('store_name'),
+                'phone' => Tools::getValue('phone'),
+                'store_country' => Tools::getValue('store_country'),
                 'store_address_1' => Tools::getValue('store_address_1'),
                 'store_address_2' => Tools::getValue('store_address_2'),
                 'store_address_3' => Tools::getValue('store_address_3'),
@@ -1259,12 +1262,12 @@ class Upela extends Module
                 'store_address_1' => Tools::getValue('store_address_1'),
                 'store_address_2' => Tools::getValue('store_address_2'),
                 'store_address_3' => Tools::getValue('store_address_3'),
-                'store_city'      => Tools::getValue('store_city'),
-                'store_zipcode'   => Tools::getValue('store_zipcode'),
-                'webservicekey'   => $this->getWebServiceKey(),
-                'store_business'  => Tools::getValue('store_business'),
-                'company_vat'     => Tools::getValue('company_vat'),
-                'company_siret'   => Tools::getValue('company_siret'),
+                'store_city' => Tools::getValue('store_city'),
+                'store_zipcode' => Tools::getValue('store_zipcode'),
+                'webservicekey' => $this->getWebServiceKey(),
+                'store_business' => Tools::getValue('store_business'),
+                'company_vat' => Tools::getValue('company_vat'),
+                'company_siret' => Tools::getValue('company_siret'),
 
                 'company_name'      => Tools::getValue('company_name'),
                 'company_country'   => Tools::getValue('company_country'),
@@ -1735,14 +1738,6 @@ class Upela extends Module
                     'required' => true,
                     'tab'      => 'store',
                 ),
-                //                array(
-                //                    'col' => 3,
-                //                    'type' => 'text',
-                //                    'name' => 'webservicekey',
-                //                    'label' => $this->l('Webservice key'),
-                //                    'required' => true,
-                //                    'tab' => 'store',
-                //                ),
             ),
             'submit' => array(
                 'title' => $this->l('   Create Account   ')
