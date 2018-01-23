@@ -30,7 +30,7 @@
 </style>
 <script type="text/javascript">
     var infoExpedition = {$jsonShipInfo};
-    var pdfImg = "{$simple_link|escape:'html':'UTF-8'}views/img/bordereau.jpg";
+    var pdfImg = "{$simple_link|escape:'url':'UTF-8'}views/img/bordereau.jpg";
 
 
     $(function () {
@@ -156,14 +156,14 @@
                             {else}
                                 <a id="upela-expedier" class="btn btn-primary text-center part__button"
                                    style="background-color: #FF6600" onclick="sendCommandeToUpela(infoExpedition)"
-                                        > {$suivi|escape:'html':'UTF-8'}</a>
+                                        > {$suivi|escape:'htmlall':'UTF-8'}</a>
                             {/if}
                         </td>
                     </tr>
                 {else}
                     <tr>
                         <td class="up-sended-td">
-                            <img  src="{$simple_link|escape:'html':'UTF-8'}views/img/bordereau.jpg" width="150px;">
+                            <img  src="{$simple_link|escape:'htmlall':'UTF-8'}views/img/bordereau.jpg" width="150px;">
                             <br>
                             <a href="{$waybill_url|escape:'htmlall':'UTF-8'}" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a>
                         </td></tr>

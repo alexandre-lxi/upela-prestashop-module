@@ -21,48 +21,52 @@ class UpelaHelper
 {
     public static $countryCities = array(
         'FR' => array(
-            'cp' => '13001',
+            'cp'   => '13001',
             'city' => 'Marseille'
         ),
         'ES' => array(
-            'cp' => '08001',
+            'cp'   => '08001',
             'city' => 'Barcelona'
         ),
         'DE' => array(
-            'cp' => '80331',
+            'cp'   => '80331',
             'city' => 'Munich'
         ),
         'IT' => array(
-            'cp' => '00100',
+            'cp'   => '00100',
             'city' => 'Rome'
         )
     );
 
     public static $tracking_urls = array(
-        "Chronopost" => "http://www.chronopost.fr/expedier/inputLTNumbersNoJahia.do?lang=fr_FR&listeNumeros=@",
-        "Mondial Relay" => "http://www.mondialrelay.fr/suivi-de-colis/?NumeroExpedition=@&CodePostal=",
-        "Colissimo" => "http://www.colissimo.fr/portail_colissimo/suivreResultat.do?parcelnumber=@",
-        "TNT" => "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
-        "TNT International" => "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
-        "TNT Relais Colis" => "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
-        "FedEx" => "https://www.fedex.com/apps/fedextrack/?tracknumbers=@",
-        "FedEx2" => "https://www.fedex.com/apps/fedextrack/?tracknumbers=@",
-        "DHL+" => "http://www.dhl.fr/content/fr/fr/dhl_express/suivi_expedition.shtml?brand=DHL&AWB=@",
-        "DP Group" => "http://www.dhl.fr/content/fr/fr/dhl_express/suivi_expedition.shtml?brand=DHL&AWB=@",
-        "UPS" =>
+        "Chronopost"        => "http://www.chronopost.fr/expedier/inputLTNumbersNoJahia.do?lang=fr_FR&listeNumeros=@",
+        "Mondial Relay"     => "http://www.mondialrelay.fr/suivi-de-colis/?NumeroExpedition=@&CodePostal=",
+        "Colissimo"         => "http://www.colissimo.fr/portail_colissimo/suivreResultat.do?parcelnumber=@",
+        "TNT"               =>
+            "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
+        "TNT International" =>
+            "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
+        "TNT Relais Colis"  =>
+            "http://www.tnt.fr/public/suivi_colis/recherche/visubontransport.do?radiochoixrecherche=BT&bonTransport=@",
+        "FedEx"             => "https://www.fedex.com/apps/fedextrack/?tracknumbers=@",
+        "FedEx2"            => "https://www.fedex.com/apps/fedextrack/?tracknumbers=@",
+        "DHL+"              => "http://www.dhl.fr/content/fr/fr/dhl_express/suivi_expedition.shtml?brand=DHL&AWB=@",
+        "DP Group"          => "http://www.dhl.fr/content/fr/fr/dhl_express/suivi_expedition.shtml?brand=DHL&AWB=@",
+        "UPS"               =>
             "http://wwwapps.ups.com/etracking/tracking.cgi?InquiryNumber1=@&loc=fr_FR&TypeOfInquiryNumber=T",
-        "UPS Access Point" =>
+        "UPS Access Point"  =>
             "https://wwwapps.ups.com/WebTracking/track?HTMLVersion=5.0&loc=fr_FR&Requester=UPSHome&WBPM_lid=homepage%252Fct1.html_pnl_trk&track.x=Suivi&trackNums=@",
-        "Seur" => "http://www.seur.com/seguimiento-online.do",
-        "Correos" => "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?numero=@",
-        "Correos Express" => "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?numero=@",
-        "DPD" => "http://www.dpd.fr/traces_@",
-        "DPD Relais" => "http://www.dpd.fr/traces_@",
-        "Nexive" => "https://www.formulacerta.it/Tracking-Spedizioni-Nexive.aspx?b=@",
-        "Sda" => "https://www.sda.it/SITO_SDA-WEB/dispatcher?button=+&id_ldv=@&invoker=home&LEN=ENG&execute2=ActionTracking.doGetTrackingHome",
-        "Asm" => "http://www.asmred.com/extranet/public/ExpedicionASM.aspx?codigo=@&cpDst=",
-        "Brt" => "https://vas.brt.it/vas/sped_det_new.htm?brtCode=@",
-        "Upela" => "https://www.upela.com/en/tracking/?code=@"
+        "Seur"              => "http://www.seur.com/seguimiento-online.do",
+        "Correos"           => "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?numero=@",
+        "Correos Express"   => "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?numero=@",
+        "DPD"               => "http://www.dpd.fr/traces_@",
+        "DPD Relais"        => "http://www.dpd.fr/traces_@",
+        "Nexive"            => "https://www.formulacerta.it/Tracking-Spedizioni-Nexive.aspx?b=@",
+        "Sda"               =>
+            "https://www.sda.it/SITO_SDA-WEB/dispatcher?button=+&id_ldv=@&invoker=home&LEN=ENG&execute2=ActionTracking.doGetTrackingHome",
+        "Asm"               => "http://www.asmred.com/extranet/public/ExpedicionASM.aspx?codigo=@&cpDst=",
+        "Brt"               => "https://vas.brt.it/vas/sped_det_new.htm?brtCode=@",
+        "Upela"             => "https://www.upela.com/en/tracking/?code=@"
     );
     /**
      * Webservices presmissions of the module
@@ -70,17 +74,23 @@ class UpelaHelper
      * @access protected
      */
     protected $permissions = array(
-        'addresses' => array('GET' => 'on'),
-        'carriers' => array('GET' => 'on'),
-        'configurations' => array('GET' => 'on'),
-        'countries' => array('GET' => 'on'),
-        'customers' => array('GET' => 'on'),
-        'order_carriers' => array('GET' => 'on', 'PUT' => 'on'),
-        'order_histories' => array('GET' => 'on', 'POST' => 'on'),
-        'order_states' => array('GET' => 'on'),
-        'orders' => array('GET' => 'on'),
-        'products' => array('GET' => 'on'),
-        'states' => array('GET' => 'on'),
+        'addresses'       => array('GET' => 'on'),
+        'carriers'        => array('GET' => 'on'),
+        'configurations'  => array('GET' => 'on'),
+        'countries'       => array('GET' => 'on'),
+        'customers'       => array('GET' => 'on'),
+        'order_carriers'  => array(
+            'GET' => 'on',
+            'PUT' => 'on'
+        ),
+        'order_histories' => array(
+            'GET'  => 'on',
+            'POST' => 'on'
+        ),
+        'order_states'    => array('GET' => 'on'),
+        'orders'          => array('GET' => 'on'),
+        'products'        => array('GET' => 'on'),
+        'states'          => array('GET' => 'on'),
     );
     /**
      * SQL tables names of the module
@@ -207,6 +217,4 @@ class UpelaHelper
             return 'ROW';
         }
     }
-
-
 }

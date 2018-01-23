@@ -38,17 +38,21 @@ function upgrade_module_2_0_0($module)
     // Because all merchants can't execute every sql queries in one execute, we have to explode them.
     $query = explode('-- REQUEST --', $sql_file);
 
-    Db::getInstance()->execute('START TRANSACTION;');
+    Db::getInstance()
+      ->execute('START TRANSACTION;');
     foreach ($query as $q) {
-        if (trim($q) != '' && Db::getInstance()->execute($q) === false) {
-            Db::getInstance()->execute('ROLLBACK;');
+        if (trim($q) != '' && Db::getInstance()
+                                ->execute($q) === false) {
+            Db::getInstance()
+              ->execute('ROLLBACK;');
 
             return false;
         }
     }
 
     // Validate upgrade
-    Db::getInstance()->execute('COMMIT;');
+    Db::getInstance()
+      ->execute('COMMIT;');
 
     return true;
 }
