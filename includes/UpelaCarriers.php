@@ -102,7 +102,7 @@ class UpelaCarriers
                 'id_carrier' => $carrier['id_carrier'],
                 'label' => $carrier['label'],
                 'desc_store' => $carrier['desc_store'],
-                'is_active' => $carrier['is_active'],
+                'is_active' => ($carrier['is_active'] && ($carrier['id_reference'] !== null)),
                 'is_pickup_point' => $carrier['is_pickup_point'],
                 'is_dropoff_point' => $carrier['is_dropoff_point'],
                 'is_express' => $carrier['is_express'],

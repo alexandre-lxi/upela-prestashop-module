@@ -406,7 +406,11 @@ class Upela extends Module
         $cart_id = $this->context->cart->id;
         $carrierInfo = $this->carriers->getCarriersServices($this->context->cart->id_carrier, true);
 
-        if ($carrierInfo['up_code_carrier'] != '') {
+        $query = 'select count(*) nb from `'._DB_PREFIX_.'upela_orders` where id_cart_ps = '.$this->context->cart->id;
+        $countOrders  = Db::getInstance()->getRow($query);
+
+
+        if (($carrierInfo['up_code_carrier'] != '') || ((int)$countOrders['nb']>0)) {
             $controller = $this->context->controller;
 
             if (method_exists($controller, 'registerJavascript')) {
@@ -524,7 +528,7 @@ class Upela extends Module
                 'reference' => " ",
                 'suivi' => $this->l('Ship', 'upela'),
                 'iconBtn' => "icon-plus-sign",
-                'link_suivi' => ($this->isConnected) ?
+                'link_suivi' => (($this->isConnected)|| ($countOrders >0)) ?
                     $this->context->link->getAdminLink('AdminModules').
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name.'&sendorder=1' :
@@ -532,7 +536,7 @@ class Upela extends Module
                     '&configure='.$this->name.'&tab_module='.$this->tab.
                     '&module_name='.$this->name,
                 'img15' => 'views/img/add.gif',
-                'target' => ($this->isConnected) ? '_blank' : '',
+                'target' => (($this->isConnected) || ($countOrders >0)) ? '_blank' : '',
                 'upela_ship_content' => Configuration::get('UPELA_SHIP_CONTENT'),
                 'upela_weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
                 'upela_length' => Configuration::get('UPELA_SHIP_LENGTH'),
@@ -540,8 +544,8 @@ class Upela extends Module
                 'upela_height' => Configuration::get('UPELA_SHIP_HEIGHT'),
                 'jsonShipInfo' => json_encode($infoShipment),
                 'paymentInfos' => $paymentInfo,
-                'upela_param_link' => ($this->isConnected) ? $this->api->getUrlparameter() : '',
-                'is_connected' => $this->isConnected,
+                'upela_param_link' => (($this->isConnected) || ($countOrders >0)) ? $this->api->getUrlparameter() : '',
+                'is_connected' => ($this->isConnected || ($countOrders >0)),
                 'waybill_url' => false
             );
 
