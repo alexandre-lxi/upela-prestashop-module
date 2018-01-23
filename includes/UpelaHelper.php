@@ -83,8 +83,9 @@ class UpelaHelper
             'GET' => 'on',
             'PUT' => 'on'
         ),
-        'order_histories' => array('GET'  => 'on',
-                                   'POST' => 'on'
+        'order_histories' => array(
+            'GET'  => 'on',
+            'POST' => 'on'
         ),
         'order_states'    => array('GET' => 'on'),
         'orders'          => array('GET' => 'on'),
@@ -216,6 +217,4 @@ class UpelaHelper
             return 'ROW';
         }
     }
-
-
 }

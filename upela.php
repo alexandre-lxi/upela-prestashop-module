@@ -634,7 +634,6 @@ class Upela extends Module
         $service = $this->carriers->getCarriersServices($carrier_id, true);
 
         if ($service['is_dropoff_point'] == true) {
-
             // $_COOKIE here it s used too store dropOff point shipment information
             // from external service. I don't know how to create Prestashop Cookie in JS
             if (isset($_COOKIE['dropoffLocation'])) {
@@ -670,7 +669,6 @@ class Upela extends Module
         $stores = array();
         $user = '';
         $info = array();
-        $fields_form = array('0' => array());
 
         if (Tools::isSubmit('processChangeMode')) {
             $this->setMode(
@@ -994,9 +992,9 @@ class Upela extends Module
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         //$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->currentIndex = $this->context->link->getAdminLink(
-            'AdminModules',
-            false
-        ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+                'AdminModules',
+                false
+            ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
         // Title and toolbar
         $helper->title = $this->displayName;
@@ -1163,12 +1161,12 @@ class Upela extends Module
             );
         } else {
             $return = array(
-                'firstname' => Tools::getValue('firstname'),
-                'lastname' => Tools::getValue('lastname'),
-                'email' => Tools::getValue('email'),
-                'store_name' => Tools::getValue('store_name'),
-                'phone' => Tools::getValue('phone'),
-                'store_country' => Tools::getValue('store_country'),
+                'firstname'       => Tools::getValue('firstname'),
+                'lastname'        => Tools::getValue('lastname'),
+                'email'           => Tools::getValue('email'),
+                'store_name'      => Tools::getValue('store_name'),
+                'phone'           => Tools::getValue('phone'),
+                'store_country'   => Tools::getValue('store_country'),
                 'store_address_1' => Tools::getValue('store_address_1'),
                 'store_address_2' => Tools::getValue('store_address_2'),
                 'store_address_3' => Tools::getValue('store_address_3'),
@@ -1262,12 +1260,12 @@ class Upela extends Module
                 'store_address_1' => Tools::getValue('store_address_1'),
                 'store_address_2' => Tools::getValue('store_address_2'),
                 'store_address_3' => Tools::getValue('store_address_3'),
-                'store_city' => Tools::getValue('store_city'),
-                'store_zipcode' => Tools::getValue('store_zipcode'),
-                'webservicekey' => $this->getWebServiceKey(),
-                'store_business' => Tools::getValue('store_business'),
-                'company_vat' => Tools::getValue('company_vat'),
-                'company_siret' => Tools::getValue('company_siret'),
+                'store_city'      => Tools::getValue('store_city'),
+                'store_zipcode'   => Tools::getValue('store_zipcode'),
+                'webservicekey'   => $this->getWebServiceKey(),
+                'store_business'  => Tools::getValue('store_business'),
+                'company_vat'     => Tools::getValue('company_vat'),
+                'company_siret'   => Tools::getValue('company_siret'),
 
                 'company_name'      => Tools::getValue('company_name'),
                 'company_country'   => Tools::getValue('company_country'),
@@ -1494,7 +1492,7 @@ class Upela extends Module
 
     private function displayRegistrationForm2()
     {
-        $fields_form = array('0' => array());
+        $fields_form = array();
 
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
@@ -1751,9 +1749,9 @@ class Upela extends Module
         $helper->name_controller = $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = $this->context->link->getAdminLink(
-            'AdminModules',
-            false
-        ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+                'AdminModules',
+                false
+            ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
         // Language
         $helper->default_form_language = $default_lang;
@@ -1785,7 +1783,7 @@ class Upela extends Module
      */
     private function displayCreateStoreForm2()
     {
-        $fields_form = array('0' => array());
+        $fields_form = array();
 
         $countries = Country::getCountries($this->context->language->id);
         $lCountries = array();
@@ -1923,9 +1921,9 @@ class Upela extends Module
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         //$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->currentIndex = $this->context->link->getAdminLink(
-            'AdminModules',
-            false
-        ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+                'AdminModules',
+                false
+            ).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
         // Language
         $helper->default_form_language = $default_lang;
