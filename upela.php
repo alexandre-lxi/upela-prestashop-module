@@ -318,7 +318,6 @@ class Upela extends Module
         $smarty = $this->context->smarty;
         $controller = $this->context->controller;
         $smarty->assign('upelaBaseDir', _MODULE_DIR_.'/upela/');
-        $controllerClass = get_class($controller);
 
         if (method_exists($controller, 'registerJavascript')) {
             $controller->registerJavascript(
@@ -554,7 +553,6 @@ class Upela extends Module
                 $smartyVariables['waybill_url'] = $upelaInfo['waybill_url'];
             }
 
-            dump( $upelaInfo );
             $this->context->smarty->assign($smartyVariables);
 
             if (version_compare(_PS_VERSION_, '1.6', '<')) {
@@ -581,6 +579,9 @@ class Upela extends Module
         $service = $this->carriers->getCarriersServices($carrier_id, true);
 
         if ($service['is_dropoff_point'] == true) {
+
+            // $_COOKIE here it s used too store dropOff point shipment information
+            // from external service. I don't know how to create Prestashop Cookie in JS
             if (isset($_COOKIE['dropoffLocation'])) {
                 $location = json_decode($_COOKIE['dropoffLocation']);
 
@@ -859,6 +860,7 @@ class Upela extends Module
 
         $this->context->controller->addCSS($this->_path.'views/css/back.css');
         $this->context->smarty->assign(array('upela_login' => Tools::isSubmit('login')));
+        $fields_form = array();
 
         $fields_form[0]['form'] = array(
             'input' => array(
@@ -1429,6 +1431,8 @@ class Upela extends Module
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 
+        $fields_form = array();
+
         // Init Fields form array
         $fields_form[0]['form'] = array(
             'legend' => array(
@@ -1668,14 +1672,6 @@ class Upela extends Module
                     'required' => true,
                     'tab' => 'store',
                 ),
-                //                array(
-                //                    'col' => 3,
-                //                    'type' => 'text',
-                //                    'name' => 'webservicekey',
-                //                    'label' => $this->l('Webservice key'),
-                //                    'required' => true,
-                //                    'tab' => 'store',
-                //                ),
             ),
             'submit' => array(
                 'title' => $this->l('   Create Account   ')
@@ -1730,7 +1726,7 @@ class Upela extends Module
 
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-
+        $fields_form = array();
         // Init Fields form array
         $fields_form[0]['form'] = array(
             'legend' => array(
