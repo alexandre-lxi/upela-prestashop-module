@@ -279,20 +279,6 @@ class Upela extends Module
         Configuration::deleteByName('UPELA_API_MODE');
         Configuration::deleteByName('UPELA_WEBSERVICE_KEY');
 
-        //        Configuration::deleteByName('UPELA_STORE_FIRSTNAME');
-        //        Configuration::deleteByName('UPELA_STORE_LASTNAME');
-        //        Configuration::deleteByName('UPELA_STORE_EMAIL');
-        //        Configuration::deleteByName('UPELA_STORE_NAME');
-        //        Configuration::deleteByName('UPELA_STORE_PHONE');
-        //        Configuration::deleteByName('UPELA_STORE_COUNTRY');
-        //        Configuration::deleteByName('UPELA_STORE_ADDRESS1');
-        //        Configuration::deleteByName('UPELA_STORE_ADDRESS2');
-        //        Configuration::deleteByName('UPELA_STORE_ADDRESS3');
-        //        Configuration::deleteByName('UPELA_STORE_CITY');
-        //        Configuration::deleteByName('UPELA_STORE_ZIPCODE');
-        //        Configuration::deleteByName('UPELA_STORE_BUSINESS');
-        //        Configuration::deleteByName('UPELA_STORE_DEFINE');
-
         return true;
     }
 
@@ -444,12 +430,6 @@ class Upela extends Module
                 $controller->addJs(_MODULE_DIR_.'/upela/views/js/upela.js');
             }
 
-            //            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
-            //                $fromCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
-            //            } else {
-            //                $fromCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
-            //            }
-
             if ($carrierInfo['is_dropoff_point'] == true) {
                 $dropoffPoint = $this->carriers->getDropoffPointByCart($cart_id);
                 $is_dropoff = $dropoffPoint['dp_address1'] != '';
@@ -539,7 +519,7 @@ class Upela extends Module
                 'cart_id' => $cart_id
             );
 
-            $this->context->smarty->assign(array(
+            $smartyVariables = array(
                 'simple_link' => $this->_path,
                 'reference' => " ",
                 'suivi' => $this->l('Ship', 'upela'),
@@ -561,8 +541,21 @@ class Upela extends Module
                 'jsonShipInfo' => json_encode($infoShipment),
                 'paymentInfos' => $paymentInfo,
                 'upela_param_link' => ($this->isConnected) ? $this->api->getUrlparameter() : '',
-                'is_connected' => $this->isConnected
-            ));
+                'is_connected' => $this->isConnected,
+                'waybill_url' => false
+            );
+
+            // get information to know if Upela as send this order
+
+            $upelaInfo = $this->carriers->getUpelaOrderByCartId($cart_id);
+
+            if(count($upelaInfo) > 0 && $upelaInfo['waybill_url'] !='')
+            {
+                $smartyVariables['waybill_url'] = $upelaInfo['waybill_url'];
+            }
+
+            dump( $upelaInfo );
+            $this->context->smarty->assign($smartyVariables);
 
             if (version_compare(_PS_VERSION_, '1.6', '<')) {
                 $expedition = $this->display(__FILE__, 'expedition15.tpl');

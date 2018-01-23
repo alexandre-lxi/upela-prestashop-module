@@ -21,8 +21,8 @@
     <div class="upela_home_form_bg">
         <div class="container">
             <div class="upela_home_caption">
-                <h1>{l s='Upela' mod='upela'} V2</h1>
-                <h2>{l s='The best way to ship a parcel' mod='upela'} V2</h2>
+                <h1>{l s='Upela' mod='upela'}</h1>
+                <h2>{l s='The best way to ship a parcel' mod='upela'}</h2>
                 <p>{l s='Compare quotes and ship with ease from a single platform.' mod='upela'}</p>
             </div>
             <div class="row pb10">

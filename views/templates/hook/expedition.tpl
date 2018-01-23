@@ -58,6 +58,7 @@
     <div class="tab-pane active">
         <div class="table-responsive">
 
+
             <table class="table" id="table-upela">
                 <thead>
                     <tr>
@@ -69,6 +70,7 @@
                 </thead>
                 {if {$is_connected|escape:'htmlall':'UTF-8'} == true}
                 <tbody id="table-body-upela">
+                {if !$waybill_url }
                     <tr >
                         <td class="up-exp-td">
                             <div class="form-group">
@@ -158,6 +160,14 @@
                             {/if}
                         </td>
                     </tr>
+                {else}
+                    <tr>
+                        <td class="up-sended-td">
+                            <img  src="{$simple_link|escape:'html':'UTF-8'}views/img/bordereau.jpg" width="150px;">
+                            <br>
+                            <a href="{$waybill_url|escape:'htmlall':'UTF-8'}" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a>
+                        </td></tr>
+                {/if}
                 </tbody>
                 {else}
                 <tbody id="table-body-upela">

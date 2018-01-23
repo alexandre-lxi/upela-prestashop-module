@@ -532,4 +532,20 @@ class UpelaCarriers
 
         return $aResult;
     }
+
+
+
+    /**
+     * Get Carriers list
+     * @param $cartIt
+     * @param $where
+     * @return array
+     */
+    public function getUpelaOrderByCartId(  $cartId  )
+    {
+        $query = 'SELECT * FROM '._DB_PREFIX_.'upela_orders uo WHERE uo.id_cart_ps = '.(int)$cartId;
+
+
+        return $this->db->getRow($query);
+    }
 }
