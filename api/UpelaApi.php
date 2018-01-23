@@ -194,7 +194,7 @@ class UpelaApi
 
         $data = array(
             'account' => array(
-                'login' => $username,
+                'login'    => $username,
                 'password' => $password
             )
         );
@@ -240,15 +240,15 @@ class UpelaApi
             if ($http_header) {
                 $stream_context = array(
                     'http' => array(
-                        'method' => 'POST',
+                        'method'  => 'POST',
                         'content' => $body,
-                        'header' => $http_header
+                        'header'  => $http_header
                     )
                 );
             } else {
                 $stream_context = array(
                     'http' => array(
-                        'method' => 'POST',
+                        'method'  => 'POST',
                         'content' => $body
                     )
                 );
@@ -290,23 +290,37 @@ class UpelaApi
                         curl_setopt($curl, CURLOPT_POSTFIELDS, $opts['http']['content']);
                     }
                     if (isset($opts['http']['header'])) {
-                        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                            "Content-type: application/json",
-                            "Content-Length: ".Tools::strlen($opts['http']['content']),
-                            "Authorization: ".$opts['http']['header']
-                        ));
+                        curl_setopt(
+                            $curl,
+                            CURLOPT_HTTPHEADER,
+                            array(
+                                "Content-type: application/json",
+                                "Content-Length: ".Tools::strlen($opts['http']['content']),
+                                "Authorization: ".$opts['http']['header']
+                            )
+                        );
                     } else {
-                        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                            "Content-type: application/json",
-                            "Content-Length: ".Tools::strlen($opts['http']['content'])/*,
-                            "Authorization: ".Configuration::get('UPELA_API_KEY')*/
-                        ));
+                        curl_setopt(
+                            $curl,
+                            CURLOPT_HTTPHEADER,
+                            array(
+                                "Content-type: application/json",
+                                "Content-Length: ".Tools::strlen($opts['http']['content'])
+                                /*,
+                                                            "Authorization: ".Configuration::get('UPELA_API_KEY')*/
+                            )
+                        );
                     }
                 } else {
-                    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                        "Content-type: application/json"/*,
-                        "Authorization: ".Configuration::get('UPELA_API_KEY')*/
-                    ));
+                    curl_setopt(
+                        $curl,
+                        CURLOPT_HTTPHEADER,
+                        array(
+                            "Content-type: application/json"
+                            /*,
+                                                    "Authorization: ".Configuration::get('UPELA_API_KEY')*/
+                        )
+                    );
                 }
             }
 
@@ -381,20 +395,19 @@ class UpelaApi
         $this->endpoint = self::API_PTF_VERSION.'/user';
 
         $data = array(
-            'login' => $values['login'],
-            'pseudo' => $values['pseudo'],
-            'email' => $values['email'],
-            'password' => $values['password'],
-            'gender' => 'M',
-            'module' => $values['module'],
-            'lastname' => $values['lastname'],
+            'login'     => $values['login'],
+            'pseudo'    => $values['pseudo'],
+            'email'     => $values['email'],
+            'password'  => $values['password'],
+            'gender'    => 'M',
+            'module'    => $values['module'],
+            'lastname'  => $values['lastname'],
             'firstname' => $values['firstname'],
-            'company' => $values['company'],
-            'pro' => '1'
+            'company'   => $values['company'],
+            'pro'       => '1'
         );
 
         $ret = $this->makeCall($this->getBody($data), null, false, false);
-
 
         $result = false;
 
@@ -415,35 +428,35 @@ class UpelaApi
             $this->endpoint = self::API_PTF_VERSION.'/address/'.$ret['id'].'/new';
 
             $data = array(
-                'alias' => 'Address',
-                'company' => $values['company'],
-                'pro' => $values['pro'],
-                'gender' => 'M',
-                'lastname' => $values['lastname'],
-                'firstname' => $values['firstname'],
-                'address1' => $values['address_1'],
-                'address2' => $values['address_2'],
-                'address3' => $values['address_3'],
-                'postcode' => $values['zipcode'],
-                'city' => $values['city'],
-                'countryId' => $countryId,
-                'stateId' => '',
-                'state' => '',
+                'alias'        => 'Address',
+                'company'      => $values['company'],
+                'pro'          => $values['pro'],
+                'gender'       => 'M',
+                'lastname'     => $values['lastname'],
+                'firstname'    => $values['firstname'],
+                'address1'     => $values['address_1'],
+                'address2'     => $values['address_2'],
+                'address3'     => $values['address_3'],
+                'postcode'     => $values['zipcode'],
+                'city'         => $values['city'],
+                'countryId'    => $countryId,
+                'stateId'      => '',
+                'state'        => '',
                 'departmentId' => '',
-                'phone' => $values['phone'],
-                'phoneMobile' => '',
-                'fax' => '',
-                'email' => $values['email'],
-                'vatNumber' => $values['immat'],
-                'siret' => $values['siret'],
-                'naf' => '',
+                'phone'        => $values['phone'],
+                'phoneMobile'  => '',
+                'fax'          => '',
+                'email'        => $values['email'],
+                'vatNumber'    => $values['immat'],
+                'siret'        => $values['siret'],
+                'naf'          => '',
             );
 
             $address_ret = $this->makeCall($this->getBody($data), null, false, false);
 
             if (isset($address_ret['id'])) {
                 $result = array(
-                    'user_id' => $ret['id'],
+                    'user_id'    => $ret['id'],
                     'address_id' => $address_ret['id']
                 );
             }
@@ -474,40 +487,40 @@ class UpelaApi
         $this->endpoint = self::API_PTF_VERSION.'/address/'.$values['user_id'].'/new';
 
         $data = array(
-            'alias' => $values['store_name'],
-            'company' => $values['company_name'],
-            'pro' => $values['pro'],
-            'gender' => 'M',
-            'lastname' => $values['lastname'],
-            'firstname' => $values['firstname'],
-            'address1' => $values['store_address_1'],
-            'address2' => $values['store_address_2'],
-            'address3' => $values['store_address_3'],
-            'postcode' => $values['store_zipcode'],
-            'city' => $values['store_city'],
-            'countryId' => $store_countryId,
-            'stateId' => '',
-            'state' => '',
+            'alias'        => $values['store_name'],
+            'company'      => $values['company_name'],
+            'pro'          => $values['pro'],
+            'gender'       => 'M',
+            'lastname'     => $values['lastname'],
+            'firstname'    => $values['firstname'],
+            'address1'     => $values['store_address_1'],
+            'address2'     => $values['store_address_2'],
+            'address3'     => $values['store_address_3'],
+            'postcode'     => $values['store_zipcode'],
+            'city'         => $values['store_city'],
+            'countryId'    => $store_countryId,
+            'stateId'      => '',
+            'state'        => '',
             'departmentId' => '',
-            'phone' => $values['phone'],
-            'phoneMobile' => '',
-            'fax' => '',
-            'email' => $values['email'],
-            'vatNumber' => '',
-            'siret' => '',
-            'naf' => '',
+            'phone'        => $values['phone'],
+            'phoneMobile'  => '',
+            'fax'          => '',
+            'email'        => $values['email'],
+            'vatNumber'    => '',
+            'siret'        => '',
+            'naf'          => '',
         );
 
         $store_address_ret = $this->makeCall($this->getBody($data));
 
         if (isset($store_address_ret['id'])) {
             $data = array(
-                'name' => $values['name'],
+                'name'       => $values['name'],
                 'address_id' => $store_address_ret['id'],
                 'module_url' => $values['module_url'],
-                'type' => $values['type'],
-                'username' => $values['username'],
-                'apiKey' => $values['apikey'],
+                'type'       => $values['type'],
+                'username'   => $values['username'],
+                'apiKey'     => $values['apikey'],
                 'statusList' => $values['statusList']
             );
 
@@ -539,31 +552,32 @@ class UpelaApi
         $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
 
         $data = array(
-            'account' => $this->getCredentials(),
-            'ship_from' => array(
+            'account'       => $this->getCredentials(),
+            'ship_from'     => array(
                 'country_code' => $addressFrom['country'],
-                'postcode' => $addressFrom['cp'],
-                'city' => $addressFrom['city'],
-                'pro' => 1,
+                'postcode'     => $addressFrom['cp'],
+                'city'         => $addressFrom['city'],
+                'pro'          => 1,
             ),
-            'ship_to' => array(
+            'ship_to'       => array(
                 'country_code' => $addressTo['country'],
-                'postcode' => $addressTo['cp'],
-                'city' => $addressTo['city'],
-                'pro' => 1,
+                'postcode'     => $addressTo['cp'],
+                'city'         => $addressTo['city'],
+                'pro'          => 1,
             ),
-            'parcels' => array(
+            'parcels'       => array(
                 array(
                     'number' => 1,
                     'weight' => (int)$parcel['weight'],
-                    'x' => (int)$parcel['length'],
-                    'y' => (int)$parcel['width'],
-                    'z' => (int)$parcel['height'],)
+                    'x'      => (int)$parcel['length'],
+                    'y'      => (int)$parcel['width'],
+                    'z'      => (int)$parcel['height'],
+                )
             ),
             'shipment_date' => $date,
-            'unit' => 'fr',
-            'selection' => 'all',
-            'type' => 'parcel'
+            'unit'          => 'fr',
+            'selection'     => 'all',
+            'type'          => 'parcel'
         );
 
         $prices = $this->makeCall($this->getBody($data), null, true, false);
@@ -576,7 +590,10 @@ class UpelaApi
      */
     public function getCredentials()
     {
-        return array('login' => $this->user, 'password' => $this->passwd);
+        return array(
+            'login'    => $this->user,
+            'password' => $this->passwd
+        );
     }
 
     /**
@@ -586,12 +603,12 @@ class UpelaApi
     public function getPayments()
     {
         $ret = array(
-            'info' => false,
-            'method' => '',
+            'info'      => false,
+            'method'    => '',
             'avalaible' => false,
-            'amount' => 0,
-            'voucher' => false,
-            'vamount' => 0
+            'amount'    => 0,
+            'voucher'   => false,
+            'vamount'   => 0
         );
 
         $this->action = self::API_POST;
@@ -652,61 +669,64 @@ class UpelaApi
         $this->endpoint = 'api/'.self::API_VERSION.'directShipping/';
 
         $data = array(
-            'account' => $this->getCredentials(),
-            'carrier_code' => $service['carrier_code'],
-            'service_code' => $service['service_code'],
-            'ship_from' => array(
-                'company' => '1',
-                'name' => $shipFrom['name'],
-                'phone' => $shipFrom['phone'],
-                'email' => $shipFrom['email'],
-                'address1' => $shipFrom['address1'],
-                'address2' => $shipFrom['address2'],
-                'address3' => null,
+            'account'       => $this->getCredentials(),
+            'carrier_code'  => $service['carrier_code'],
+            'service_code'  => $service['service_code'],
+            'ship_from'     => array(
+                'company'      => '1',
+                'name'         => $shipFrom['name'],
+                'phone'        => $shipFrom['phone'],
+                'email'        => $shipFrom['email'],
+                'address1'     => $shipFrom['address1'],
+                'address2'     => $shipFrom['address2'],
+                'address3'     => null,
                 'country_code' => $shipFrom['country_code'],
-                'postcode' => $shipFrom['postcode'],
-                'city' => $shipFrom['city'],
-                'pro' => '1'),
-            'ship_to' => array(
-                'company' => '1',
-                'name' => $shipTo['name'],
-                'phone' => $shipTo['phone'],
-                'email' => $shipTo['email'],
-                'address1' => $shipTo['address1'],
-                'address2' => $shipTo['address2'],
-                'address3' => null,
+                'postcode'     => $shipFrom['postcode'],
+                'city'         => $shipFrom['city'],
+                'pro'          => '1'
+            ),
+            'ship_to'       => array(
+                'company'      => '1',
+                'name'         => $shipTo['name'],
+                'phone'        => $shipTo['phone'],
+                'email'        => $shipTo['email'],
+                'address1'     => $shipTo['address1'],
+                'address2'     => $shipTo['address2'],
+                'address3'     => null,
                 'country_code' => $shipTo['country_code'],
-                'postcode' => $shipTo['postcode'],
-                'city' => $shipTo['city'],
-                'pro' => '1'),
-            'dropoff_to' => ($dropoffTo['active'] == false) ? null :
+                'postcode'     => $shipTo['postcode'],
+                'city'         => $shipTo['city'],
+                'pro'          => '1'
+            ),
+            'dropoff_to'    => ($dropoffTo['active'] == false) ? null :
                 array(
                     'dropoff_location_id' => $dropoffTo['name'],
-                    'name' => $dropoffTo['name'],
-                    'phone' => $dropoffTo['phone'],
-                    'email' => $dropoffTo['email'],
-                    'address1' => $dropoffTo['address1'],
-                    'address2' => '',
-                    'address3' => null,
-                    'country_code' => $dropoffTo['country_code'],
-                    'postcode' => $dropoffTo['postcode'],
-                    'city' => $dropoffTo['city'],
+                    'name'                => $dropoffTo['name'],
+                    'phone'               => $dropoffTo['phone'],
+                    'email'               => $dropoffTo['email'],
+                    'address1'            => $dropoffTo['address1'],
+                    'address2'            => '',
+                    'address3'            => null,
+                    'country_code'        => $dropoffTo['country_code'],
+                    'postcode'            => $dropoffTo['postcode'],
+                    'city'                => $dropoffTo['city'],
                 ),
-            'parcels' => array(
+            'parcels'       => array(
                 array(
                     'number' => 1,
                     'weight' => (int)$parcel['weight'],
-                    'x' => (int)$parcel['length'],
-                    'y' => (int)$parcel['width'],
-                    'z' => (int)$parcel['height'],)
+                    'x'      => (int)$parcel['length'],
+                    'y'      => (int)$parcel['width'],
+                    'z'      => (int)$parcel['height'],
+                )
             ),
             'shipment_date' => $date,
-            'unit' => 'fr',
-            'selection' => 'all',
-            'type' => 'parcel',
-            'reason' => 'Commercial',
-            'content' => $parcel['content'],
-            'labelFormat' => 'PDF'
+            'unit'          => 'fr',
+            'selection'     => 'all',
+            'type'          => 'parcel',
+            'reason'        => 'Commercial',
+            'content'       => $parcel['content'],
+            'labelFormat'   => 'PDF'
         );
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);

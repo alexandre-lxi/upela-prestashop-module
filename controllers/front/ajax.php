@@ -62,8 +62,8 @@ class UpelaAjaxModuleFrontController extends ModuleFrontController
         $this->display();
     }
 
-    public function smartyOutputContent($content)
-    {
-        $this->display();
-    }
+    //    public function smartyOutputContent($content)
+    //    {
+    //        $this->display();
+    //    }
 }

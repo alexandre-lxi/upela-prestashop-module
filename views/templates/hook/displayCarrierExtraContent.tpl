@@ -67,10 +67,10 @@
     </div>
 </div>
 
-
 <script type="text/javascript">
-    var url = 'https://www.upela.com/fr/order/actions.php?action=search_delivery_points&shipment_id=1212&service_id={$address.upela_service}&postcode={$address.postcode}&city={$address.city}';
-    var carrier_id = {$address.carrier_id};
+    var url = 'https://www.upela.com/fr/order/actions.php?action=search_delivery_points&shipment_id=1212&service_id={$address.upela_service|escape:'url':'utf-8'}&postcode={$address.postcode|escape:'url':'utf-8'}&city={$address.city|escape:'url':'utf-8'}';
+    var carrier_id = {$address.carrier_id|escape:'htmlall':'utf-8'};
 
 </script>
+
 
