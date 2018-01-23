@@ -441,7 +441,7 @@ class Upela extends Module
         $cart_id = $this->context->cart->id;
         $carrierInfo = $this->carriers->getCarriersServices($this->context->cart->id_carrier, true);
 
-        $query = 'select count(*) nb from `'._DB_PREFIX_.'upela_orders` where id_cart_ps = '.$this->context->cart->id;
+        $query = 'select count(*) nb from `'._DB_PREFIX_.'upela_orders` where id_cart_ps = '.(int)$this->context->cart->id;
         $countOrders = Db::getInstance()
                          ->getRow($query);
 

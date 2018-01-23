@@ -75,9 +75,9 @@ class UpelaCarriers
         if ($idReference !== false) {
             if ($byRef === true) {
                 $query .= '  WHERE id_carrier = (select id_reference from '._DB_PREFIX_.'carrier 
-                        where id_carrier = "'.$idReference.'")';
+                        where id_carrier = "'.(int)$idReference.'")';
             } else {
-                $query .= '  WHERE id_carrier= "'.$idReference.'" ';
+                $query .= '  WHERE id_carrier= "'.(int)$idReference.'" ';
             }
         }
 
@@ -136,7 +136,7 @@ class UpelaCarriers
 
         // Get By Origin
         if ($origin !== false) {
-            $query .= ' AND us.`origine_point` = "'.$origin.'" ';
+            $query .= ' AND us.`origine_point` = "'.pSQL($origin).'" ';
         }
 
         if ($where !== false) {
@@ -144,11 +144,11 @@ class UpelaCarriers
         }
 
         if ($id !== false) {
-            $query .= ' AND us.id_service ='.$id.' ';
+            $query .= ' AND us.id_service ='.(int)$id.' ';
         }
 
         if ($idreference !== false) {
-            $query .= ' AND c.id_carrier ='.$idreference.' ';
+            $query .= ' AND c.id_carrier ='.(int)$idreference.' ';
         }
 
         $query .= ' ORDER BY us.label';
@@ -239,7 +239,7 @@ class UpelaCarriers
                 }
 
                 $query = 'update `'._DB_PREFIX_.'upela_services` us
-                        set is_active=0, id_carrier=0 where id_carrier = '.$activeCarrier['id_carrier'];
+                        set is_active=0, id_carrier=0 where id_carrier = '.(int)$activeCarrier['id_carrier'];
 
                 $this->db->execute($query);
             }
@@ -265,15 +265,11 @@ class UpelaCarriers
             '" AND id_reference <> 0 ORDER BY id_carrier DESC'
         );
 
-        //print_r($old_carrier);
-
         // if old carrier is not deleted, we keep the current information
         if (isset($old_carrier['id_reference']) && $old_carrier['deleted'] == 0) {
-            //  print('OLD');
             return $old_carrier['id_reference'];
         }
 
-        //die;
 
         $carrier = new Carrier();
         $carrier->name = $aDefinition['label'];
@@ -307,7 +303,6 @@ class UpelaCarriers
             if (isset($old_carrier['id_reference']) && $old_carrier['deleted'] == 1) {
                 $carrier->copyCarrierData($old_carrier['id_carrier']);
             } else {
-                //update carrier reference
                 $carrier->id_reference = (int)$carrier->id;
                 $carrier->save();
             }
@@ -497,7 +492,7 @@ class UpelaCarriers
     public function updateCarrierUpela($id, $psid, $active = 1)
     {
         $query = 'update `'._DB_PREFIX_.'upela_services` us     
-         set id_carrier = '.$psid.', is_active='.$active.' where id_service = '.$id;
+         set id_carrier = '.(int)$psid.', is_active='.(int)$active.' where id_service = '.(int)$id;
 
         return $this->db->execute($query);
     }

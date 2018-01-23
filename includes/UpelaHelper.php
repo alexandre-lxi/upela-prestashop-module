@@ -202,7 +202,7 @@ class UpelaHelper
             $query = "
          SELECT cz_zo
          FROM `"._DB_PREFIX_."upela_country_zone`
-         WHERE cz_co = '$coCode'";
+         WHERE cz_co = '".pSQL($coCode)."'";
 
             $res = $this->db->executes($query);
 
