@@ -413,15 +413,15 @@ class UpelaApi
 
         if (isset($ret['id'])) {
             //Add company address
-
             $this->action = self::API_POST;
             $this->endpoint = 'api/'.self::API_VERSION.'/get_country_id/';
             $data = array(
                 'iso' => $values['country']
             );
 
-            $countryId = $this->makeCall($this->getBody($data), null, false);
+            $countryId = $this->makeCall($this->getBody($data), null, true,false);
             $countryId = $countryId['id'];
+
 
             $this->action = self::API_POST;
 
@@ -543,8 +543,9 @@ class UpelaApi
      * @param $parcel
      * @return mixed
      */
-    public function getPrices($addressFrom, $addressTo, $parcel)
+    public function getPrices($addressFrom, $addressTo, $parcel, $carrier_code = false,$carrier_service = false)
     {
+
         $date = date('Y-m-d');
         $date = date('Y-m-d', strtotime($date.' + 2 days'));
 
@@ -580,6 +581,11 @@ class UpelaApi
             'type'          => 'parcel'
         );
 
+        if($carrier_code && $carrier_service)
+        {
+            $data['carrier_code']       = $carrier_code;
+            $data['service_code']       = $carrier_service;
+        }
         $prices = $this->makeCall($this->getBody($data), null, true, false);
 
         return $prices;

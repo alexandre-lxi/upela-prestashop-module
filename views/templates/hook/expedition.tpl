@@ -30,14 +30,11 @@
 </style>
 <script type="text/javascript">
     var infoExpedition = {$jsonShipInfo};
-    var pdfImg = "{$simple_link|escape:'url':'UTF-8'}views/img/bordereau.jpg";
-
-
-    $(function () {
+    var pdfImg = decodeURIComponent("{$simple_link|escape:'url':'UTF-8'}views/img/bordereau.jpg");
+$(function () {
         $('#expeditionTab').insertBefore('#myTab');
         $('#UpelaExpedition').insertAfter('#expeditionTab');
     });
-    //  $('#expeditionPl').after('hr');
 </script>
 
 <div>

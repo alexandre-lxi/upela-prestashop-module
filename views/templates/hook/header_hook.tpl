@@ -30,5 +30,4 @@
 
 <script>
     var site_root_url = '{$smarty.server.HTTP_HOST}';
-    }
 </script>

@@ -401,6 +401,7 @@ class Upela extends Module
         $tpl = '';
         $postcode = null;
         $city = null;
+        $country = null;
         $deleted = null;
         $results = $this->carriers->getCarriersServices($params['carrier']['id_reference']);
         $is_dropoff = $results['is_dropoff_point'];
@@ -411,23 +412,43 @@ class Upela extends Module
         foreach ($this->context->cart->getAddressCollection() as $address) {
             $postcode = $address->postcode;
             $city = $address->city;
+            $country = $address->country;
             $deleted = $address->deleted;
         }
 
-        if ($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted) {
+        $carrier = $this->carriers->getCarriersServices( $params['carrier']['id_reference'] );
+
+        $addressTo = array(
+            'postcode'      => $postcode,
+            'cp'      => $postcode,
+            'city'          => $city,
+            'country'          => $country,
+            'upela_service' => $upela_service,
+            'carrier_id'    => $carrier_id
+        );
+        $price = $this->carriers->getCarrierPriceByServices(['0'=>$carrier],$addressTo);
+
+        if(count($price['offers']) == 0){
             $this->context->smarty->assign(
                 array(
-                    'address' =>
-                        array(
-                            'postcode'      => $postcode,
-                            'city'          => $city,
-                            'upela_service' => $upela_service,
-                            'carrier_id'    => $carrier_id
-                        )
+                    'address' =>$addressTo,
+                    'hide'=>$params['carrier']['id_reference'],
                 )
             );
-            $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
+            $tpl = $this->display(__FILE__, 'displayCarrierExtraContentOffers.tpl');
         }
+        else
+        {
+            if ($is_dropoff && !is_null($postcode) && !is_null($city) && !$deleted) {
+                $this->context->smarty->assign(
+                    array(
+                        'address' =>$addressTo
+                    )
+                );
+                $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
+            }
+        }
+
 
         return $tpl;
     }
@@ -634,11 +655,8 @@ class Upela extends Module
         $service = $this->carriers->getCarriersServices($carrier_id, true);
 
         if ($service['is_dropoff_point'] == true) {
-            // $_COOKIE here it s used too store dropOff point shipment information
-            // from external service. I don't know how to create Prestashop Cookie in JS
-            if (isset($_COOKIE['dropoffLocation'])) {
-                $location = json_decode($_COOKIE['dropoffLocation']);
-
+            if (isset($this->context->cookie->dropoffLocation)) {
+                $location = json_decode(str_replace('\\','',$this->context->cookie->dropoffLocation ));
                 $data = array(
                     'id_cart_ps'  => (int)$cart_id,
                     'dp_company'  => pSQL(trim($location->name)),

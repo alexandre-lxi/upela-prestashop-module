@@ -43,7 +43,11 @@ class UpelaAjaxModuleFrontController extends ModuleFrontController
 
         if ($option == 'directShiping') {
             $posted_value = $_POST;
-            $this->result = $upela->ShipDirect($posted_value);
+            $this->result = $upela->ShipDirect( $posted_value );
+        }
+        elseif($option == 'setDropOff')
+        {
+            $this->context->cookie->__set('dropoffLocation' , json_encode($_POST));
         } else {
             $this->result = 'Route not found or option not Found';
         }

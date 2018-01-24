@@ -256,7 +256,7 @@
                 <div class="margin-form submit">
                     <div class="col-sm-offset-4">
                         <button name="processParameters" type="submit"
-                                class="btn btn-primary text-center part__button">
+                                class="btn btn-primary text-center part__button ">
                             {l s='Save' mod='upela'}
                         </button>
                     </div>

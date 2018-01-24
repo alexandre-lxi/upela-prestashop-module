@@ -113,10 +113,9 @@
 
 
                             <div class="form-group">
-                                <div class="col-sm-offset-4">
+                                <div class="col-sm-12">
                                     <button name="processStoreUpdate" type="submit"
                                             class="btn btn-primary text-center part__button button--white">
-
                                         {l s='Save' mod='upela'}
                                     </button>
                                 </div>
@@ -180,9 +179,9 @@
 
 
                             <div class="form-group">
-                                <div class="col-sm-offset-4">
+                                <div class="col-sm-12">
                                     <button name="processParameters" type="submit"
-                                            class="btn btn-primary text-center part__button button--white">
+                                            class="btn btn-primary text-center part__button button--white pull -right">
 
                                         {l s='Save' mod='upela'}
                                     </button>

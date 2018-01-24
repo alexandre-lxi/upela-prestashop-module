@@ -29,6 +29,11 @@ if (typeof carrier_id === 'undefined') {
     var carrier_id = false;
 }
 
+function hideOffer($idCarrier)
+{
+    $('#delivery_option_' + $idCarrier).hide();
+}
+
 function createCookie(name, value, days) {
     var expires;
 
@@ -39,7 +44,29 @@ function createCookie(name, value, days) {
     } else {
         expires = "";
     }
+
     document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+
+
+    var url = '/index.php?fc=module&module=upela&controller=ajax&option=setDropOff';
+
+    if ( typeof value !== 'undefined' && value !== '' )
+    {
+        value2 = JSON.parse(value);
+        value2.hours_html='';
+        $.ajax({
+            url:url,
+            type:'POST',
+            data: value2,
+            success:function(s){
+                document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+            },
+            error:function(){
+                console.log('unable to set dropoff location');
+            }
+        })
+    }
+
 }
 
 function readCookie(name) {
@@ -146,7 +173,6 @@ $('#delivery_option_' + carrier_id).change(
     });
 
 $(document).ready(function () {
-
     if (typeof url === 'undefined') {
         return;
     }
@@ -161,6 +187,7 @@ $(document).ready(function () {
                 else {
                     if (readCookie('dropoffLocation') === null) {
                         first = s.rows[0];
+                        createCookie('dropoffLocation', JSON.stringify(s.rows[0]), 1);
                     }
                     else {
                         first = JSON.parse(readCookie('dropoffLocation'))
@@ -260,3 +287,5 @@ function sendCommandeToUpela($data) {
 
     });
 }
+
+

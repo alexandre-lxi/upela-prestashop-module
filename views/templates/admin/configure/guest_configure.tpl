@@ -109,6 +109,7 @@
          role="tabpanel">
         {include file="$tpl_params"}
     </div>
+
     <div class="tab-pane" id="contact_form" role="tabpanel">
         {include file="$tpl_contact"}
     </div>
