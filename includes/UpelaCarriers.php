@@ -1,9 +1,7 @@
 <?php
 /**
  * 2007-2016 PrestaShop
- *
  * NOTICE OF LICENSE
- *
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
@@ -11,7 +9,6 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to license@prestashop.com so we can send you a copy immediately.
- *
  * @author    UPELA
  * @copyright 2017-2018 MPG Upela
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
@@ -26,9 +23,9 @@ class UpelaCarriers
 
     public function __construct($db, $module, $api)
     {
-        $this->db = $db;
+        $this->db          = $db;
         $this->module_name = $module;
-        $this->api = $api;
+        $this->api         = $api;
     }
 
     /**
@@ -71,22 +68,22 @@ class UpelaCarriers
 
         $query = '
          SELECT  is_dropoff_point,id_up_service, id_service, up_code_service, up_code_carrier
-         FROM '._DB_PREFIX_.'upela_services';
+         FROM ' . _DB_PREFIX_ . 'upela_services';
 
         // Get By Origin
         if ($idReference !== false) {
             if ($byRef === true) {
-                $query .= '  WHERE id_carrier = (select id_reference from '._DB_PREFIX_.'carrier 
-                        where id_carrier = "'.(int)$idReference.'")';
+                $query .= '  WHERE id_carrier = (select id_reference from ' . _DB_PREFIX_ . 'carrier 
+                        where id_carrier = "' . (int)$idReference . '")';
             } else {
-                $query .= '  WHERE id_carrier= "'.(int)$idReference.'" ';
+                $query .= '  WHERE id_carrier= "' . (int)$idReference . '" ';
             }
         }
 
         $result = $this->db->getRow($query);
 
 
-        return $result ;
+        return $result;
     }
 
     /**
@@ -131,29 +128,29 @@ class UpelaCarriers
     {
         $query = '
          SELECT *
-         FROM `'._DB_PREFIX_.'upela_services` us     
-         LEFT JOIN `'._DB_PREFIX_.'carrier` c
+         FROM `' . _DB_PREFIX_ . 'upela_services` us     
+         LEFT JOIN `' . _DB_PREFIX_ . 'carrier` c
          ON c.`id_reference` = us.`id_carrier` 
             AND c.`deleted` = 0 
             AND c.`external_module_name` = "upela" 
-            and c.id_reference <> 0
+            AND c.id_reference <> 0
          WHERE 1';
 
         // Get By Origin
         if ($origin !== false) {
-            $query .= ' AND us.`origine_point` = "'.pSQL($origin).'" ';
+            $query .= ' AND us.`origine_point` = "' . pSQL($origin) . '" ';
         }
 
         if ($where !== false) {
-            $query .= ' '.$where.' ';
+            $query .= ' ' . $where . ' ';
         }
 
         if ($id !== false) {
-            $query .= ' AND us.id_service ='.(int)$id.' ';
+            $query .= ' AND us.id_service =' . (int)$id . ' ';
         }
 
         if ($idreference !== false) {
-            $query .= ' AND c.id_carrier ='.(int)$idreference.' ';
+            $query .= ' AND c.id_carrier =' . (int)$idreference . ' ';
         }
 
         $query .= ' ORDER BY us.label';
@@ -171,15 +168,13 @@ class UpelaCarriers
         $ret = true;
 
         if (count($servicesId) > 0) {
-
             foreach ($servicesId as $serviceId) {
-                if ($serviceId == '' || !$serviceId) {
+                if ($serviceId == '' || ! $serviceId) {
                     continue;
                 }
-                $carrierInfo = $this->getCarriers( false, false, $serviceId );
-
-                $this->prices = $this->getCarrierPriceByServices( $carrierInfo );
-                $carrierId = $this->createCarrier($carrierInfo[0]);
+                $carrierInfo  = $this->getCarriers(false, false, $serviceId);
+                $this->prices = $this->getCarrierPriceByServices($carrierInfo);
+                $carrierId    = $this->createCarrier($carrierInfo[0]);
                 $this->updateCarrierUpela($carrierInfo[0]['id_service'], $carrierId, 1);
             }
         }
@@ -187,7 +182,7 @@ class UpelaCarriers
         $activeCarriers = $this->getActiveCarriers();
 
         if (count($activeCarriers) == 0) {
-            $query = 'update `'._DB_PREFIX_.'upela_services` us
+            $query = 'update `' . _DB_PREFIX_ . 'upela_services` us
                         set is_active=0, id_carrier=0';
             $this->db->execute($query);
         }
@@ -211,15 +206,15 @@ class UpelaCarriers
             }
 
             if ($toDel) {
-                $carrier = new Carrier($activeCarrier['id_carrier']);
+                $carrier          = new Carrier($activeCarrier['id_carrier']);
                 $carrier->deleted = 1;
                 try {
                     $carrier->save();
                 } catch (Exception $e) {
                 }
 
-                $query = 'update `'._DB_PREFIX_.'upela_services` us
-                        set is_active=0, id_carrier=0 where id_carrier = '.(int)$activeCarrier['id_carrier'];
+                $query = 'update `' . _DB_PREFIX_ . 'upela_services` us
+                        set is_active=0, id_carrier=0 where id_carrier = ' . (int)$activeCarrier['id_carrier'];
 
                 $this->db->execute($query);
             }
@@ -227,6 +222,49 @@ class UpelaCarriers
 
 
         return $ret;
+    }
+
+    /**
+     * @param $serviceId
+     * @return array
+     */
+    public function getCarrierPriceByServices($carrierInfo, $addressToOverride = false)
+    {
+
+        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+        } else {
+            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+        }
+
+        if (array_key_exists($defaultCountry, UpelaHelper::$countryCities)) {
+            $addressFrom = array(
+                'country' => $defaultCountry,
+                'city'    => Configuration::get('UPELA_STORE_CITY'),
+                'cp'      => Configuration::get('UPELA_STORE_ZIPCODE')
+            );
+            $addressTo   = $addressToOverride ? $addressToOverride : array(
+                'country' => $defaultCountry,
+                'city'    => UpelaHelper::$countryCities[$defaultCountry]['city'],
+                'cp'      => UpelaHelper::$countryCities[$defaultCountry]['cp'],
+            );
+            $parcel      = array(
+                'weight' => Configuration::get('UPELA_SHIP_WEIGHT'),
+                'length' => Configuration::get('UPELA_SHIP_LENGTH'),
+                'width'  => Configuration::get('UPELA_SHIP_WIDTH'),
+                'height' => Configuration::get('UPELA_SHIP_HEIGHT'),
+            );
+
+            $prices = $this->api->getPrices(
+                $addressFrom,
+                $addressTo,
+                $parcel,
+                $carrierInfo[0]['up_code_carrier'],
+                $carrierInfo[0]['up_code_service']
+            );
+        }
+
+        return $prices;
     }
 
     /**
@@ -239,8 +277,8 @@ class UpelaCarriers
         $langs = Language::getLanguages(true);
 
         $old_carrier = $this->db->getRow(
-            'SELECT * FROM '._DB_PREFIX_.'carrier 
-            WHERE id_reference = "'.(int)$aDefinition['id_reference'].
+            'SELECT * FROM ' . _DB_PREFIX_ . 'carrier 
+            WHERE id_reference = "' . (int)$aDefinition['id_reference'] .
             '" AND id_reference <> 0 ORDER BY id_carrier DESC'
         );
 
@@ -250,16 +288,16 @@ class UpelaCarriers
         }
 
 
-        $carrier = new Carrier();
-        $carrier->name = $aDefinition['label'];
-        $carrier->active = true;
-        $carrier->deleted = 0;
-        $carrier->shipping_handling = true;
-        $carrier->range_behavior = 0;
-        $carrier->shipping_external = false;
-        $carrier->is_module = true;
+        $carrier                       = new Carrier();
+        $carrier->name                 = $aDefinition['label'];
+        $carrier->active               = true;
+        $carrier->deleted              = 0;
+        $carrier->shipping_handling    = true;
+        $carrier->range_behavior       = 0;
+        $carrier->shipping_external    = false;
+        $carrier->is_module            = true;
         $carrier->external_module_name = $this->module_name;
-        $carrier->need_range = true;
+        $carrier->need_range           = true;
 
         if (array_key_exists($aDefinition['label'], UpelaHelper::$tracking_urls)) {
             $carrier->url = UpelaHelper::$tracking_urls[$aDefinition['label']];
@@ -288,9 +326,9 @@ class UpelaCarriers
 
             $this->addCarrierToGroups($carrier);
             $this->addCarrierToZones($carrier);
-            $oRangeWeight = $this->addCarrierRangeWeight($carrier);
-            $oRangePrice = $this->addCarrierRangePrice($carrier);
-            $this->addDeliveryPrice($carrier, $oRangeWeight, $oRangePrice, $aDefinition);
+            //$oRangeWeight = $this->addCarrierRangeWeight($carrier);
+            //$oRangePrice = $this->addCarrierRangePrice($carrier);
+            $this->addDeliveryPrice($carrier, $aDefinition);
 
             $this->copyCarrierImage($carrier, $aDefinition['up_code_carrier']);
 
@@ -318,7 +356,7 @@ class UpelaCarriers
     /**
      * Copy of Carrier::setGroups, not disponible before 1.5.4
      * @param Carrier $oCarriers
-     * @param array $aGroups
+     * @param array   $aGroups
      * @param boolean $bDelete
      * @return boolean
      */
@@ -327,11 +365,11 @@ class UpelaCarriers
         if ($bDelete) {
             Db::getInstance()
               ->execute(
-                  'DELETE FROM '._DB_PREFIX_.'carrier_group WHERE id_carrier = '.(int)$oCarriers->id
+                  'DELETE FROM ' . _DB_PREFIX_ . 'carrier_group WHERE id_carrier = ' . (int)$oCarriers->id
               );
         }
 
-        if (!is_array($aGroups) || !count($aGroups)) {
+        if ( ! is_array($aGroups) || ! count($aGroups)) {
             return true;
         }
 
@@ -341,7 +379,8 @@ class UpelaCarriers
             $aValues[] = sprintf('(%d,%d)', (int)$oCarriers->id, (int)$nGroupId);
         }
 
-        $sQuery = 'INSERT INTO '._DB_PREFIX_.'carrier_group (id_carrier, id_group) VALUES '.implode(',', $aValues);
+        $sQuery = 'INSERT INTO ' . _DB_PREFIX_ . 'carrier_group (id_carrier, id_group) VALUES ' . implode(',',
+                $aValues);
 
         return Db::getInstance()
                  ->execute($sQuery);
@@ -358,62 +397,20 @@ class UpelaCarriers
         }
     }
 
-    /**
-     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
-     * @param Carrier $oCarrier
-     * @return RangeWeight
-     */
-    protected function addCarrierRangeWeight(Carrier $oCarrier)
-    {
-        $oRangeWeight = RangeWeight::getRanges($oCarrier->id);
-
-        if (count($oRangeWeight) === 0) {
-            $oRangeWeight = new RangeWeight();
-            $oRangeWeight->id_carrier = $oCarrier->id;
-            $oRangeWeight->delimiter1 = 0;
-            $oRangeWeight->delimiter2 = 10000;
-            $oRangeWeight->add();
-        }
-
-        return $oRangeWeight;
-    }
-
-    /**
-     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
-     * @param Carrier $oCarrier
-     * @return RangePrice
-     */
-    protected function addCarrierRangePrice(Carrier $oCarrier)
-    {
-        $oRangePrice = RangePrice::getRanges($oCarrier->id);
-
-        if (count($oRangePrice) === 0) {
-            $oRangePrice = new RangePrice();
-            $oRangePrice->id_carrier = $oCarrier->id;
-            $oRangePrice->delimiter1 = 0;
-            $oRangePrice->delimiter2 = 10000;
-            $oRangePrice->add();
-        }
-
-        return $oRangePrice;
-    }
-
-    protected function addDeliveryPrice(Carrier $oCarrier, $oRangeWeight, $oRangePrice, $defCarrier)
+    protected function addDeliveryPrice(Carrier $oCarrier, $defCarrier)
     {
 
-        $result = false;
+        $result    = false;
         $upCarrier = $defCarrier['up_code_carrier'];
         $upService = $defCarrier['up_code_service'];
 
         $price = $this->getPrice($upCarrier, $upService);
 
-        foreach ($oCarrier->getZones() as $aZone) {
-            $sql = 'UPDATE `'._DB_PREFIX_.'delivery` 
-                    set `price` = '.(float)$price.' 
-                    where `id_carrier` = '.(int)($oCarrier->id);
+        $sql = 'UPDATE `' . _DB_PREFIX_ . 'delivery` 
+                    set `price` = ' . (float)$price . ' 
+                    where `id_carrier` = ' . (int)($oCarrier->id);
 
-            $result = $this->db->execute($sql );
-        }
+        $result = $this->db->execute($sql);
 
         return $result;
 
@@ -446,14 +443,14 @@ class UpelaCarriers
      */
     protected function copyCarrierImage($oCarrier, $carrierCode)
     {
-        $sSource = _PS_MODULE_DIR_.$this->module_name.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'img'.
-            DIRECTORY_SEPARATOR.'carriers'.DIRECTORY_SEPARATOR.'logo-'.Tools::strtolower($carrierCode).'.jpg';
-        if (!file_exists($sSource)) {
-            $sSource = _PS_MODULE_DIR_.$this->module_name.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'img'.
-                DIRECTORY_SEPARATOR.'carriers'.DIRECTORY_SEPARATOR.'carrier-upela.jpg';
-            $sDestination = _PS_SHIP_IMG_DIR_.$oCarrier->id.'.jpg';
+        $sSource = _PS_MODULE_DIR_ . $this->module_name . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'img' .
+                   DIRECTORY_SEPARATOR . 'carriers' . DIRECTORY_SEPARATOR . 'logo-' . Tools::strtolower($carrierCode) . '.jpg';
+        if ( ! file_exists($sSource)) {
+            $sSource      = _PS_MODULE_DIR_ . $this->module_name . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'img' .
+                            DIRECTORY_SEPARATOR . 'carriers' . DIRECTORY_SEPARATOR . 'carrier-upela.jpg';
+            $sDestination = _PS_SHIP_IMG_DIR_ . $oCarrier->id . '.jpg';
         } else {
-            $sDestination = _PS_SHIP_IMG_DIR_.$oCarrier->id.'.jpg';
+            $sDestination = _PS_SHIP_IMG_DIR_ . $oCarrier->id . '.jpg';
         }
 
         return copy($sSource, $sDestination);
@@ -461,8 +458,8 @@ class UpelaCarriers
 
     public function updateCarrierUpela($id, $psid, $active = 1)
     {
-        $query = 'update `'._DB_PREFIX_.'upela_services` us     
-         set id_carrier = '.(int)$psid.', is_active='.(int)$active.' where id_service = '.(int)$id;
+        $query = 'update `' . _DB_PREFIX_ . 'upela_services` us     
+         set id_carrier = ' . (int)$psid . ', is_active=' . (int)$active . ' where id_service = ' . (int)$id;
 
         return $this->db->execute($query);
     }
@@ -477,9 +474,9 @@ class UpelaCarriers
     {
         $query = "
          SELECT id_reference, id_carrier
-         FROM `"._DB_PREFIX_."carrier`             
+         FROM `" . _DB_PREFIX_ . "carrier`             
          WHERE external_module_name = 'upela'
-         and deleted = 0";
+         AND deleted = 0";
 
         return $this->db->executes($query);
     }
@@ -493,7 +490,7 @@ class UpelaCarriers
     public function removeCarriers()
     {
         $query = "
-         delete FROM `"._DB_PREFIX_."carrier`             
+         DELETE FROM `" . _DB_PREFIX_ . "carrier`             
          WHERE external_module_name = 'upela'";
 
         return $this->db->execute($query);
@@ -507,9 +504,49 @@ class UpelaCarriers
      */
     public function getUpelaOrderByCartId($cartId)
     {
-        $query = 'SELECT * FROM '._DB_PREFIX_.'upela_orders uo WHERE uo.id_cart_ps = '.(int)$cartId;
+        $query = 'SELECT * FROM ' . _DB_PREFIX_ . 'upela_orders uo WHERE uo.id_cart_ps = ' . (int)$cartId;
 
         return $this->db->getRow($query);
+    }
+
+    /**
+     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
+     * @param Carrier $oCarrier
+     * @return RangeWeight
+     */
+    protected function addCarrierRangeWeight(Carrier $oCarrier)
+    {
+        $oRangeWeight = RangeWeight::getRanges($oCarrier->id);
+
+        if (count($oRangeWeight) === 0) {
+            $oRangeWeight             = new RangeWeight();
+            $oRangeWeight->id_carrier = $oCarrier->id;
+            $oRangeWeight->delimiter1 = 0;
+            $oRangeWeight->delimiter2 = 10000;
+            $oRangeWeight->add();
+        }
+
+        return $oRangeWeight;
+    }
+
+    /**
+     * Adds empty weight range to carrier (without it carrier is not visible, even if it doesn't use one)
+     * @param Carrier $oCarrier
+     * @return RangePrice
+     */
+    protected function addCarrierRangePrice(Carrier $oCarrier)
+    {
+        $oRangePrice = RangePrice::getRanges($oCarrier->id);
+
+        if (count($oRangePrice) === 0) {
+            $oRangePrice             = new RangePrice();
+            $oRangePrice->id_carrier = $oCarrier->id;
+            $oRangePrice->delimiter1 = 0;
+            $oRangePrice->delimiter2 = 10000;
+            $oRangePrice->add();
+        }
+
+        return $oRangePrice;
     }
 
     /**
@@ -525,49 +562,5 @@ class UpelaCarriers
         } // foreach
 
         return $aResult;
-    }
-
-    /**
-     * @param $serviceId
-     *
-     * @return array
-     */
-    public function getCarrierPriceByServices($carrierInfo ,$addressToOverride = false)
-    {
-
-        if (empty( Configuration::get( 'PS_SHOP_COUNTRY_ID' ) )) {
-            $defaultCountry = Country::getIsoById( Configuration::get( 'PS_COUNTRY_DEFAULT' ) );
-        } else {
-            $defaultCountry = Country::getIsoById( Configuration::get( 'PS_SHOP_COUNTRY_ID' ) );
-        }
-
-        if (array_key_exists( $defaultCountry, UpelaHelper::$countryCities )) {
-            $addressFrom = array(
-                'country' => $defaultCountry,
-                'city'    => Configuration::get( 'UPELA_STORE_CITY' ),
-                'cp'      => Configuration::get( 'UPELA_STORE_ZIPCODE' )
-            );
-            $addressTo   = $addressToOverride ? $addressToOverride : array(
-                'country' => $defaultCountry,
-                'city'    => UpelaHelper::$countryCities[$defaultCountry]['city'],
-                'cp'      => UpelaHelper::$countryCities[$defaultCountry]['cp'],
-            );
-            $parcel      = array(
-                'weight' => Configuration::get( 'UPELA_SHIP_WEIGHT' ),
-                'length' => Configuration::get( 'UPELA_SHIP_LENGTH' ),
-                'width'  => Configuration::get( 'UPELA_SHIP_WIDTH' ),
-                'height' => Configuration::get( 'UPELA_SHIP_HEIGHT' ),
-            );
-
-            $prices = $this->api->getPrices(
-                $addressFrom,
-                $addressTo,
-                $parcel,
-                $carrierInfo[0]['up_code_carrier'],
-                $carrierInfo[0]['up_code_service']
-            );
-        }
-
-        return $prices;
     }
 }

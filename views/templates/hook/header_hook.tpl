@@ -27,7 +27,3 @@
 
 
 <!--<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal-bs3patch.min.css" >-->
-
-<script>
-    var site_root_url = '{$smarty.server.HTTP_HOST}';
-</script>

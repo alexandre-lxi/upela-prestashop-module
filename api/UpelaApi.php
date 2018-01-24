@@ -1,9 +1,7 @@
 <?php
 /**
  * 2007-2016 PrestaShop
- *
  * NOTICE OF LICENSE
- *
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
@@ -11,7 +9,6 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to license@prestashop.com so we can send you a copy immediately.
- *
  * @author    UPELA
  * @copyright 2017-2018 MPG Upela
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
@@ -46,8 +43,7 @@ class UpelaApi
 
     /**
      * UpelaApi constructor.
-     *
-     * @param array|bool $user
+     * @param array|bool  $user
      * @param null|string $mode
      */
     public function __construct($user, $mode)
@@ -67,7 +63,7 @@ class UpelaApi
      */
     protected function setCredentials($user, $password)
     {
-        $this->user = $user;
+        $this->user   = $user;
         $this->passwd = $password;
     }
 
@@ -85,10 +81,10 @@ class UpelaApi
     public function setMode($mode)
     {
         if ($mode == self::API_MODE_PROD) {
-            $this->host = self::URL_API;
+            $this->host      = self::URL_API;
             $this->url_upela = self::URL_UPELA;
         } else {
-            $this->host = self::URL_API_TEST;
+            $this->host      = self::URL_API_TEST;
             $this->url_upela = self::URL_UPELA_TEST;
         }
 
@@ -140,8 +136,8 @@ class UpelaApi
      */
     public function getUrlconnection()
     {
-        $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
-        $url .= $this->getId().'&url='.$this->url_upela.'store/orders.php';
+        $url = $this->url_upela . 'admin/user/actions_spec.php?action=login_as&id=';
+        $url .= $this->getId() . '&url=' . $this->url_upela . 'store/orders.php';
 
         return $url;
     }
@@ -167,8 +163,8 @@ class UpelaApi
      */
     public function getUrlparameter()
     {
-        $url = $this->url_upela.'admin/user/actions_spec.php?action=login_as&id=';
-        $url .= $this->getId().'&url='.$this->url_upela.'mon-compte/prelevement-sepa';
+        $url = $this->url_upela . 'admin/user/actions_spec.php?action=login_as&id=';
+        $url .= $this->getId() . '&url=' . $this->url_upela . 'mon-compte/prelevement-sepa';
 
         return $url;
     }
@@ -184,13 +180,12 @@ class UpelaApi
     /**
      * @param $username
      * @param $password
-     *
      * @return mixed
      */
     public function getUserId($username, $password)
     {
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/login/';
+        $this->action   = self::API_POST;
+        $this->endpoint = 'api/' . self::API_VERSION . '/login/';
 
         $data = array(
             'account' => array(
@@ -214,21 +209,19 @@ class UpelaApi
 
     /**
      * Make call
-     *
-     * @param  mixed $body body content
-     * @param  mixed $http_header header content
+     * @param  mixed  $body body content
+     * @param  mixed  $http_header header content
      * @param  string $user User login
      * @param  string $passwd User password
-     *
      * @return mixed               Call
      */
     protected function makeCall($body = null, $http_header = null, $urlOrApi = false, $vardump = false)
     {
         // init uri to call
         if ($urlOrApi) {
-            $uri_to_call = $this->url_upela.$this->endpoint;
+            $uri_to_call = $this->url_upela . $this->endpoint;
         } else {
-            $uri_to_call = $this->host.$this->endpoint;
+            $uri_to_call = $this->host . $this->endpoint;
         }
 
         if ($vardump) {
@@ -268,9 +261,8 @@ class UpelaApi
 
     /**
      * @param string $url
-     * @param null $stream_context
-     * @param int $curl_timeout
-     *
+     * @param null   $stream_context
+     * @param int    $curl_timeout
      * @return bool|mixed
      */
     private function fileGetContents($url, $opts = null, $curl_timeout = '20L')
@@ -284,7 +276,10 @@ class UpelaApi
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 
             if ($opts != null) {
-                if (isset($opts['http']['method']) && Tools::strtolower($opts['http']['method']) == self::API_POST) {
+                if (isset($opts['http']['method']) && Tools::strtolower(
+                    $opts['http']['method']
+                ) == self::API_POST
+                ) {
                     curl_setopt($curl, CURLOPT_POST, true);
                     if (isset($opts['http']['content'])) {
                         curl_setopt($curl, CURLOPT_POSTFIELDS, $opts['http']['content']);
@@ -295,8 +290,8 @@ class UpelaApi
                             CURLOPT_HTTPHEADER,
                             array(
                                 "Content-type: application/json",
-                                "Content-Length: ".Tools::strlen($opts['http']['content']),
-                                "Authorization: ".$opts['http']['header']
+                                "Content-Length: " . Tools::strlen($opts['http']['content']),
+                                "Authorization: " . $opts['http']['header']
                             )
                         );
                     } else {
@@ -305,7 +300,7 @@ class UpelaApi
                             CURLOPT_HTTPHEADER,
                             array(
                                 "Content-type: application/json",
-                                "Content-Length: ".Tools::strlen($opts['http']['content'])
+                                "Content-Length: " . Tools::strlen($opts['http']['content'])
                                 /*,
                                                             "Authorization: ".Configuration::get('UPELA_API_KEY')*/
                             )
@@ -336,7 +331,6 @@ class UpelaApi
 
     /**
      * @param array $fields
-     *
      * @return bool|string
      */
     protected function getBody(array $fields)
@@ -362,8 +356,8 @@ class UpelaApi
      */
     public function getUserExists($username)
     {
-        $this->action = self::API_GET;
-        $this->endpoint = self::API_PTF_VERSION.'/users/'.$username;
+        $this->action   = self::API_GET;
+        $this->endpoint = self::API_PTF_VERSION . '/users/' . $username;
 
         $ret = $this->makeCall();
 
@@ -376,8 +370,8 @@ class UpelaApi
      */
     public function getStores($userId)
     {
-        $this->action = self::API_GET;
-        $this->endpoint = self::API_PTF_VERSION.'/store/'.$userId;
+        $this->action   = self::API_GET;
+        $this->endpoint = self::API_PTF_VERSION . '/store/' . $userId;
 
         $ret = $this->makeCall();
 
@@ -386,13 +380,12 @@ class UpelaApi
 
     /**
      * @values array user
-     *
      * @return bool
      */
     public function createAccount($values)
     {
-        $this->action = self::API_POST;
-        $this->endpoint = self::API_PTF_VERSION.'/user';
+        $this->action   = self::API_POST;
+        $this->endpoint = self::API_PTF_VERSION . '/user';
 
         $data = array(
             'login'     => $values['login'],
@@ -413,19 +406,19 @@ class UpelaApi
 
         if (isset($ret['id'])) {
             //Add company address
-            $this->action = self::API_POST;
-            $this->endpoint = 'api/'.self::API_VERSION.'/get_country_id/';
-            $data = array(
+            $this->action   = self::API_POST;
+            $this->endpoint = 'api/' . self::API_VERSION . '/get_country_id/';
+            $data           = array(
                 'iso' => $values['country']
             );
 
-            $countryId = $this->makeCall($this->getBody($data), null, true,false);
+            $countryId = $this->makeCall($this->getBody($data), null, true, false);
             $countryId = $countryId['id'];
 
 
             $this->action = self::API_POST;
 
-            $this->endpoint = self::API_PTF_VERSION.'/address/'.$ret['id'].'/new';
+            $this->endpoint = self::API_PTF_VERSION . '/address/' . $ret['id'] . '/new';
 
             $data = array(
                 'alias'        => 'Address',
@@ -467,16 +460,15 @@ class UpelaApi
 
     /**
      * @param $values array
-     *
      * @return mixed
      */
     public function createStore($values)
     {
         //add store address
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/get_country_id/';
+        $this->action   = self::API_POST;
+        $this->endpoint = 'api/' . self::API_VERSION . '/get_country_id/';
 
-        $data = array(
+        $data            = array(
             'iso' => $values['store_country']
         );
         $store_countryId = $this->makeCall($this->getBody($data), null, true);
@@ -484,7 +476,7 @@ class UpelaApi
 
         $this->action = self::API_POST;
 
-        $this->endpoint = self::API_PTF_VERSION.'/address/'.$values['user_id'].'/new';
+        $this->endpoint = self::API_PTF_VERSION . '/address/' . $values['user_id'] . '/new';
 
         $data = array(
             'alias'        => $values['store_name'],
@@ -524,8 +516,8 @@ class UpelaApi
                 'statusList' => $values['statusList']
             );
 
-            $this->action = self::API_POST;
-            $this->endpoint = self::API_PTF_VERSION.'/store/'.$values['user_id'].'/new';
+            $this->action   = self::API_POST;
+            $this->endpoint = self::API_PTF_VERSION . '/store/' . $values['user_id'] . '/new';
 
             $ret = $this->makeCall($this->getBody($data));
 
@@ -543,14 +535,14 @@ class UpelaApi
      * @param $parcel
      * @return mixed
      */
-    public function getPrices($addressFrom, $addressTo, $parcel, $carrier_code = false,$carrier_service = false)
+    public function getPrices($addressFrom, $addressTo, $parcel, $carrier_code = false, $carrier_service = false)
     {
 
         $date = date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date.' + 2 days'));
+        $date = date('Y-m-d', strtotime($date . ' + 2 days'));
 
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/rate/';
+        $this->action   = self::API_POST;
+        $this->endpoint = 'api/' . self::API_VERSION . '/rate/';
 
         $data = array(
             'account'       => $this->getCredentials(),
@@ -581,10 +573,9 @@ class UpelaApi
             'type'          => 'parcel'
         );
 
-        if($carrier_code && $carrier_service)
-        {
-            $data['carrier_code']       = $carrier_code;
-            $data['service_code']       = $carrier_service;
+        if ($carrier_code && $carrier_service) {
+            $data['carrier_code'] = $carrier_code;
+            $data['service_code'] = $carrier_service;
         }
         $prices = $this->makeCall($this->getBody($data), null, true, false);
 
@@ -617,8 +608,8 @@ class UpelaApi
             'vamount'   => 0
         );
 
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/get_payments/';
+        $this->action   = self::API_POST;
+        $this->endpoint = 'api/' . self::API_VERSION . '/get_payments/';
 
         $data = array(
             'account' => $this->getCredentials()
@@ -630,14 +621,14 @@ class UpelaApi
             $paymentInfos = $paymentInfos['paiments_info'];
 
             if ($paymentInfos['cb']['activated']) {
-                $ret['method'] = 'CB';
+                $ret['method']    = 'CB';
                 $ret['avalaible'] = (float)$paymentInfos['cb']['amount'] >= 0;
-                $ret['amount'] = (float)$paymentInfos['cb']['amount'];
+                $ret['amount']    = (float)$paymentInfos['cb']['amount'];
             }
             if ($paymentInfos['sepa']['activated']) {
-                $ret['method'] = 'SEPA';
+                $ret['method']    = 'SEPA';
                 $ret['avalaible'] = true;
-                $ret['amount'] = (float)$paymentInfos['sepa']['amount'];
+                $ret['amount']    = (float)$paymentInfos['sepa']['amount'];
             }
             if ($paymentInfos['voucher']['activated']) {
                 $ret['voucher'] = (float)$paymentInfos['voucher']['amount'] > 0;
@@ -669,10 +660,10 @@ class UpelaApi
     public function ship($shipFrom, $shipTo, $dropoffTo, $service, $parcel)
     {
         $date = date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date.' + 2 days'));
+        $date = date('Y-m-d', strtotime($date . ' + 2 days'));
 
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'directShipping/';
+        $this->action   = self::API_POST;
+        $this->endpoint = 'api/' . self::API_VERSION . 'directShipping/';
 
         $data = array(
             'account'       => $this->getCredentials(),
@@ -742,9 +733,9 @@ class UpelaApi
 
     public function shipDirect(array $info)
     {
-        $this->action = self::API_POST;
-        $this->endpoint = 'api/'.self::API_VERSION.'/directShipping/';
-        $data = $info;
+        $this->action    = self::API_POST;
+        $this->endpoint  = 'api/' . self::API_VERSION . '/directShipping/';
+        $data            = $info;
         $data['account'] = $this->getCredentials();
 
         $ship = $this->makeCall($this->getBody($data), null, true, false);

@@ -1,9 +1,7 @@
 <?php
 /**
  * 2007-2016 PrestaShop
- *
  * NOTICE OF LICENSE
- *
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
@@ -11,7 +9,6 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to license@prestashop.com so we can send you a copy immediately.
- *
  * @author    UPELA
  * @copyright 2017-2018 MPG Upela
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
@@ -114,11 +111,11 @@ class UpelaHelper
     // @codingStandardsIgnoreStart
     public function __construct()
     {
-        $ctp = func_num_args();
+        $ctp  = func_num_args();
         $args = func_get_args();
 
         if ($ctp == 1) {
-            $this->db = $args[0];
+            $this->db    = $args[0];
             $this->hasDb = true;
         } else {
             $this->hasDb = false;
@@ -140,11 +137,12 @@ class UpelaHelper
         if ($field == false) {
             return $serialized_field;
         } else {
-            if (!isset($field[$language])) {
+            if ( ! isset($field[$language])) {
                 // return any target language
                 foreach ($field as $lang => $value) {
                     if ((Tools::strtolower(Tools::substr($language, 0, 2)) ==
-                            Tools::strtolower(Tools::substr($lang, 0, 2))) && $value != '') {
+                         Tools::strtolower(Tools::substr($lang, 0, 2))) && $value != ''
+                    ) {
                         return $value;
                     }
                 }
@@ -163,7 +161,8 @@ class UpelaHelper
                 // return any target language if empty
                 foreach ($field as $lang => $value) {
                     if (Tools::strtolower(Tools::substr($language, 0, 2)) ==
-                        Tools::strtolower(Tools::substr($lang, 0, 2))) {
+                        Tools::strtolower(Tools::substr($lang, 0, 2))
+                    ) {
                         return $value;
                     }
                 }
@@ -201,8 +200,8 @@ class UpelaHelper
         if ($this->hasDb) {
             $query = "
          SELECT cz_zo
-         FROM `"._DB_PREFIX_."upela_country_zone`
-         WHERE cz_co = '".pSQL($coCode)."'";
+         FROM `" . _DB_PREFIX_ . "upela_country_zone`
+         WHERE cz_co = '" . pSQL($coCode) . "'";
 
             $res = $this->db->executes($query);
 
