@@ -190,7 +190,7 @@ $("input[value^='" + carrier_id_parent + ",']").change(
 
 $(document).ready(function () {
 
-    if (typeof url !== 'undefined' && unableCarrier.length > 0) {
+    if (typeof url !== 'undefined' && typeof unableCarrier !== 'undefined' && unableCarrier.length > 0) {
         for (i = 0; i < unableCarrier.length; i++) {
             removeCarrier(unableCarrier[i]);
         }
