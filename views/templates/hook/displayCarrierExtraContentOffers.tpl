@@ -16,5 +16,10 @@
 * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *}
 <script>
-    document.getElementById('delivery_option_'+{$hide}).parentNode.parentNode.parentNode.style.display = 'none'
+    if(typeof unableCarrier === "undefined" )
+        {
+            var unableCarrier = [];
+        }
+    unableCarrier.push({$hide});
+    unableCarrier.push({$hide2});
 </script>

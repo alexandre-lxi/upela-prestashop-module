@@ -166,14 +166,16 @@ class Upela extends Module
 
         return parent::install() &&
                Configuration::updateValue('UPELA_API_MODE', UpelaApi::API_MODE_PROD) &&
-               //$this->installTab('AdminUpela', Tab::getIdFromClassName('AdminParentShipping'), 'Upela') &&
                $this->registerHook('displayAdminOrder') &&
                $this->registerHook('displayCarrierExtraContent') &&
                $this->registerHook('header') &&
                $this->registerHook('displayOrderConfirmation') &&
+               $this->registerHook('displayCarrierList') &&
                $this->installDb() &&
                $this->dumpConfigurations();
     }
+
+
 
     /**
      * @return bool
@@ -320,17 +322,11 @@ class Upela extends Module
     {
         $smarty     = $this->context->smarty;
         $controller = $this->context->controller;
+        //dump(get_class($controller));
         $smarty->assign('upelaBaseDir', _MODULE_DIR_ . '/upela/');
 
+        $controller->addJquery();
         if (method_exists($controller, 'registerJavascript')) {
-            $controller->registerJavascript(
-                'upela-jquery',
-                'https://code.jquery.com/jquery-3.2.1.min.js',
-                array(
-                    'priority' => 100,
-                    'server'   => 'remote'
-                )
-            );
             $controller->registerJavascript(
                 'upela-googlemap',
                 'https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw',
@@ -372,8 +368,7 @@ class Upela extends Module
                 )
             );
         } else {
-            $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
-            $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw');
+           $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw');
             $controller->addJs(
                 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js'
             );
@@ -404,6 +399,7 @@ class Upela extends Module
         $upela_service = $results['id_up_service'];
         // ici on utilise le pointeur vers le carrier de reference
         $carrier_id = $params['carrier']['id_reference'];
+        $carrier_id_parent = $params['carrier']['id'];
 
         foreach ($this->context->cart->getAddressCollection() as $address) {
             $postcode = $address->postcode;
@@ -422,26 +418,30 @@ class Upela extends Module
                 Country::getIdByName(Language::getLanguages(true, $this->context->shop->id), $country)
             ),
             'upela_service' => $upela_service,
-            'carrier_id'    => $carrier_id
+            'carrier_id'    => $carrier_id,
+            'carrier_id_parent'    => $carrier_id_parent
         );
         $price     = $this->carriers->getCarrierPriceByServices(array('0' => $carrier), $addressTo);
         $exist     = false;
 
-        if (count($price['offers']) == 0) {
+        if (isset($price['offers']) && count($price['offers']) > 0) {
             foreach ($price['offers'] as $offer) {
-                $exist = $offer['service_code'] == $carrier['up_code_service'] ? true : false;
-            }
+                if(!$exist)
+                {
+                    $exist = $offer['service_code'] == $carrier['up_code_service']  ? true : false;
+                }
+                 }
         }
 
-        if ( ! $exist) {
+        if ( $exist == false) {
             $this->context->smarty->assign(
                 array(
                     'address' => $addressTo,
                     'hide'    => $params['carrier']['id_reference'],
+                    'hide2'    => $params['carrier']['id'],
                 )
             );
             $tpl = $this->display(__FILE__, 'displayCarrierExtraContentOffers.tpl');
-
         } else {
             if ($is_dropoff && ! is_null($postcode) && ! is_null($city) && ! $deleted) {
                 $this->context->smarty->assign(
@@ -452,7 +452,6 @@ class Upela extends Module
                 $tpl = $this->display(__FILE__, 'displayCarrierExtraContent.tpl');
             }
         }
-
 
         return $tpl;
     }
@@ -475,14 +474,6 @@ class Upela extends Module
 
             if (method_exists($controller, 'registerJavascript')) {
                 $controller->registerJavascript(
-                    'upela-jquery',
-                    'https://code.jquery.com/jquery-3.2.1.min.js',
-                    array(
-                        'priority' => 100,
-                        'server'   => 'remote'
-                    )
-                );
-                $controller->registerJavascript(
                     'upela',
                     'modules/upela/views/js/upela.js',
                     array(
@@ -499,7 +490,6 @@ class Upela extends Module
                     )
                 );
             } else {
-                $controller->addJs('https://code.jquery.com/jquery-3.2.1.min.js');
                 $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
             }
 
@@ -707,6 +697,10 @@ class Upela extends Module
             );
         }
 
+        if(Configuration::get('UPELA_API_MODE') != 'prod' && $this->isConnected == true)
+            {
+                $info[] = $this->l('The module is currently on test mode, log out from the module to activate the production mode and be able to send your orders!','upela');
+            }
         if (Tools::isSubmit('processAccountCreation')) {
             $this->postValidation();
             if ( ! count($this->postErrors)) {
@@ -777,7 +771,6 @@ class Upela extends Module
         if (Tools::isSubmit('updateLogin')) {
             $this->dumpConfigurations();
             $this->isConnected = false;
-            //return $this->displayLoginForm(true);
         }
 
         if (Tools::isSubmit('updateparameters')) {
@@ -2081,4 +2074,7 @@ class Upela extends Module
 
         return json_encode($ret);
     }
+
+
+
 }

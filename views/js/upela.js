@@ -17,8 +17,6 @@
  *
  */
 
-$.noConflict();
-
 var map;
 var markers = [];
 var infoWindow;
@@ -29,8 +27,11 @@ if (typeof carrier_id === 'undefined') {
     var carrier_id = false;
 }
 
-function hideOffer($idCarrier)
-{
+if (typeof carrier_id_parent === 'undefined') {
+    var carrier_id_parent = false;
+}
+
+function hideOffer($idCarrier) {
     $('#delivery_option_' + $idCarrier).hide();
 }
 
@@ -50,18 +51,17 @@ function createCookie(name, value, days) {
 
     var url = '/index.php?fc=module&module=upela&controller=ajax&option=setDropOff';
 
-    if ( typeof value !== 'undefined' && value !== '' )
-    {
+    if (typeof value !== 'undefined' && value !== '') {
         value2 = JSON.parse(value);
-        value2.hours_html='';
+        value2.hours_html = '';
         $.ajax({
-            url:url,
-            type:'POST',
+            url: url,
+            type: 'POST',
             data: value2,
-            success:function(s){
+            success: function (s) {
                 document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
             },
-            error:function(){
+            error: function () {
                 console.log('unable to set dropoff location');
             }
         })
@@ -157,7 +157,23 @@ function setDropOffPoints(dropOfflist) {
     $('#delivery-point-list').html(html.join(''));
 }
 
-$('#delivery_option_' + carrier_id).change(
+$("input[value^='" + carrier_id + ",']").change(
+    function (e) {
+        if ($(this).is(':checked')) {
+            e.stopPropagation();
+            $('#upela-delivery').parent('div').show();
+            initializeMap({id: 'map-upela-selected', lat: first.latitude, lng: first.longitude, zoom: 11});
+            var latlng = new google.maps.LatLng(
+                parseFloat(first.latitude),
+                parseFloat(first.longitude));
+            first.number = 1;
+            createMarker(latlng, first);
+            google.maps.event.trigger(map, 'resize');
+        }
+    });
+
+
+$("input[value^='" + carrier_id_parent + ",']").change(
     function (e) {
         if ($(this).is(':checked')) {
             e.stopPropagation();
@@ -173,6 +189,12 @@ $('#delivery_option_' + carrier_id).change(
     });
 
 $(document).ready(function () {
+
+    if (typeof url !== 'undefined' && unableCarrier.length > 0) {
+        for (i = 0; i < unableCarrier.length; i++) {
+            removeCarrier(unableCarrier[i]);
+        }
+    }
     if (typeof url === 'undefined') {
         return;
     }
@@ -274,10 +296,16 @@ function sendCommandeToUpela($data) {
             var result = JSON.parse(s);
             if (result.success === false) {
                 $('#upela-error').html($('#tr_error1').val());
+                console.log(result);
             } else {
+
+                if(typeof imprimerLeBordereau === 'undefined')
+                {
+                    imprimerLeBordereau = 'Imprimer le bordereau';
+                }
                 var WayBilllink = '<tr><td class="up-sended-td">';
                 WayBilllink += '<img  src="' + pdfImg + '" width="150px;">';
-                WayBilllink = WayBilllink + '<br><a href="' + result.waybill.url + '" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a></td></tr>';
+                WayBilllink = WayBilllink + '<br><a href="' + result.waybill.url + '" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">'+imprimerLeBordereau+'</a></td></tr>';
                 $('#table-body-upela').html(WayBilllink);
             }
         },
@@ -288,4 +316,21 @@ function sendCommandeToUpela($data) {
     });
 }
 
+function removeCarrier(carrier) {
+    if (typeof carrier == "undefined") {
+        console.log('unableto find carrier');
+        return;
+    }
+    var carrierDiv = "input[value^='" + carrier + ",']";
+    // for 1.6, 1.5
+    var carrierDivParent = $(".delivery_option").has(carrierDiv);
+    // for 1.7
+    if (carrierDivParent.length === 0) {
+        carrierDivParent = $(".delivery-option").has(carrierDiv);
+    }
+    if (carrierDivParent.length) {
+        carrierDivParent.attr('style', 'display:none');
+        carrierDivParent.find("input").attr("disabled", true);
+    }
+}
 

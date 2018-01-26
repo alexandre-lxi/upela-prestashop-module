@@ -30,10 +30,12 @@
 </style>
 <script type="text/javascript">
     var infoExpedition = {$jsonShipInfo};
+    var expeditionButton = "{l s='Expédier' mod='upela'}";
+    var imprimerLeBordereau = "{l s='IMPRIMER LE BORDEREAU' mod='upela'}";
     var pdfImg = decodeURIComponent("{$simple_link|escape:'url':'UTF-8'}views/img/bordereau.jpg");
 $(function () {
-        $('#expeditionTab').insertBefore('#myTab');
-        $('#UpelaExpedition').insertAfter('#expeditionTab');
+    $('#expeditionTab').insertBefore('#myTab');
+    $('#UpelaExpedition').insertAfter('#expeditionTab');
     });
 </script>
 
@@ -162,7 +164,8 @@ $(function () {
                         <td class="up-sended-td">
                             <img  src="{$simple_link|escape:'htmlall':'UTF-8'}views/img/bordereau.jpg" width="150px;">
                             <br>
-                            <a href="{$waybill_url|escape:'htmlall':'UTF-8'}" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">Imprimer le bordereau</a>
+                            <br>
+                            <a href="{$waybill_url|escape:'htmlall':'UTF-8'}" target="blank" class="btn btn-primary text-center part__button" style="background-color: #FF6600">{l s='IMPRIMER LE BORDEREAU' mod='upela'}</a>
                         </td></tr>
                 {/if}
                 </tbody>
