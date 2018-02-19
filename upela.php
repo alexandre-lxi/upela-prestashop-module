@@ -42,7 +42,7 @@ class Upela extends Module
     {
         $this->name          = 'upela';
         $this->tab           = 'shipping_logistics';
-        $this->version       = '2.0.0';
+        $this->version       = '2.0.1';
         $this->author        = 'Upela';
         $this->need_instance = 1;
         $this->bootstrap     = true;
@@ -61,7 +61,7 @@ class Upela extends Module
         );
 
         $this->ps_versions_compliancy = array(
-            'min' => '1.5',
+            'min' => '1.6',
             'max' => _PS_VERSION_
         );
 
@@ -322,63 +322,69 @@ class Upela extends Module
     {
         $smarty     = $this->context->smarty;
         $controller = $this->context->controller;
-        //dump(get_class($controller));
         $smarty->assign('upelaBaseDir', _MODULE_DIR_ . '/upela/');
-
         $controller->addJquery();
-        if (method_exists($controller, 'registerJavascript')) {
-            $controller->registerJavascript(
-                'upela-googlemap',
-                'https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw',
-                array(
-                    'priority' => 100,
-                    'server'   => 'remote'
-                )
-            );
-            $controller->registerJavascript(
-                'upela-googlemap',
-                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js',
-                array(
-                    'priority' => 100,
-                    'server'   => 'remote'
-                )
-            );
-            $controller->registerJavascript(
-                'upela-googlemap',
-                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js',
-                array(
-                    'priority' => 100,
-                    'server'   => 'remote'
-                )
-            );
-            $controller->registerJavascript(
-                'upela',
-                'modules/upela/views/js/upela.js',
-                array(
-                    'priority' => 100,
-                    'server'   => 'local'
-                )
-            );
-            $controller->registerStylesheet(
-                'upela',
-                'modules/upela/views/css/upela.css',
-                array(
-                    'priority' => 100,
-                    'server'   => 'local'
-                )
-            );
-        } else {
-           $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyBplTpOQbyilWbKmwfImXa2B2VeCTQMosw');
-            $controller->addJs(
-                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js'
-            );
-            $controller->addJs(
-                'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js'
-            );
-            $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
+
+        if (!($file = basename(Tools::getValue('controller')))) {
+            $file = str_replace('.php', '', basename($_SERVER['SCRIPT_NAME']));
+        }
+        if (in_array($file, array('order-opc', 'order', 'orderopc', 'amzpayments'))) {
+            if (method_exists($controller, 'registerJavascript')) {
+                $controller->registerJavascript(
+                    'upela-googlemap',
+                    'https://maps.google.com/maps/api/js?key=AIzaSyA27MzRJkTl8oaGSJhflxF4VyqypWwxMfA',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'remote'
+                    )
+                );
+                $controller->registerJavascript(
+                    'upela-modal',
+                    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'remote'
+                    )
+                );
+                $controller->registerJavascript(
+                    'upela-modal-manager',
+                    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'remote'
+                    )
+                );
+                $controller->registerJavascript(
+                    'upela-script',
+                    'modules/upela/views/js/upela.js',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'local'
+                    )
+                );
+                $controller->registerStylesheet(
+                    'upela-css',
+                    'modules/upela/views/css/upela.css',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'local'
+                    )
+                );
+            } else {
+                $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyA27MzRJkTl8oaGSJhflxF4VyqypWwxMfA');
+                $controller->addJs(
+                    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js'
+                );
+                $controller->addJs(
+                    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js'
+                );
+                $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
+            }
+
+            return $this->display(__FILE__, '/views/templates/hook/header_hook.tpl');
         }
 
-        return $this->display(__FILE__, '/views/templates/hook/header_hook.tpl');
+        return '';
     }
 
     /**
@@ -481,6 +487,14 @@ class Upela extends Module
                         'server'   => 'local'
                     )
                 );
+                $controller->registerJavascript(
+                    'upela-googlemap',
+                    'https://maps.google.com/maps/api/js?key=AIzaSyA27MzRJkTl8oaGSJhflxF4VyqypWwxMfA',
+                    array(
+                        'priority' => 100,
+                        'server'   => 'remote'
+                    )
+                );
                 $controller->registerStylesheet(
                     'upela',
                     'modules/upela/views/css/upela.css',
@@ -490,6 +504,7 @@ class Upela extends Module
                     )
                 );
             } else {
+                $controller->addJs('https://maps.google.com/maps/api/js?key=AIzaSyA27MzRJkTl8oaGSJhflxF4VyqypWwxMfA');
                 $controller->addJs(_MODULE_DIR_ . '/upela/views/js/upela.js');
             }
 
@@ -783,7 +798,9 @@ class Upela extends Module
             $param_select = true;
         }
 
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+        $psShopCountryId = Configuration::get('PS_SHOP_COUNTRY_ID');
+
+        if (empty($psShopCountryId)) {
             $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
         } else {
             $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -1151,8 +1168,10 @@ class Upela extends Module
 
     public function getStoreFormValues()
     {
+        $psShopCountryId = Configuration::get('PS_SHOP_COUNTRY_ID');
+
         if ( ! Tools::isSubmit('processStoreCreation')) {
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            if (empty($psShopCountryId)) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -1228,8 +1247,10 @@ class Upela extends Module
 
     public function getAccountFormValues()
     {
+        $psShopCountryId = Configuration::get('PS_SHOP_COUNTRY_ID');
+
         if ( ! Tools::isSubmit('processAccountCreation')) {
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            if (empty($psShopCountryId)) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
@@ -1370,7 +1391,7 @@ class Upela extends Module
                 'login'     => $values['email'],
                 'pseudo'    => $values['firstname'] . ' ' . $values['lastname'],
                 'email'     => $values['email'],
-                'module'    => 'prestashop',
+                'module'    => 'PRESTASHOP DOWNLOAD',
                 'password'  => $values['password'],
                 'lastname'  => $values['firstname'] . ' ' . $values['lastname'],
                 'firstname' => $values['firstname'],
@@ -2019,7 +2040,9 @@ class Upela extends Module
                 'upela_store_business'  => Configuration::get('UPELA_STORE_BUSINESS'),
             );
         } else {
-            if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+            $psShopCountryId = Configuration::get('PS_SHOP_COUNTRY_ID');
+
+            if (empty($psShopCountryId)) {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             } else {
                 $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));

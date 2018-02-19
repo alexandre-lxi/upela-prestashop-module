@@ -295,10 +295,14 @@ function sendCommandeToUpela($data) {
         success: function (s) {
             var result = JSON.parse(s);
             if (result.success === false) {
-                $('#upela-error').html($('#tr_error1').val());
+               // $('#upela-error').html($('#tr_error1').val());
+                var bufferErrors = '';
+                for (var key in result.errors) {
+                    bufferErrors += result.errors[key];
+                }
+                $('#upela-error').html(bufferErrors);
                 console.log(result);
             } else {
-
                 if(typeof imprimerLeBordereau === 'undefined')
                 {
                     imprimerLeBordereau = 'Imprimer le bordereau';

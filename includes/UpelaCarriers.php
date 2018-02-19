@@ -230,11 +230,13 @@ class UpelaCarriers
      */
     public function getCarrierPriceByServices($carrierInfo, $addressToOverride = false)
     {
+        $psShopCountryId = Configuration::get('PS_SHOP_COUNTRY_ID');
 
-        if (empty(Configuration::get('PS_SHOP_COUNTRY_ID'))) {
+        if (empty($psShopCountryId)) {
             $defaultCountry = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
         } else {
-            $defaultCountry = Country::getIsoById(Configuration::get('PS_SHOP_COUNTRY_ID'));
+
+            $defaultCountry = Country::getIsoById($psShopCountryId);
         }
 
         if (array_key_exists($defaultCountry, UpelaHelper::$countryCities)) {

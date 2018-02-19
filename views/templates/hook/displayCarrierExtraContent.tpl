@@ -16,6 +16,7 @@
 * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *}
 
+<!-- KLH UPELA -->
 <div>
     <input type="hidden" name="tr_nodp" id="tr_nodp" value="{l s='Can not find a relay point!' mod='upela'}">
 </div>
@@ -74,4 +75,6 @@
 
 </script>
 
+
+<!-- KLH UPELA -->
 

@@ -15,7 +15,9 @@
 * @copyright 2017-2018 MPG Upela
 * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *}
+<!-- KLH UPELA NO OFFER -->
 <script>
+    var test = 1;
     if(typeof unableCarrier === "undefined" )
         {
             var unableCarrier = [];
@@ -23,3 +25,4 @@
     unableCarrier.push({$hide});
     unableCarrier.push({$hide2});
 </script>
+<!-- KLH UPELA -->

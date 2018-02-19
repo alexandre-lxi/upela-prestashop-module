@@ -77,7 +77,7 @@ $(function () {
                                 <div class="col-sm-4">
                                     <input name="upela_count" type="text" class="form-control" id="upela_count"
                                            placeholder="1"
-                                           value="{$upela_weight|escape:'htmlall':'UTF-8'}">
+                                           value="1">
                                 </div>
                             </div>
                         </td>
